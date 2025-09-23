@@ -1,0 +1,232 @@
+body.woocommerce-checkout section.elementor-section .woocommerce {
+    margin-top: 70px
+}
+
+body.woocommerce-checkout section.elementor-section .woocommerce form .woocommerce-billing-fields .form-row.ast-hidden {
+    padding: 0;
+    margin: 0
+}
+
+body .skn-booking #skn-disponibilita-page {
+    width: 100% !important;
+    left: 0 !important;
+    padding: 0 !important
+}
+
+body .skn-booking #skn-disponibilita-page .elementor-column-gap-wide>.elementor-column>.elementor-element-populated {
+    padding: 0 !important
+}
+
+body .skn-booking #skn-disponibilita-page .elementor-column-gap-wide>.elementor-column>.elementor-element-populated .elementor-heading-title {
+    margin-top: 0 !important
+}
+
+body .skn-booking #skn-disponibilita-page .elementor-form .elementor-field-group-qty,
+body .skn-booking #skn-disponibilita-page .elementor-form .elementor-field-type-select .select-caret-down-wrapper {
+    display: none !important
+}
+
+body .skn-booking #skn-disponibilita-page #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid thead .fc-scroller {
+    overflow: hidden !important
+}
+
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-type-submit,
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-message {
+    display: none
+}
+
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group .elementor-field {
+    border: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+    outline: 0
+}
+
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group .elementor-select-wrapper .elementor-field-textual {
+    border: 0;
+    background: 0 0
+}
+
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group #form-field-qty,
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group #form-field-sede {
+    max-height: 40px
+}
+
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group.elementor-error .elementor-field,
+body #skn-disponibilita-page section .elementor-form:not(#skianet_form_disponibilita) .elementor-field-group.elementor-error .elementor-select-wrapper {
+    border-color: var(--e-a-btn-bg-danger)
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container {
+    position: relative
+}
+
+@media (max-width:767px) {
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-header-toolbar {
+        display: grid;
+        grid-template: 1fr 1fr/1fr;
+        grid-gap: 10px;
+        place-items: center stretch
+    }
+
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        grid-row: 1;
+        grid-column: 2
+    }
+
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        grid-row: 1;
+        grid-column: 1
+    }
+
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        grid-row: 2;
+        grid-column: span 2
+    }
+
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-header-toolbar .fc-toolbar-chunk:nth-child(3) .fc-button-group {
+        width: 100%
+    }
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main {
+    line-height: 1.2;
+    padding: 5px 5px 2px
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .calendar-loader {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background-color: rgba(255, 255, 255, .5);
+    cursor: wait
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .calendar-loader i.fa-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog {
+    overflow: visible
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .ui-dialog-titlebar {
+    height: auto
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog {
+    padding: 15px
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container {
+    gap: 20px
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-text-editor h4:not(:last-child) {
+    margin-bottom: 5px
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-text-editor h4 a:active,
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-text-editor h4 a:focus,
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-text-editor h4 a:hover {
+    color: var(--e-global-color-primary);
+    text-decoration: underline
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-loop-carousel#skianet-disponibilita-loop-products .swiper-container .product.product-type-simple .elementor-widget-wc-add-to-cart form.cart p.price {
+    color: var(--e-global-color-secondary);
+    font-family: 'Amiri', sans-serif;
+    font-size: 1.7rem
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-loop-carousel#skianet-disponibilita-loop-products .swiper-container .product .elementor-widget-woocommerce-product-title {
+    display: block
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-loop-carousel#skianet-disponibilita-loop-products .swiper-container .product form.variations_form.cart .single_variation_wrap .woocommerce-message {
+    display: flex;
+    flex-direction: column
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-loop-carousel#skianet-disponibilita-loop-products .swiper-container .product form.variations_form.cart .single_variation_wrap .woocommerce-message a.button {
+    border: 2px solid var(--e-global-color-primary);
+    color: var(--e-global-color-31904c4d);
+    background-color: var(--e-global-color-primary)
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-loop-carousel#skianet-disponibilita-loop-products .swiper-container .product form.variations_form.cart .single_variation_wrap .woocommerce-message a.button:hover {
+    color: var(--e-global-color-primary);
+    background-color: var(--e-global-color-31904c4d);
+    border-color: var(--e-global-color-primary)
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section#skianet-form-ticket .elementor-container .elementor-column .elementor-element.elementor-widget-wc-add-to-cart form.cart button.single_add_to_cart_button {
+    margin: 0
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select-caret-down-wrapper,
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select2-container .selection .select2-selection.select2-selection--single .select2-selection__arrow b {
+    display: none
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select2-container .selection .select2-selection.select2-selection--single {
+    background-image: linear-gradient(45deg, transparent 50%, #69727d 50%), linear-gradient(135deg, #69727d 50%, transparent 50%), linear-gradient(to right, #69727d, #69727d);
+    background-position: calc(100% - 20px) 1em, calc(100% - 15px) 1em, calc(100% - 2.5em) 0;
+    background-size: 5px 5px, 5px 5px, 1px 100%;
+    background-repeat: no-repeat;
+    border: 1px solid #69727d;
+    border-radius: 2px;
+    height: 33px;
+    padding: 0
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select2-container .selection .select2-selection.select2-selection--single .select2-selection__rendered {
+    height: 33px;
+    line-height: 1;
+    font-size: 13px;
+    padding: .7em .8em
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select2-container.select2-container--focus .selection .select2-selection.select2-selection--single,
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog section form#skianet_form_disponibilita .elementor-field-group-city .elementor-field .select2-container.select2-container--open .selection .select2-selection.select2-selection--single {
+    background-image: linear-gradient(45deg, #ddd 50%, transparent 50%), linear-gradient(135deg, transparent 50%, #ddd 50%), linear-gradient(to right, #ccc, #ccc);
+    background-position: calc(100% - 15px) 1em, calc(100% - 20px) 1em, calc(100% - 2.5em) 0;
+    border: 2px solid #ddd
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container .ui-dialog .dialog .select2-container.select2-container--open .select2-dropdown {
+    font-size: 13px
+}
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame {
+    flex-wrap: wrap;
+}
+
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame .fc-event-time {
+    width: 100%;
+}
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame .fc-event-time {
+    width: 100%;
+    margin-right: 0;
+    font-size: 1rem;
+}
+body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame .fc-event-title-container {
+    font-size: 1rem;
+}
+@media (max-width:767px) {
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame .fc-event-time {
+        font-size: 0.8rem;
+    }
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-view-harness .fc-scrollgrid tr td.fc-day .fc-event .fc-event-main .fc-event-main-frame .fc-event-title-container {
+        font-size: 0.8rem;
+    }
+    body #skn-disponibilita-page section #skn-disponibilita-calendar-container #skn-disponibilita-calendar .fc-timeGridWeek-view .fc-timegrid-slot {
+        height: 40px !important; /* Puoi regolare questo valore in base alle tue esigenze */
+    }      
+}
+/*# sourceMappingURL=skianet-style.min.css.map */

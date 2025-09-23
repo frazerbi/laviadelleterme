@@ -1,0 +1,209 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Skianet Custom Termegest\n"
+"POT-Creation-Date: 2024-12-05 02:51+0100\n"
+"PO-Revision-Date: 2023-06-19 14:56+0200\n"
+"Last-Translator: \n"
+"Language-Team: Skianet\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
+"_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;_ex:1,2c;"
+"esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;"
+"esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: components/skianet-custom-definitions.php:13
+msgid "Inizio"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:14
+msgid "Fine"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:15
+#: components/skianet-custom-definitions.php:21
+msgid "Sede"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:16
+#: components/skianet-custom-definitions.php:23
+msgid "Quantità"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:20
+msgid "ID"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:22
+msgid "Evento"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:34
+#: components/skianet-termegest-custom-fields.php:263
+msgid "Numero uomini"
+msgstr ""
+
+#: components/skianet-custom-definitions.php:35
+#: components/skianet-termegest-custom-fields.php:268
+msgid "Numero donne"
+msgstr ""
+
+#: components/skianet-custom-my-account.php:33
+msgid "Prenotazioni"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:20
+msgid "Skianet Custom - Prenota Termegest"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:71
+#, php-format
+msgid "Errore durante la prenotazione: campo %s non presente"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:91
+msgid "Errore durante la prenotazione: evento non valido"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:105
+#: components/skianet-termegest-custom-fields.php:344
+msgid "carrello"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:106
+#: components/skianet-termegest-custom-fields.php:345
+msgid "disponibilità"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:110
+#: components/skianet-termegest-custom-fields.php:363
+#, php-format
+msgid ""
+"Disponibilità non sufficiente per la sede <strong>%s</strong> per la "
+"data <strong>%s</strong>.<br>Si prega di tornare al %s, togliere il "
+"prodotto dal carrello e selezionare un altro orario alla pagina %s"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:128
+msgid "Errore durante la prenotazione: categoria non presente"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:152
+#: components/skianet-disponibilita-book-dialog-action.php:162
+#: components/skianet-disponibilita-book-dialog-action.php:178
+msgid "Errore durante la prenotazione"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:185
+msgid "Prenotazione effettuata con successo"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:198
+msgid "Ticket non trovato"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:205
+msgid "Prodotto non trovato"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:212
+msgid "Errore durante l'attivazione del ticket"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog-action.php:226
+msgid "Errore durante l'aggiornamento del ticket"
+msgstr ""
+
+#: components/skianet-disponibilita-book-dialog.php:27
+#, php-format
+msgid "Prenota a %s per il giorno %s alle ore %s"
+msgstr ""
+
+#: components/skianet-shortcode-booking.php:16
+msgid "Scegli provincia"
+msgstr ""
+
+#: components/skianet-shortcode-disponibilita.php:134
+#, php-format
+msgid "Posti: %d<br>A partire da %s"
+msgstr ""
+
+#: components/skianet-shortcode-location-select.php:21
+msgid "Scegli sede"
+msgstr ""
+
+#: components/skianet-termegest-custom-fields.php:46
+#, php-format
+msgid "Campo %s mancante"
+msgstr ""
+
+#: components/skianet-termegest-custom-fields.php:296
+msgid "Inserisci un numero valido di uomini"
+msgstr ""
+
+#: components/skianet-termegest-custom-fields.php:307
+msgid "Inserisci un numero valido di donne"
+msgstr ""
+
+#: components/skianet-termegest-custom-fields.php:315
+msgid ""
+"Il numero di uomini e donne non corrisponde al numero di prodotti nel "
+"carrello"
+msgstr ""
+
+#: components/skianet-termegest-custom-fields.php:351
+msgid "Errore durante la verifica della disponibilità"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:51
+#, php-format
+msgid "Ordine %s non proveniente da calendario"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:63
+#, php-format
+msgid "Errore checkout %s: campo %s non presente"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:85
+#, php-format
+msgid "Errore checkout %s: codici non presenti"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:95
+#, php-format
+msgid "Errore checkout %s: codice non presente"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:104
+#, php-format
+msgid "Errore checkout %s: categoria non presente"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:128
+#, php-format
+msgid "Errore prenotazione checkout %s"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:136
+#, php-format
+msgid "Errore risposta prenotazione %s"
+msgstr ""
+
+#: components/skianet-termegest-prenotazione.php:147
+#, php-format
+msgid "Ticket venduto %s: %s"
+msgstr ""
+
+#: plugin-custom-skianet.php:152
+msgid "Errore durante l'aggiunta al carrello"
+msgstr ""

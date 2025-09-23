@@ -1,0 +1,53 @@
+{
+    "name": "termegest/plugin-custom-skianet",
+    "type": "library",
+    "description": "termegest/plugin-custom-skianet",
+    "require": {
+        "php": "8.2.24",
+        "ext-soap": "*",
+        "laminas/laminas-code": "*",
+        "guzzlehttp/guzzle": "*",
+        "phpro/soap-client": "*"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "*",
+        "laravel/pint": "*",
+        "rector/rector": "*",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "TermeGest\\Type\\": "config/",
+            "TermeGestGetReserv\\": "src/TermeGestGetReserv",
+            "TermeGestGetReserv\\Type\\": "src/TermeGestGetReserv/Type",
+            "TermeGestSetInfo\\": "src/TermeGestSetInfo",
+            "TermeGestSetInfo\\Type\\": "src/TermeGestSetInfo/Type"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Utils\\Rector\\": "utils/rector/src",
+            "Utils\\Rector\\Tests\\": "utils/rector/tests"
+        }
+    },
+    "scripts": {
+        "post-update-cmd": [
+            "./vendor/bin/pint",
+            "./vendor/bin/rector process --clear-cache --no-diffs"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.24"
+        },
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "composer/package-versions-deprecated": true
+        }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}

@@ -1,0 +1,94 @@
+
+/* Customize Mobile Menu Container */
+.menu-mobile-container li.e-n-menu-item {
+    width: 100%;
+    border-bottom: 1px solid var(--e-global-color-secondary);
+    position: relative;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row
+}
+.menu-mobile-container li.e-n-menu-item .e-n-menu-content {
+    width: 100%!important;
+    top: 100%!important;
+    left: 0!important;
+    height: auto!important;
+    position: static!important
+}
+.menu-mobile-container li.e-n-menu-item .e-n-menu-content.e-active {
+    height: 100%!important;
+    position: static!important
+}
+.menu-mobile-container ul.e-n-menu-heading {
+    flex-wrap: wrap;
+}
+.menu-mobile-container .e-n-menu-wrapper li.e-n-menu-item .e-n-menu-content.e-active {
+    height: 100% !important;
+    position: static !important;
+}
+
+
+/* Canvas Menu styles */
+.e-off-canvas .icon-menu-mobile-toggle svg path {
+    stroke: white !important;
+}
+.e-off-canvas .icon-menu-mobile-toggle-sticky svg path {
+    stroke: white !important;
+}
+.e-off-canvas .header_main_sub_container {
+    border-bottom: none !important;
+}
+.elementor-widget-off-canvas .e-off-canvas {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.menu-mobile-list-container li {
+    border-bottom: 1px solid white;
+}
+.hamburger .line {
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+.hamburger .top {
+transform-origin: 4px 50%;
+}
+.hamburger .bottom {
+transform-origin: 4px 50%;
+}
+
+/* Menu open styles */
+.icon-menu-mobile-toggle.open .line.top {
+    transform: rotate(45deg) translate(-1px, 1px);
+}
+.icon-menu-mobile-toggle.open .line.middle {
+    opacity: 0;
+}
+.icon-menu-mobile-toggle.open .line.bottom {
+    transform: rotate(-45deg) translate(0px, -1px);
+}
+.icon-menu-mobile-toggle-sticky.open .line.top {
+    transform: rotate(45deg) translate(-1px, 1px);
+}
+.icon-menu-mobile-toggle-sticky.open .line.middle {
+    opacity: 0;
+}
+.icon-menu-mobile-toggle-sticky.open .line.bottom {
+    transform: rotate(-45deg) translate(0px, -1px);
+}
+
+
+/* Hide the second header when the user is at the top of the page */
+#header_main_sub_container {
+    transition: transform 0.3s ease-in-out;
+    transform: translateY(-120%);
+}
+#header_main_sub_container.hidden {    
+    visibility: hidden;
+    pointer-events: none; 
+    display: flex !important;
+}
+/* When the user scrolls beyond 150px, show the header */
+#header_main_sub_container.show {
+    transform: translateY(0) !important;
+    visibility: visible;
+}

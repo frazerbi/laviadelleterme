@@ -1,0 +1,26 @@
+# ignore everything in WP...
+wordpress/*
+.vite
+package-lock.json
+.env
+
+# ignore all /dist
+*/dist/
+
+# ignore node dependency directories
+*/node_modules/
+
+# ignore log files and databases
+*.log
+*.sql
+*.sqlite
+
+# ignore some editor settings
+.vscode/*
+ftp-kr.json
+
+# ignore 💩 files
+.DS_store
+.htaccess
+license.txt
+readme.html
