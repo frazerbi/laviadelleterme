@@ -188,7 +188,7 @@ function skianet_termegest_send_order_to_termegest($orderId): void
             }
             
             $currentGender = $sexArray[$currentSexIndex];
-            $currentSexIndex++; // ✅ INCREMENTA per il prossimo codices
+            $currentSexIndex++; // ✅ INCREMENTA per il prossimo codice
             
             error_log("SKIANET: Codice {$processedCodes}/{$totalCodes}: {$currentCode} - Gender: " . ($currentGender ? 'M' : 'F'));
 
