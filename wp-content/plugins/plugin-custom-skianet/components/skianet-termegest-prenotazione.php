@@ -181,14 +181,14 @@ function skianet_termegest_send_order_to_termegest($orderId): void
 
             if ($currentSexIndex >= count($sexArray)) {
                 $msg = sprintf(__('ERROR: Insufficienti dati gender (codice %d di %d, ma solo %d gender disponibili)', PLUGIN_SKIANET_TEXT_DOMAIN), 
-                    $processedCodes, $totalCodes, count($sexArray));
+                $processedCodes, $totalCodes, count($sexArray));
                 $termeGestLogger->send($msg);
                 $wcOrder->update_status('failed', $msg);
                 throw new Exception($msg);
             }
             
             $currentGender = $sexArray[$currentSexIndex];
-            $currentSexIndex++; // ✅ INCREMENTA per il prossimo codice
+            $currentSexIndex++; // ✅ INCREMENTA per il prossimo codices
             
             error_log("SKIANET: Codice {$processedCodes}/{$totalCodes}: {$currentCode} - Gender: " . ($currentGender ? 'M' : 'F'));
 
