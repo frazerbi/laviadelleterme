@@ -21,3 +21,4 @@ jobs:
         remote-user: u2-hnksdm9lq7dq
         private-ssh-key: ${{ secrets.SSH_KEY }}
         destination-path: /home/u2-hnksdm9lq7dqt/staging2.laviadelleterme.it/public_html/
+        ssh-port: 18765
