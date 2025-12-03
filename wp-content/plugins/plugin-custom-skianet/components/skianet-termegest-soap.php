@@ -50,7 +50,7 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         $response = $client->getDisponibilitaByDay(
             new GetDisponibilitaByDay($year, $month, $day, $encrypted_location)
         );
-
+        
         // Prima salva in una variabile
         $raw_response = $response->getGetDisponibilitaByDayResult()?->getAny();
         error_log("Raw response getDisponibilitaByDayResult: " . print_r($raw_response, true));
@@ -61,7 +61,7 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
 
         // E ritorna
         return $result;
-        
+
     } catch (Throwable $throwable) {
         $termeGestLogger->send('Error getDisponibilitaByDay: ' . $throwable->getMessage());
         $termeGestLogger->flushLog();
