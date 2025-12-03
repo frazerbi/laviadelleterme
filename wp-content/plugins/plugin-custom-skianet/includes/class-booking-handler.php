@@ -97,6 +97,10 @@ class Booking_Handler {
         add_action('wp_ajax_submit_booking_ajax', array($this, 'handle_ajax_submission'));
         add_action('wp_ajax_nopriv_submit_booking_ajax', array($this, 'handle_ajax_submission'));
         
+        // Hook AJAX per chiamata API esterna
+        add_action('wp_ajax_check_availability_api', array($this, 'check_availability_api'));
+        add_action('wp_ajax_nopriv_check_availability_api', array($this, 'check_availability_api'));
+
         // Enqueue scripts e styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
     }
@@ -254,6 +258,10 @@ class Booking_Handler {
      * Effettua chiamata API per verificare disponibilità
      */
     public function check_availability_api() {
+        error_log('=== check_availability_api chiamato ===');
+        error_log('POST data: ' . print_r($_POST, true));
+    
+
         // Verifica nonce
         if (!isset($_POST['nonce']) || 
             !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
@@ -265,6 +273,8 @@ class Booking_Handler {
         // Sanitizza i dati
         $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
         $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
+
+        error_log("Location: {$location}, Date: {$booking_date}");
 
         // Valida i dati base
         if (empty($location) || empty($booking_date)) {
