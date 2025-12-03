@@ -13,10 +13,16 @@ class Booking_Handler {
     /**
      * Location disponibili
      */
-    private static $locations = array(
+    private static $locations_to_be_encrypted = array(
+        'terme-saint-vincent' => 'Terme Saint Vincent',
+        'terme-genova' => 'Terme di Genova',
+        'monterosa-spa' => 'Monterosa'
+    );
+
+    private static $locations_labels = array(
         'terme-saint-vincent' => 'Terme di Saint-Vincent',
         'terme-genova' => 'Terme di Genova',
-        'monterosa-spa' => 'Monterosa Spa'
+        'monterosa-spa' => 'Monterosa SPA'
     );
 
     /**
@@ -59,10 +65,17 @@ class Booking_Handler {
     }
 
     /**
-     * Ottieni le location disponibili
+     * Ottieni le location per il form (slug => label)
      */
     public static function get_available_locations() {
-        return self::$locations;
+        return self::$locations_labels;
+    }
+
+    /**
+     * Ottieni il valore da criptare per TermeGest
+     */
+    private function get_location_value_for_encryption($location_slug) {
+        return self::$locations_to_be_encrypted[$location_slug] ?? '';
     }
 
     /**
@@ -119,7 +132,7 @@ class Booking_Handler {
         wp_enqueue_script(
             'booking-form-script',
             plugin_dir_url(dirname(__FILE__)) . 'assets/js/booking-form.js',
-            array('jquery'),
+            array(),
             '1.0.0',
             true
         );
@@ -194,7 +207,7 @@ class Booking_Handler {
         $errors = new WP_Error();
 
         // Valida location
-        $valid_locations = array_keys(self::$locations);
+        $valid_locations = array_keys(self::$locations_labels);
         if (empty($location) || !in_array($location, $valid_locations)) {
             $errors->add('invalid_location', 'Seleziona una location valida.');
         }
@@ -271,14 +284,14 @@ class Booking_Handler {
         $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
 
         // Valida i dati base
-        if (empty($location) || empty($booking_date)) {
+        if (empty($location) ) {
             wp_send_json_error(array(
                 'message' => 'Location e data sono obbligatori.'
             ));
         }
 
         // Valida location
-        if (!array_key_exists($location, self::$locations)) {
+        if (!array_key_exists($location, self::$locations_labels)) {
             wp_send_json_error(array(
                 'message' => 'Location non valida.'
             ));
@@ -302,11 +315,21 @@ class Booking_Handler {
             ));
         }
     
+        $location_value = $this->get_location_value_for_encryption($location);
+
+        if (empty($location_value)) {
+            error_log('ERRORE: Valore location non trovato per - ' . $location);
+            wp_send_json_error(array(
+                'message' => 'Codice location non trovato.'
+            ));
+        }
+        
+        error_log("Location value per criptazione: {$location_value}");
+        
         error_log("Data convertita - Day: {$day}, Month: {$month}, Year: {$year}");
-        error_log("Location code: {$location}");
 
         // Chiama l'API TermeGest
-        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location);
+        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location_value);
 
         error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
 
