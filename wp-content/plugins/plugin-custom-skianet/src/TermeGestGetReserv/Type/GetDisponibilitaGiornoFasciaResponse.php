@@ -8,18 +8,17 @@ use Phpro\SoapClient\Type\ResultInterface;
 
 class GetDisponibilitaGiornoFasciaResponse implements ResultInterface
 {
-    private ?GetDisponibilitaByDayResult $GetDisponibilitaByDayResult = null;
+    private ?GetDisponibilitaGiornoFasciaResult $GetDisponibilitaGiornoFasciaResult = null;
 
-    public function getGetDisponibilitaByDayResult(): ?GetDisponibilitaByDayResult
+    public function getGetDisponibilitaGiornoFasciaResult(): ?GetDisponibilitaGiornoFasciaResult
     {
-        return $this->GetDisponibilitaByDayResult;
+        return $this->GetDisponibilitaGiornoFasciaResult;
     }
 
-    public function withGetDisponibilitaByDayResult(?GetDisponibilitaByDayResult $GetDisponibilitaByDayResult): static
+    public function withGetDisponibilitaGiornoFasciaResult(?GetDisponibilitaGiornoFasciaResult $GetDisponibilitaGiornoFasciaResult): static
     {
         $new = clone $this;
-        $new->GetDisponibilitaByDayResult = $GetDisponibilitaByDayResult;
-
+        $new->GetDisponibilitaGiornoFasciaResult = $GetDisponibilitaGiornoFasciaResult;
         return $new;
     }
 }
