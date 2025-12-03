@@ -50,6 +50,7 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.
 
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH .'/includes/class-booking-handler.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-encryption.php';
 
 // Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');

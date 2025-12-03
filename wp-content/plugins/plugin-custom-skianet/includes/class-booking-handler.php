@@ -258,10 +258,6 @@ class Booking_Handler {
      * Effettua chiamata API per verificare disponibilità
      */
     public function check_availability_api() {
-        error_log('=== check_availability_api chiamato ===');
-        error_log('POST data: ' . print_r($_POST, true));
-    
-
         // Verifica nonce
         if (!isset($_POST['nonce']) || 
             !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
@@ -274,8 +270,6 @@ class Booking_Handler {
         $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
         $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
 
-        error_log("Location: {$location}, Date: {$booking_date}");
-
         // Valida i dati base
         if (empty($location) || empty($booking_date)) {
             wp_send_json_error(array(
@@ -284,8 +278,7 @@ class Booking_Handler {
         }
 
         // Valida location
-        $valid_locations = array_keys(self::$locations);
-        if (!in_array($location, $valid_locations)) {
+        if (!array_key_exists($location, self::$locations)) {
             wp_send_json_error(array(
                 'message' => 'Location non valida.'
             ));
@@ -303,41 +296,25 @@ class Booking_Handler {
         $month = (int) $date->format('m');
         $year = (int) $date->format('Y');
 
-        // Mappa le location ai codici TermeGest
-        $location_code = $this->get_termegest_location_code($location);
-
-        if (empty($location_code)) {
+        if (empty($location)) {
             wp_send_json_error(array(
                 'message' => 'Codice location non trovato.'
             ));
         }
 
-        // Chiama l'API TermeGest getDisponibilitaByDay
-        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location_code);
+        // Chiama l'API TermeGest
+        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location);
+        $fasce = skianet_termegest_get_fascia($day, $month, $year, $location);
 
-        if (empty($disponibilita)) {
+        // Verifica risultati
+        if (empty($fasce)) {
             wp_send_json_error(array(
                 'message' => 'Nessuna disponibilità per la data selezionata.'
             ));
         }
 
-        // Log dei dati ricevuti
-        error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
-
-        // Chiama anche getFascia per ottenere le fasce orarie
-        $fasce = skianet_termegest_get_fascia($day, $month, $year, $location_code);
-
-        // Formatta i dati per il frontend
-        $available_slots = array();
-        foreach ($fasce as $fascia) {
-            if (isset($fascia->ora) && isset($fascia->id)) {
-                $available_slots[] = array(
-                    'id' => $fascia->id,
-                    'time' => $fascia->ora,
-                    'disponibilita' => $fascia->disponibilita ?? 0
-                );
-            }
-        }
+        // Formatta le fasce per il frontend
+        $available_slots = $this->format_available_slots($fasce);
 
         // Ritorna i dati
         wp_send_json_success(array(
@@ -347,6 +324,29 @@ class Booking_Handler {
             'available_slots' => $available_slots
         ));
     }
+
+    /**
+     * Formatta le fasce orarie per il frontend
+     * 
+     * @param array $fasce Array di oggetti Fascia
+     * @return array Array formattato per JavaScript
+     */
+    private function format_available_slots(array $fasce): array {
+        $slots = array();
+        
+        foreach ($fasce as $fascia) {
+            if (isset($fascia->ora, $fascia->id)) {
+                $slots[] = array(
+                    'id' => $fascia->id,
+                    'time' => $fascia->ora,
+                    'disponibilita' => $fascia->disponibilita ?? 0
+                );
+            }
+        }
+        
+        return $slots;
+    }
+
     /**
      * Verifica disponibilità
      */

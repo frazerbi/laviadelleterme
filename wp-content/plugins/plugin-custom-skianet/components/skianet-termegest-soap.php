@@ -19,7 +19,6 @@ if (! \defined('PLUGIN_SKIANET_FILE')) {
     exit();
 }
 
-
 /**
  * Verifica disponibilità per un giorno specifico
  * 
@@ -30,7 +29,6 @@ if (! \defined('PLUGIN_SKIANET_FILE')) {
  * @param string $time_slot Fascia oraria (es. "09:00")
  * @return int Numero di posti disponibili
  */
-
 function skianet_termegest_get_disponibilita_by_day(
     int $day, 
     int $month, 
@@ -40,10 +38,19 @@ function skianet_termegest_get_disponibilita_by_day(
     $termeGestLogger = TermeGestLogger::getInstance();
 
     try {
+        // Usa la classe di criptazione
+        $encryption = TermeGest_Encryption::get_instance();
+        $encrypted_location = $encryption->encrypt($location);
+        
+        if (empty($encrypted_location)) {
+            $termeGestLogger->send('Error encrypting location: ' . $location);
+            return [];
+        }
+
         $client = TermeGestGetReservClientFactory::factory('https://www.termegest.it/getReserv.asmx?WSDL');
 
         $response = $client->getDisponibilitaByDay(
-            new GetDisponibilitaByDay($year, $month, $day, $location)
+            new GetDisponibilitaByDay($year, $month, $day, $encrypted_location)
         );
 
         return (new AnyXML($response->getGetDisponibilitaByDayResult()?->getAny()))->convertXmlToPhpObject();
@@ -54,6 +61,8 @@ function skianet_termegest_get_disponibilita_by_day(
         return [];
     }
 }
+
+
 
 /**
  * @return array|Disponibilita[]
