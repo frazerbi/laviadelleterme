@@ -41,6 +41,9 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
             $termeGestLogger->send('Error encrypting location: ' . $location);
             return [];
         }
+        error_log("=== GET DISPONIBILITA BY DAY ===");
+        error_log("Location originale: {$location}");
+        error_log("Location criptata: {$encrypted_location}");
 
         $client = TermeGestGetReservClientFactory::factory('https://www.termegest.it/getReserv.asmx?WSDL');
         
