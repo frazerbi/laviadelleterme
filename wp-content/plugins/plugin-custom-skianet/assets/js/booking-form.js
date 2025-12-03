@@ -6,9 +6,6 @@
         const form = document.getElementById('booking-form');
         if (!form) return;
         
-        const submitBtn = form.querySelector('.btn-submit');
-        const responseDiv = document.getElementById('booking-response');
-        
         // Campi del form
         const locationField = document.getElementById('location');
         const dateField = document.getElementById('booking_date');
@@ -16,122 +13,103 @@
         const timeSlotField = document.getElementById('time_slot');
         const numMaleField = document.getElementById('num_male');
         const numFemaleField = document.getElementById('num_female');
+        const submitBtn = form.querySelector('.btn-submit');
+        const responseDiv = document.getElementById('booking-response');
         
-        // Gestione abilitazione progressiva dei campi
+        // Dati API
+        let apiData = null;
+        
+        // === GESTIONE PROGRESSIVA DEI CAMPI ===
+        
         locationField.addEventListener('change', function() {
-            if (this.value) {
-                dateField.disabled = false;
-            } else {
-                dateField.disabled = true;
+            dateField.disabled = !this.value;
+            if (!this.value) {
                 dateField.value = '';
-                resetFollowingFields('date');
+                disableFieldsFrom('date');
             }
         });
         
         dateField.addEventListener('change', function() {
             if (this.value && locationField.value) {
-                ticketTypeField.disabled = false;
-                // Chiama l'API quando location e data sono selezionati
                 callAvailabilityAPI(locationField.value, this.value);
             } else {
-                ticketTypeField.disabled = true;
-                ticketTypeField.value = '';
-                resetFollowingFields('ticket');
+                disableFieldsFrom('ticket');
             }
         });
         
         ticketTypeField.addEventListener('change', function() {
-            if (this.value) {
-                timeSlotField.disabled = false;
-            } else {
-                timeSlotField.disabled = true;
+            timeSlotField.disabled = !this.value;
+            if (!this.value) {
                 timeSlotField.value = '';
-                resetFollowingFields('time');
+                disableFieldsFrom('time');
             }
         });
         
         timeSlotField.addEventListener('change', function() {
-            if (this.value) {
-                numMaleField.disabled = false;
-                numFemaleField.disabled = false;
-                checkSubmitButton();
-            } else {
-                numMaleField.disabled = true;
-                numFemaleField.disabled = true;
+            const isEnabled = !!this.value;
+            numMaleField.disabled = !isEnabled;
+            numFemaleField.disabled = !isEnabled;
+            
+            if (!isEnabled) {
                 numMaleField.value = '0';
                 numFemaleField.value = '0';
                 submitBtn.disabled = true;
+            } else {
+                checkSubmitButton();
             }
         });
         
-        // Controlla se abilitare il bottone submit
         numMaleField.addEventListener('input', checkSubmitButton);
         numFemaleField.addEventListener('input', checkSubmitButton);
         
-        function checkSubmitButton() {
-            const male = parseInt(numMaleField.value) || 0;
-            const female = parseInt(numFemaleField.value) || 0;
-            const total = male + female;
-            
-            if (total > 0 && total <= 20 && timeSlotField.value) {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
-        }
+        // === FUNZIONI HELPER ===
         
-        function resetFollowingFields(from) {
-            if (from === 'date') {
-                ticketTypeField.disabled = true;
-                ticketTypeField.value = '';
-                timeSlotField.disabled = true;
-                timeSlotField.value = '';
-                numMaleField.disabled = true;
-                numMaleField.value = '0';
-                numFemaleField.disabled = true;
-                numFemaleField.value = '0';
-                submitBtn.disabled = true;
-            } else if (from === 'ticket') {
-                timeSlotField.disabled = true;
-                timeSlotField.value = '';
-                numMaleField.disabled = true;
-                numMaleField.value = '0';
-                numFemaleField.disabled = true;
-                numFemaleField.value = '0';
-                submitBtn.disabled = true;
-            } else if (from === 'time') {
-                numMaleField.disabled = true;
-                numMaleField.value = '0';
-                numFemaleField.disabled = true;
-                numFemaleField.value = '0';
-                submitBtn.disabled = true;
-            }
-        }
-        
-        /**
-         * Effettua chiamata API per verificare disponibilità
-         */
-        function callAvailabilityAPI(location, date) {
-            // Mostra messaggio di caricamento
-            responseDiv.className = 'booking-response';
-            responseDiv.textContent = 'Verifica disponibilità in corso...';
-            responseDiv.style.display = 'block';
+        function disableFieldsFrom(from) {
+            apiData = null;
             
-            // Disabilita campi successivi durante la chiamata
-            ticketTypeField.disabled = true;
-            timeSlotField.disabled = true;
-            numMaleField.disabled = true;
-            numFemaleField.disabled = true;
+            const fields = {
+                'date': [ticketTypeField, timeSlotField, numMaleField, numFemaleField],
+                'ticket': [timeSlotField, numMaleField, numFemaleField],
+                'time': [numMaleField, numFemaleField]
+            };
+            
+            if (fields[from]) {
+                fields[from].forEach(field => {
+                    field.disabled = true;
+                    field.value = field.type === 'number' ? '0' : '';
+                });
+            }
+            
             submitBtn.disabled = true;
+        }
+        
+        function checkSubmitButton() {
+            const total = (parseInt(numMaleField.value) || 0) + (parseInt(numFemaleField.value) || 0);
+            submitBtn.disabled = !(total > 0 && total <= 20 && timeSlotField.value);
+        }
+        
+        function showMessage(type, text) {
+            responseDiv.className = `booking-response ${type}`;
+            responseDiv.textContent = text;
+            responseDiv.style.display = 'block';
+        }
+        
+        function hideMessage() {
+            responseDiv.style.display = 'none';
+        }
+        
+        // === CHIAMATA API DISPONIBILITÀ ===
+        
+        function callAvailabilityAPI(location, date) {
+            showMessage('', 'Verifica disponibilità in corso...');
+            disableFieldsFrom('ticket');
             
-            // Prepara i dati
             const formData = new FormData();
             formData.append('action', 'check_availability_api');
             formData.append('nonce', bookingFormData.nonce);
             formData.append('location', location);
             formData.append('booking_date', date);
             
-            // Effettua la chiamata AJAX
             fetch(bookingFormData.ajaxurl, {
                 method: 'POST',
                 body: formData
@@ -139,114 +117,81 @@
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    // Salva i dati ricevuti dall'API
                     apiData = data.data;
                     
                     console.log('Disponibilità giorno:', apiData.disponibilita_day);
                     console.log('Fasce disponibili:', apiData.fasce);
-                    console.log('Available slots:', apiData.available_slots);
                     
-                    // Nascondi il messaggio
-                    responseDiv.style.display = 'none';
-                    
-                    // Aggiorna le fasce orarie disponibili
+                    hideMessage();
                     updateTimeSlots(apiData.available_slots);
-                    
-                    // Abilita il campo successivo
                     ticketTypeField.disabled = false;
-                    
                 } else {
-                    // Mostra errore
-                    responseDiv.className = 'booking-response error';
-                    responseDiv.textContent = data.data.message || 'Nessuna disponibilità per questa data.';
-                    responseDiv.style.display = 'block';
-                    
-                    // Reset campi successivi
-                    resetFollowingFields('ticket');
+                    showMessage('error', data.data.message || 'Nessuna disponibilità per questa data.');
+                    disableFieldsFrom('ticket');
                 }
             })
             .catch(error => {
-                console.error('Errore chiamata API:', error);
-                responseDiv.className = 'booking-response error';
-                responseDiv.textContent = 'Errore di connessione durante la verifica disponibilità.';
-                responseDiv.style.display = 'block';
-                
-                // Reset campi successivi
-                resetFollowingFields('ticket');
+                console.error('Errore API:', error);
+                showMessage('error', 'Errore di connessione durante la verifica disponibilità.');
+                disableFieldsFrom('ticket');
             });
         }
-
-        /**
-         * Aggiorna le fasce orarie disponibili in base alla risposta API
-         */
-        function updateTimeSlots(availableSlots) {
-            // Reset delle opzioni
+        
+        function updateTimeSlots(slots) {
             timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
             
-            if (!availableSlots || availableSlots.length === 0) {
-                responseDiv.className = 'booking-response error';
-                responseDiv.textContent = 'Nessuna fascia oraria disponibile per questa data.';
-                responseDiv.style.display = 'block';
+            if (!slots || slots.length === 0) {
+                showMessage('error', 'Nessuna fascia oraria disponibile per questa data.');
                 return;
             }
             
-            // Aggiungi solo le fasce disponibili
-            availableSlots.forEach(slot => {
+            slots.forEach(slot => {
                 if (slot.disponibilita > 0) {
                     const option = document.createElement('option');
                     option.value = slot.time;
-                    option.textContent = slot.time + ' - ' + slot.disponibilita + ' posti disponibili';
-                    option.dataset.fasciaId = slot.id; // Salva l'ID della fascia
+                    option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
+                    option.dataset.fasciaId = slot.id;
                     timeSlotField.appendChild(option);
                 }
             });
         }
-        // Gestione submit
+        
+        // === SUBMIT FORM ===
+        
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Disabilita bottone
             submitBtn.disabled = true;
             submitBtn.textContent = 'Invio in corso...';
+            hideMessage();
             
-            // Nascondi messaggi precedenti
-            responseDiv.style.display = 'none';
-            responseDiv.className = 'booking-response';
+            const formData = new FormData(form);
+            if (apiData) {
+                formData.append('api_data', JSON.stringify(apiData));
+            }
             
-            // Invia dati
             fetch(bookingFormData.ajaxurl, {
                 method: 'POST',
-                body: new FormData(form)
+                body: formData
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    responseDiv.className = 'booking-response success';
-                    responseDiv.textContent = data.data.message;
+                    showMessage('success', data.data.message);
                     form.reset();
-                    
-                    // Resetta lo stato dei campi
+                    disableFieldsFrom('date');
                     dateField.disabled = true;
-                    ticketTypeField.disabled = true;
-                    timeSlotField.disabled = true;
-                    numMaleField.disabled = true;
-                    numFemaleField.disabled = true;
-                    submitBtn.disabled = true;
                 } else {
-                    responseDiv.className = 'booking-response error';
-                    responseDiv.textContent = data.data.message || 'Errore durante la prenotazione.';
-                }
-                responseDiv.style.display = 'block';
-            })
-            .catch(() => {
-                responseDiv.className = 'booking-response error';
-                responseDiv.textContent = 'Errore di connessione.';
-                responseDiv.style.display = 'block';
-            })
-            .finally(() => {
-                if (!submitBtn.disabled) {
+                    showMessage('error', data.data.message || 'Errore durante la prenotazione.');
                     submitBtn.disabled = false;
                 }
+            })
+            .catch(error => {
+                console.error('Errore submit:', error);
+                showMessage('error', 'Errore di connessione.');
+                submitBtn.disabled = false;
+            })
+            .finally(() => {
                 submitBtn.textContent = 'Prenota Ora';
             });
         });
