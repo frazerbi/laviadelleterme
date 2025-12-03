@@ -56,8 +56,8 @@ class Booking_Handler {
         add_shortcode('booking_form', array($this, 'render_booking_form'));
         
         // Hook per gestire il submit del form
-        add_action('admin_post_submit_booking', array($this, 'handle_form_submission'));
-        add_action('admin_post_nopriv_submit_booking', array($this, 'handle_form_submission'));
+        add_action('wp_ajax_submit_booking_ajax', array($this, 'handle_ajax_submission'));
+        add_action('wp_ajax_nopriv_submit_booking_ajax', array($this, 'handle_ajax_submission'));
         
         // Enqueue scripts e styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));

@@ -16,6 +16,7 @@ $locations = Booking_Handler::get_available_locations();
 <div class="booking-form-wrapper">
     <form id="booking-form" class="booking-form" method="post" action="">
         
+        <input type="hidden" name="action" value="submit_booking_ajax">
         <?php wp_nonce_field('booking_form_action', 'booking_form_nonce'); ?>
         
         <!-- Location -->
