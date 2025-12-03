@@ -40,7 +40,7 @@ $time_slots = Booking_Handler::get_time_slots();
             <input type="date" name="booking_date" id="booking_date" required 
                    min="<?php echo date('Y-m-d'); ?>">
         </div>
-        
+
         <!-- Tipo di Ingresso -->
         <div class="form-group">
             <label for="ticket_type">Tipo di Ingresso: <span class="required">*</span></label>
@@ -66,9 +66,21 @@ $time_slots = Booking_Handler::get_time_slots();
                 <?php endforeach; ?>
             </select>
         </div>
-
-
         
+        <!-- Numero Ingressi -->
+        <div class="form-group-row">
+            <div class="form-group form-group-half">
+                <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
+                <input type="number" name="num_male" id="num_male" 
+                       min="0" max="20" value="0" required>
+            </div>
+
+            <div class="form-group form-group-half">
+                <label for="num_female">Ingressi Donna: <span class="required">*</span></label>
+                <input type="number" name="num_female" id="num_female" 
+                       min="0" max="20" value="0" required>
+            </div>
+        </div>
 
         <!-- Submit -->
         <div class="form-group">
