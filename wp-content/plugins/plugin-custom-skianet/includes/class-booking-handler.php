@@ -35,6 +35,13 @@ class Booking_Handler {
     }
 
     /**
+     * Ottieni le location disponibili
+     */
+    public static function get_available_locations() {
+        return self::$locations;
+    }
+
+    /**
      * Costruttore
      */
     private function __construct() {
