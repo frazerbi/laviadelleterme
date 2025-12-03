@@ -110,15 +110,15 @@ class TermeGestGetReservClient
      *
      * @throws SoapException
      */
-    public function getDisponibilitaByDay(GetDisponibilitaByDay $parameters): GetDisponibilitaByDayResponse
-    {
-        $response = ($this->caller)('getDisponibilitaByDay', $parameters);
+    public function getDisponibilitaGiornoFascia(GetDisponibilitaGiornoFascia $parameters): GetDisponibilitaGiornoFasciaResponse
+{
+    $response = ($this->caller)('getDisponibilitaGiornoFascia', $parameters);
 
-        instance_of(GetDisponibilitaByDayResponse::class)->assert($response);
-        instance_of(ResultInterface::class)->assert($response);
+    instance_of(GetDisponibilitaGiornoFasciaResponse::class)->assert($response);
+    instance_of(ResultInterface::class)->assert($response);
 
-        return $response;
-    }
+    return $response;
+}
 
     /**
      * @param GetDisponibilitaById&RequestInterface $parameters
