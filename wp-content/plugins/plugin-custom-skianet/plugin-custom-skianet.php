@@ -48,6 +48,9 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-prenotazione.php
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-my-account.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.php';
 
+// Carica la classe
+require_once PLUGIN_SKIANET_PATH . 'includes/class-booking-handler.php';
+
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);
 function skianet_plugin_loaded(): void
