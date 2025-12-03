@@ -251,6 +251,74 @@ class Booking_Handler {
     }
 
     /**
+     * Valida i dati del form
+     */
+    private function validate_booking_data($location, $booking_date, $ticket_type, $time_slot, $num_male, $num_female) {
+        $errors = new WP_Error();
+
+        // Valida location
+        $valid_locations = array_keys(self::$locations);
+        if (empty($location) || !in_array($location, $valid_locations)) {
+            $errors->add('invalid_location', 'Seleziona una location valida.');
+        }
+
+        // Valida data
+        if (empty($booking_date)) {
+            $errors->add('empty_date', 'Inserisci una data.');
+        } else {
+            $date = DateTime::createFromFormat('Y-m-d', $booking_date);
+            $today = new DateTime();
+            $today->setTime(0, 0, 0);
+            
+            if (!$date || $date < $today) {
+                $errors->add('invalid_date', 'Inserisci una data valida (non nel passato).');
+            }
+        }
+
+        // Valida tipo ingresso
+        $valid_types = array_keys(self::$ticket_types);
+        if (empty($ticket_type) || !in_array($ticket_type, $valid_types)) {
+            $errors->add('invalid_type', 'Seleziona un tipo di ingresso valido.');
+        }
+
+        // Valida fascia oraria
+        $valid_slots = array_keys(self::$time_slots);
+        if (empty($time_slot) || !in_array($time_slot, $valid_slots)) {
+            $errors->add('invalid_time_slot', 'Seleziona una fascia oraria valida.');
+        }
+
+        // Valida numero ingressi
+        if ($num_male < 0 || $num_male > 10) {
+            $errors->add('invalid_num_male', 'Numero ingressi uomo non valido (0-20).');
+        }
+
+        if ($num_female < 0 || $num_female > 10) {
+            $errors->add('invalid_num_female', 'Numero ingressi donna non valido (0-20).');
+        }
+
+        $total_guests = $num_male + $num_female;
+        if ($total_guests === 0) {
+            $errors->add('no_guests', 'Devi selezionare almeno un ingresso.');
+        }
+
+        if ($total_guests > 20) {
+            $errors->add('too_many_guests', 'Numero massimo di ingressi: 20.');
+        }
+
+        // Controlla disponibilità
+        if (!$this->check_availability($location, $booking_date, $time_slot)) {
+            $errors->add('not_available', 'La fascia oraria non è disponibile per questa data.');
+        }
+
+        if ($errors->has_errors()) {
+            return $errors;
+        }
+
+        return true;
+    }
+
+
+    /**
      * Verifica disponibilità
      */
     private function check_availability($location, $booking_date) {
