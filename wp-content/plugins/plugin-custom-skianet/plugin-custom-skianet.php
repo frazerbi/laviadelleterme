@@ -51,6 +51,13 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH . 'includes/class-booking-handler.php';
 
+// Inizializza la classe Booking Handler
+add_action('plugins_loaded', 'init_booking_handler_plugin');
+function init_booking_handler_plugin() {
+    if (class_exists('Booking_Handler')) {
+        Booking_Handler::get_instance();
+    }
+}
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);
 function skianet_plugin_loaded(): void
