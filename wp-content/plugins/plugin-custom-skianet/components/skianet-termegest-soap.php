@@ -51,7 +51,17 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
             new GetDisponibilitaByDay($year, $month, $day, $encrypted_location)
         );
 
-        return (new AnyXML($response->getGetDisponibilitaByDayResult()?->getAny()))->convertXmlToPhpObject();
+        // Prima salva in una variabile
+        $raw_response = $response->getGetDisponibilitaByDayResult()?->getAny();
+        error_log("Raw response getDisponibilitaByDayResult: " . print_r($raw_response, true));
+
+        // Poi converti
+        $result = (new AnyXML($raw_response))->convertXmlToPhpObject();
+        error_log("Converted result: " . print_r($result, true));
+
+        // E ritorna
+        return $result;
+        
     } catch (Throwable $throwable) {
         $termeGestLogger->send('Error getDisponibilitaByDay: ' . $throwable->getMessage());
         $termeGestLogger->flushLog();
@@ -59,8 +69,6 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         return [];
     }
 }
-
-
 
 /**
  * @return array|Disponibilita[]
