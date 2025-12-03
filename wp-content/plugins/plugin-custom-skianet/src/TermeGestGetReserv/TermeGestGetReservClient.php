@@ -15,7 +15,6 @@ use TermeGestGetReserv\Type\GetCodiciBigliettiResponse;
 use TermeGestGetReserv\Type\GetDisponibilita;
 use TermeGestGetReserv\Type\GetDisponibilitaGiornoFascia;
 use TermeGestGetReserv\Type\GetDisponibilitaGiornoFasciaResponse;
-use TermeGestGetReserv\Type\GetDisponibilitaGiornoFasciaResult;
 use TermeGestGetReserv\Type\GetDisponibilitaById;
 use TermeGestGetReserv\Type\GetDisponibilitaByIdResponse;
 use TermeGestGetReserv\Type\GetDisponibilitaResponse;
