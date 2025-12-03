@@ -49,7 +49,7 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-my-account.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.php';
 
 // Carica la classe
-require_once PLUGIN_SKIANET_PATH . 'includes/class-booking-handler.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-handler.php';
 
 // Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');
