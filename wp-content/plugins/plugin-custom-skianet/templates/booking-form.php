@@ -9,17 +9,6 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
-<?php
-/**
- * Template per il form di prenotazione
- */
-
-// Previeni accesso diretto
-if (!defined('ABSPATH')) {
-    exit;
-}
-?>
-
 <div class="booking-form-wrapper">
     <form id="booking-form" class="booking-form" method="post" action="">
         

@@ -37,16 +37,16 @@ class Booking_Handler {
      */
     private function init_hooks() {
         // Hook per utenti loggati
-        add_action('admin_post_submit_booking', array($this, 'handle_form_submission'));
+        // add_action('admin_post_submit_booking', array($this, 'handle_form_submission'));
         
         // Hook per utenti non loggati
-        add_action('admin_post_nopriv_submit_booking', array($this, 'handle_form_submission'));
+        // add_action('admin_post_nopriv_submit_booking', array($this, 'handle_form_submission'));
         
         // Shortcode per il form
         add_shortcode('booking_form', array($this, 'render_booking_form'));
         
         // Enqueue scripts e styles
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+        // add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
     }
 
     /**
