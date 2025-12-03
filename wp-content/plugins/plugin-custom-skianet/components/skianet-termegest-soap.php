@@ -59,15 +59,6 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         
         error_log("Response type: " . get_class($response));
         
-
-        // Controlla se il metodo esiste
-        if (!method_exists($response, 'getGetDisponibilitaByDayResult')) {
-            error_log("ERRORE: Il metodo getGetDisponibilitaByDayResult non esiste!");
-            error_log("Metodi disponibili: " . print_r(get_class_methods($response), true));
-            return [];
-        }
-        
-        error_log("Chiamando getGetDisponibilitaByDayResult...");
         $disponibilita_result = $response->getGetDisponibilitaGiornoFasciaResult();
         
         if ($disponibilita_result === null) {
