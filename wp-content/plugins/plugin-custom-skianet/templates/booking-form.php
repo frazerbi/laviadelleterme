@@ -7,6 +7,10 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// Ottieni le location dalla classe (unica fonte di verità)
+$locations = Booking_Handler::get_available_locations();
+
 ?>
 
 <div class="booking-form-wrapper">
@@ -19,9 +23,11 @@ if (!defined('ABSPATH')) {
             <label for="location">Seleziona Location:</label>
             <select name="location" id="location" required>
                 <option value="">-- Scegli una location --</option>
-                <option value="location1">Location 1</option>
-                <option value="location2">Location 2</option>
-                <option value="location3">Location 3</option>
+                <?php foreach ($locations as $value => $label): ?>
+                    <option value="<?php echo esc_attr($value); ?>">
+                        <?php echo esc_html($label); ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
 

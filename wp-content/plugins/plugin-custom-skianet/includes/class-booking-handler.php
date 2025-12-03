@@ -11,6 +11,15 @@ if (!defined('ABSPATH')) {
 class Booking_Handler {
 
     /**
+     * Location disponibili
+     */
+    private static $locations = array(
+        'terme-saint-vincent' => 'Terme di Saint-Vincent',
+        'terme-genova' => 'Terme di Genova',
+        'monterosa-spa' => 'Monterosa Spa'
+    );
+
+    /**
      * Istanza singleton
      */
     private static $instance = null;
