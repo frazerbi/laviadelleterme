@@ -80,7 +80,7 @@ $time_slots = Booking_Handler::get_time_slots();
                 <input type="number" name="num_female" id="num_female" 
                        min="0" max="20" value="0" required>
             </div>
-        </div>
+        </div> 
 
         <!-- Submit -->
         <div class="form-group">
