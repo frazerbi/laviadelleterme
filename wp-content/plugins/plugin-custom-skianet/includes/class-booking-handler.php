@@ -304,48 +304,14 @@ class Booking_Handler {
 
         // Chiama l'API TermeGest
         $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location);
-        $fasce = skianet_termegest_get_fascia($day, $month, $year, $location);
-
-        // Verifica risultati
-        if (empty($fasce)) {
-            wp_send_json_error(array(
-                'message' => 'Nessuna disponibilità per la data selezionata.'
-            ));
-        }
-
-        // Formatta le fasce per il frontend
-        $available_slots = $this->format_available_slots($fasce);
 
         // Ritorna i dati
         wp_send_json_success(array(
             'message' => 'Disponibilità verificata con successo.',
-            'disponibilita_day' => $disponibilita,
-            'fasce' => $fasce,
-            'available_slots' => $available_slots
+            'disponibilita_day' => $disponibilita
         ));
     }
 
-    /**
-     * Formatta le fasce orarie per il frontend
-     * 
-     * @param array $fasce Array di oggetti Fascia
-     * @return array Array formattato per JavaScript
-     */
-    private function format_available_slots(array $fasce): array {
-        $slots = array();
-        
-        foreach ($fasce as $fascia) {
-            if (isset($fascia->ora, $fascia->id)) {
-                $slots[] = array(
-                    'id' => $fascia->id,
-                    'time' => $fascia->ora,
-                    'disponibilita' => $fascia->disponibilita ?? 0
-                );
-            }
-        }
-        
-        return $slots;
-    }
 
     /**
      * Verifica disponibilità
