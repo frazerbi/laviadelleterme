@@ -14,10 +14,11 @@ class Booking_Handler {
      * Location disponibili
      */
     private static $locations_to_be_encrypted = array(
-        'terme-saint-vincent' => 'Terme Saint Vincent',
-        'terme-genova' => 'Terme di Genova',
+        'terme-saint-vincent' => 'Saint Vincent',
+        'terme-genova' => 'Genova',
         'monterosa-spa' => 'Monterosa'
     );
+
 
     private static $locations_labels = array(
         'terme-saint-vincent' => 'Terme di Saint-Vincent',
