@@ -251,73 +251,92 @@ class Booking_Handler {
     }
 
     /**
-     * Valida i dati del form
+     * Effettua chiamata API per verificare disponibilità
      */
-    private function validate_booking_data($location, $booking_date, $ticket_type, $time_slot, $num_male, $num_female) {
-        $errors = new WP_Error();
+    public function check_availability_api() {
+        // Verifica nonce
+        if (!isset($_POST['nonce']) || 
+            !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
+            wp_send_json_error(array(
+                'message' => 'Errore di sicurezza.'
+            ));
+        }
+
+        // Sanitizza i dati
+        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
+
+        // Valida i dati base
+        if (empty($location) || empty($booking_date)) {
+            wp_send_json_error(array(
+                'message' => 'Location e data sono obbligatori.'
+            ));
+        }
 
         // Valida location
         $valid_locations = array_keys(self::$locations);
-        if (empty($location) || !in_array($location, $valid_locations)) {
-            $errors->add('invalid_location', 'Seleziona una location valida.');
+        if (!in_array($location, $valid_locations)) {
+            wp_send_json_error(array(
+                'message' => 'Location non valida.'
+            ));
         }
 
-        // Valida data
-        if (empty($booking_date)) {
-            $errors->add('empty_date', 'Inserisci una data.');
-        } else {
-            $date = DateTime::createFromFormat('Y-m-d', $booking_date);
-            $today = new DateTime();
-            $today->setTime(0, 0, 0);
-            
-            if (!$date || $date < $today) {
-                $errors->add('invalid_date', 'Inserisci una data valida (non nel passato).');
+        // Converti la data in giorno, mese, anno
+        $date = DateTime::createFromFormat('Y-m-d', $booking_date);
+        if (!$date) {
+            wp_send_json_error(array(
+                'message' => 'Data non valida.'
+            ));
+        }
+
+        $day = (int) $date->format('d');
+        $month = (int) $date->format('m');
+        $year = (int) $date->format('Y');
+
+        // Mappa le location ai codici TermeGest
+        $location_code = $this->get_termegest_location_code($location);
+
+        if (empty($location_code)) {
+            wp_send_json_error(array(
+                'message' => 'Codice location non trovato.'
+            ));
+        }
+
+        // Chiama l'API TermeGest getDisponibilitaByDay
+        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location_code);
+
+        if (empty($disponibilita)) {
+            wp_send_json_error(array(
+                'message' => 'Nessuna disponibilità per la data selezionata.'
+            ));
+        }
+
+        // Log dei dati ricevuti
+        error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
+
+        // Chiama anche getFascia per ottenere le fasce orarie
+        $fasce = skianet_termegest_get_fascia($day, $month, $year, $location_code);
+
+        // Formatta i dati per il frontend
+        $available_slots = array();
+        foreach ($fasce as $fascia) {
+            if (isset($fascia->ora) && isset($fascia->id)) {
+                $available_slots[] = array(
+                    'id' => $fascia->id,
+                    'time' => $fascia->ora,
+                    'disponibilita' => $fascia->disponibilita ?? 0
+                );
             }
         }
 
-        // Valida tipo ingresso
-        $valid_types = array_keys(self::$ticket_types);
-        if (empty($ticket_type) || !in_array($ticket_type, $valid_types)) {
-            $errors->add('invalid_type', 'Seleziona un tipo di ingresso valido.');
-        }
-
-        // Valida fascia oraria
-        $valid_slots = array_keys(self::$time_slots);
-        if (empty($time_slot) || !in_array($time_slot, $valid_slots)) {
-            $errors->add('invalid_time_slot', 'Seleziona una fascia oraria valida.');
-        }
-
-        // Valida numero ingressi
-        if ($num_male < 0 || $num_male > 10) {
-            $errors->add('invalid_num_male', 'Numero ingressi uomo non valido (0-20).');
-        }
-
-        if ($num_female < 0 || $num_female > 10) {
-            $errors->add('invalid_num_female', 'Numero ingressi donna non valido (0-20).');
-        }
-
-        $total_guests = $num_male + $num_female;
-        if ($total_guests === 0) {
-            $errors->add('no_guests', 'Devi selezionare almeno un ingresso.');
-        }
-
-        if ($total_guests > 20) {
-            $errors->add('too_many_guests', 'Numero massimo di ingressi: 20.');
-        }
-
-        // Controlla disponibilità
-        if (!$this->check_availability($location, $booking_date, $time_slot)) {
-            $errors->add('not_available', 'La fascia oraria non è disponibile per questa data.');
-        }
-
-        if ($errors->has_errors()) {
-            return $errors;
-        }
-
-        return true;
+        // Ritorna i dati
+        wp_send_json_success(array(
+            'message' => 'Disponibilità verificata con successo.',
+            'disponibilita_day' => $disponibilita,
+            'fasce' => $fasce,
+            'available_slots' => $available_slots
+        ));
     }
-
-
     /**
      * Verifica disponibilità
      */
