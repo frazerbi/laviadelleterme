@@ -8,7 +8,7 @@ use TermeGest\Type\Fascia;
 use TermeGest\Type\TermeGestLogger;
 use TermeGestGetReserv\TermeGestGetReservClientFactory;
 use TermeGestGetReserv\Type\GetDisponibilita;
-use TermeGestGetReserv\Type\getDisponibilitaByDay;
+use TermeGestGetReserv\Type\GetDisponibilitaGiornoFascia;
 use TermeGestGetReserv\Type\GetDisponibilitaById;
 use TermeGestGetReserv\Type\GetFascia;
 use TermeGestGetReserv\Type\SetPrenotazione;
