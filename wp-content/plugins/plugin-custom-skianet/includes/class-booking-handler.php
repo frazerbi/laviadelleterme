@@ -301,9 +301,14 @@ class Booking_Handler {
                 'message' => 'Codice location non trovato.'
             ));
         }
+    
+        error_log("Data convertita - Day: {$day}, Month: {$month}, Year: {$year}");
+        error_log("Location code: {$location}");
 
         // Chiama l'API TermeGest
         $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location);
+
+        error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
 
         // Ritorna i dati
         wp_send_json_success(array(
