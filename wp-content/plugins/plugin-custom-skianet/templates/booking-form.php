@@ -8,8 +8,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Ottieni le location dalla classe (unica fonte di verità)
+// Ottieni i dati dalla classe
 $locations = Booking_Handler::get_available_locations();
+$ticket_types = Booking_Handler::get_ticket_types();
+$time_slots = Booking_Handler::get_time_slots();
 
 ?>
 
@@ -38,21 +40,35 @@ $locations = Booking_Handler::get_available_locations();
             <input type="date" name="booking_date" id="booking_date" required 
                    min="<?php echo date('Y-m-d'); ?>">
         </div>
-
+        
         <!-- Tipo di Ingresso -->
         <div class="form-group">
-            <label>Tipo di Ingresso:</label>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="ticket_type" value="4h" required>
-                    4 Ore
-                </label>
-                <label>
-                    <input type="radio" name="ticket_type" value="giornaliero" required>
-                    Giornaliero
-                </label>
-            </div>
+            <label for="ticket_type">Tipo di Ingresso: <span class="required">*</span></label>
+            <select name="ticket_type" id="ticket_type" required>
+                <option value="">-- Seleziona tipo di ingresso --</option>
+                <?php foreach ($ticket_types as $value => $label): ?>
+                    <option value="<?php echo esc_attr($value); ?>">
+                        <?php echo esc_html($label); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
+
+        <!-- Fascia Oraria -->
+        <div class="form-group">
+            <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
+            <select name="time_slot" id="time_slot" required>
+                <option value="">-- Seleziona una fascia oraria --</option>
+                <?php foreach ($time_slots as $value => $label): ?>
+                    <option value="<?php echo esc_attr($value); ?>">
+                        <?php echo esc_html($label); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+
+        
 
         <!-- Submit -->
         <div class="form-group">

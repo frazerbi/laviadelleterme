@@ -20,6 +20,30 @@ class Booking_Handler {
     );
 
     /**
+     * Tipi di ingresso disponibili
+     */
+    private static $ticket_types = array(
+        '4h' => '4 Ore',
+        'giornaliero' => 'Giornaliero'
+    );
+
+    /**
+     * Fasce orarie disponibili
+     */
+    private static $time_slots = array(
+        '09:00' => '09:00 - Mattina',
+        '10:00' => '10:00 - Mattina',
+        '11:00' => '11:00 - Tarda Mattina',
+        '12:00' => '12:00 - Mezzogiorno',
+        '13:00' => '13:00 - Primo Pomeriggio',
+        '14:00' => '14:00 - Pomeriggio',
+        '15:00' => '15:00 - Pomeriggio',
+        '16:00' => '16:00 - Tardo Pomeriggio',
+        '17:00' => '17:00 - Sera',
+        '18:00' => '18:00 - Sera'
+    );
+
+    /**
      * Istanza singleton
      */
     private static $instance = null;
@@ -39,6 +63,20 @@ class Booking_Handler {
      */
     public static function get_available_locations() {
         return self::$locations;
+    }
+
+    /**
+     * Ottieni i tipi di ingresso disponibili
+     */
+    public static function get_ticket_types() {
+        return self::$ticket_types;
+    }
+
+    /**
+     * Ottieni le fasce orarie disponibili
+     */
+    public static function get_time_slots() {
+        return self::$time_slots;
     }
 
     /**
