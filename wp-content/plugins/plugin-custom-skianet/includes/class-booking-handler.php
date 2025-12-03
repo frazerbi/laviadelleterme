@@ -103,39 +103,42 @@ class Booking_Handler {
     }
 
     /**
-     * Gestisce il submit del form
+     * Gestisce il submit AJAX del form
      */
-    public function handle_form_submission() {
+    public function handle_ajax_submission() {
         // Verifica nonce
         if (!isset($_POST['booking_form_nonce']) || 
             !wp_verify_nonce($_POST['booking_form_nonce'], 'booking_form_action')) {
-            wp_die('Errore di sicurezza. Riprova.');
-        }
-
-        // Verifica submit
-        if (!isset($_POST['submit_booking'])) {
-            wp_die('Richiesta non valida.');
+            wp_send_json_error(array(
+                'message' => 'Errore di sicurezza. Riprova.'
+            ));
         }
 
         // Sanitizza i dati
-        $location = sanitize_text_field($_POST['location']);
-        $booking_date = sanitize_text_field($_POST['booking_date']);
-        $ticket_type = sanitize_text_field($_POST['ticket_type']);
+        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
+        $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
 
         // Validazione
         $validation = $this->validate_booking_data($location, $booking_date, $ticket_type);
         
         if (is_wp_error($validation)) {
-            wp_die($validation->get_error_message());
+            wp_send_json_error(array(
+                'message' => $validation->get_error_message()
+            ));
         }
 
-        if (empty($booking_date)) {
-            // Successo - redirect con messaggio
-            $redirect_url = add_query_arg('booking_success', '1', wp_get_referer());
-            wp_safe_redirect($redirect_url);
-            exit;
+        // TODO: Salva la prenotazione
+        $booking_success = true;
+
+        if ($booking_success) {
+            wp_send_json_success(array(
+                'message' => 'Prenotazione effettuata con successo!'
+            ));
         } else {
-            wp_die('Errore durante il salvataggio della prenotazione. Riprova.');
+            wp_send_json_error(array(
+                'message' => 'Errore durante il salvataggio. Riprova.'
+            ));
         }
     }
 
