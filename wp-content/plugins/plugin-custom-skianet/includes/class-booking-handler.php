@@ -221,11 +221,11 @@ class Booking_Handler {
         }
 
         // Valida numero ingressi
-        if ($num_male < 0 || $num_male > 20) {
+        if ($num_male < 0 || $num_male > 10) {
             $errors->add('invalid_num_male', 'Numero ingressi uomo non valido (0-20).');
         }
 
-        if ($num_female < 0 || $num_female > 20) {
+        if ($num_female < 0 || $num_female > 10) {
             $errors->add('invalid_num_female', 'Numero ingressi donna non valido (0-20).');
         }
 

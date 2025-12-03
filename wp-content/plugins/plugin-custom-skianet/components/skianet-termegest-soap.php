@@ -8,6 +8,7 @@ use TermeGest\Type\Fascia;
 use TermeGest\Type\TermeGestLogger;
 use TermeGestGetReserv\TermeGestGetReservClientFactory;
 use TermeGestGetReserv\Type\GetDisponibilita;
+use TermeGestGetReserv\Type\getDisponibilitaByDay;
 use TermeGestGetReserv\Type\GetDisponibilitaById;
 use TermeGestGetReserv\Type\GetFascia;
 use TermeGestGetReserv\Type\SetPrenotazione;
@@ -16,6 +17,42 @@ use TermeGestSetInfo\Type\SetVenduto;
 
 if (! \defined('PLUGIN_SKIANET_FILE')) {
     exit();
+}
+
+
+/**
+ * Verifica disponibilità per un giorno specifico
+ * 
+ * @param int $day Giorno del mese
+ * @param int $month Mese
+ * @param int $year Anno
+ * @param string $location Codice location
+ * @param string $time_slot Fascia oraria (es. "09:00")
+ * @return int Numero di posti disponibili
+ */
+
+function skianet_termegest_get_disponibilita_by_day(
+    int $day, 
+    int $month, 
+    int $year, 
+    string $location
+): array {
+    $termeGestLogger = TermeGestLogger::getInstance();
+
+    try {
+        $client = TermeGestGetReservClientFactory::factory('https://www.termegest.it/getReserv.asmx?WSDL');
+
+        $response = $client->getDisponibilitaByDay(
+            new GetDisponibilitaByDay($year, $month, $day, $location)
+        );
+
+        return (new AnyXML($response->getGetDisponibilitaByDayResult()?->getAny()))->convertXmlToPhpObject();
+    } catch (Throwable $throwable) {
+        $termeGestLogger->send('Error getDisponibilitaByDay: ' . $throwable->getMessage());
+        $termeGestLogger->flushLog();
+
+        return [];
+    }
 }
 
 /**
