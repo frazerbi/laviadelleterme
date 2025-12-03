@@ -33,36 +33,81 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
     $termeGestLogger = TermeGestLogger::getInstance();
 
     try {
+        error_log("=== START GET DISPONIBILITA BY DAY ===");
+        error_log("Input - Day: {$day}, Month: {$month}, Year: {$year}, Location: {$location}");
+        
         // Usa la classe di criptazione
         $encryption = TermeGest_Encryption::get_instance();
         $encrypted_location = $encryption->encrypt($location);
         
         if (empty($encrypted_location)) {
+            error_log("ERRORE: encrypted_location è vuota!");
             $termeGestLogger->send('Error encrypting location: ' . $location);
             return [];
         }
-        error_log("=== GET DISPONIBILITA BY DAY ===");
+        
         error_log("Location originale: {$location}");
         error_log("Location criptata: {$encrypted_location}");
 
+        error_log("Creando client SOAP...");
         $client = TermeGestGetReservClientFactory::factory('https://www.termegest.it/getReserv.asmx?WSDL');
+        error_log("Client SOAP creato con successo");
         
+        error_log("Chiamando getDisponibilitaByDay...");
         $response = $client->getDisponibilitaByDay(
             new GetDisponibilitaByDay($year, $month, $day, $encrypted_location)
         );
+        error_log("Risposta ricevuta da SOAP");
         
-        // Prima salva in una variabile
-        $raw_response = $response->getGetDisponibilitaByDayResult()?->getAny();
-        error_log("Raw response getDisponibilitaByDayResult: " . print_r($raw_response, true));
+        error_log("Tipo response: " . get_class($response));
+        
+        // Controlla se il metodo esiste
+        if (!method_exists($response, 'getGetDisponibilitaByDayResult')) {
+            error_log("ERRORE: Il metodo getGetDisponibilitaByDayResult non esiste!");
+            error_log("Metodi disponibili: " . print_r(get_class_methods($response), true));
+            return [];
+        }
+        
+        error_log("Chiamando getGetDisponibilitaByDayResult...");
+        $disponibilita_result = $response->getGetDisponibilitaByDayResult();
+        
+        if ($disponibilita_result === null) {
+            error_log("AVVISO: getGetDisponibilitaByDayResult ha ritornato NULL");
+            return [];
+        }
+        
+        error_log("Tipo disponibilita_result: " . get_class($disponibilita_result));
+        
+        error_log("Chiamando getAny...");
+        $raw_response = $disponibilita_result->getAny();
+        
+        if ($raw_response === null) {
+            error_log("AVVISO: getAny ha ritornato NULL");
+            return [];
+        }
+        
+        error_log("Raw response type: " . gettype($raw_response));
+        error_log("Raw response content: " . print_r($raw_response, true));
 
-        // Poi converti
+        error_log("Convertendo XML a oggetto PHP...");
         $result = (new AnyXML($raw_response))->convertXmlToPhpObject();
-        error_log("Converted result: " . print_r($result, true));
-
-        // E ritorna
+        
+        error_log("Conversione completata");
+        error_log("Result type: " . gettype($result));
+        error_log("Result is_array: " . (is_array($result) ? 'SI' : 'NO'));
+        error_log("Result count: " . (is_array($result) ? count($result) : 'N/A'));
+        error_log("Result content: " . print_r($result, true));
+        
+        error_log("=== END GET DISPONIBILITA BY DAY ===");
+        
         return $result;
 
     } catch (Throwable $throwable) {
+        error_log("=== EXCEPTION IN GET DISPONIBILITA BY DAY ===");
+        error_log("Exception type: " . get_class($throwable));
+        error_log("Exception message: " . $throwable->getMessage());
+        error_log("Exception trace: " . $throwable->getTraceAsString());
+        
         $termeGestLogger->send('Error getDisponibilitaByDay: ' . $throwable->getMessage());
         $termeGestLogger->flushLog();
 
