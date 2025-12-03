@@ -59,6 +59,21 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         );
         error_log("Risposta ricevuta da SOAP");
         
+        error_log("Response type: " . get_class($response));
+        
+        // Se è MixedResult, accedi direttamente al result
+        if ($response instanceof \Phpro\SoapClient\Type\MixedResult) {
+            error_log("È un MixedResult");
+            $raw = $response->getResult();
+            error_log("Raw result: " . print_r($raw, true));
+            
+            // Prova a convertire
+            $result = (new AnyXML($raw))->convertXmlToPhpObject();
+            error_log("Converted: " . print_r($result, true));
+            return $result;
+        }
+        
+
         error_log("Tipo response: " . get_class($response));
         
         // Controlla se il metodo esiste
