@@ -29,12 +29,7 @@ if (! \defined('PLUGIN_SKIANET_FILE')) {
  * @param string $time_slot Fascia oraria (es. "09:00")
  * @return int Numero di posti disponibili
  */
-function skianet_termegest_get_disponibilita_by_day(
-    int $day, 
-    int $month, 
-    int $year, 
-    string $location
-): array {
+function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $year, string $location): array {
     $termeGestLogger = TermeGestLogger::getInstance();
 
     try {

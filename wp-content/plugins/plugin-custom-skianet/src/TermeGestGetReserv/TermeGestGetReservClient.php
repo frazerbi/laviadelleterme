@@ -13,6 +13,9 @@ use TermeGestGetReserv\Type\GetAnnulliResponse;
 use TermeGestGetReserv\Type\GetCodiciBiglietti;
 use TermeGestGetReserv\Type\GetCodiciBigliettiResponse;
 use TermeGestGetReserv\Type\GetDisponibilita;
+use TermeGestGetReserv\Type\GetDisponibilitaByDay;
+use TermeGestGetReserv\Type\GetDisponibilitaByDayResponse;
+use TermeGestGetReserv\Type\GetDisponibilitaByDayResult;
 use TermeGestGetReserv\Type\GetDisponibilitaById;
 use TermeGestGetReserv\Type\GetDisponibilitaByIdResponse;
 use TermeGestGetReserv\Type\GetDisponibilitaResponse;
@@ -96,6 +99,22 @@ class TermeGestGetReservClient
         $response = ($this->caller)('getDisponibilita', $parameters);
 
         instance_of(GetDisponibilitaResponse::class)->assert($response);
+        instance_of(ResultInterface::class)->assert($response);
+
+        return $response;
+    }
+
+    /**
+     * @param GetDisponibilitaByDay&RequestInterface $parameters
+     * @return GetDisponibilitaByDayResponse&ResultInterface
+     *
+     * @throws SoapException
+     */
+    public function getDisponibilitaByDay(GetDisponibilitaByDay $parameters): GetDisponibilitaByDayResponse
+    {
+        $response = ($this->caller)('getDisponibilitaByDay', $parameters);
+
+        instance_of(GetDisponibilitaByDayResponse::class)->assert($response);
         instance_of(ResultInterface::class)->assert($response);
 
         return $response;
