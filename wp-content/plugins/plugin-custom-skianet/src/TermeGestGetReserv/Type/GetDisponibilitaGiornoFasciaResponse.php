@@ -6,7 +6,7 @@ namespace TermeGestGetReserv\Type;
 
 use Phpro\SoapClient\Type\ResultInterface;
 
-class GetDisponibilitaByDayResponse implements ResultInterface
+class GetDisponibilitaGiornoFasciaResponse implements ResultInterface
 {
     private ?GetDisponibilitaByDayResult $GetDisponibilitaByDayResult = null;
 

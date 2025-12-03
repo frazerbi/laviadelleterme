@@ -6,7 +6,7 @@ namespace TermeGestGetReserv\Type;
 
 use Phpro\SoapClient\Type\RequestInterface;
 
-class GetDisponibilitaByDay implements RequestInterface
+class GetDisponibilitaGiornoFascia implements RequestInterface
 {
     private int $anno;
 

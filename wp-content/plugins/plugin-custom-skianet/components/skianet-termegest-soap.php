@@ -54,8 +54,8 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         error_log("Client SOAP creato con successo");
         
         error_log("Chiamando getDisponibilitaByDay...");
-        $response = $client->getDisponibilitaByDay(
-            new GetDisponibilitaByDay($year, $month, $day, $encrypted_location)
+        $response = $client->getDisponibilitaGiornoFascia(
+            new GetDisponibilitaGiornoFascia($year, $month, $day, $encrypted_location)
         );
         error_log("Risposta ricevuta da SOAP");
         
@@ -69,7 +69,7 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         }
         
         error_log("Chiamando getGetDisponibilitaByDayResult...");
-        $disponibilita_result = $response->getGetDisponibilitaByDayResult();
+        $disponibilita_result = $response->getGetDisponibilitaGiornoFasciaResult();
         
         if ($disponibilita_result === null) {
             error_log("AVVISO: getGetDisponibilitaByDayResult ha ritornato NULL");

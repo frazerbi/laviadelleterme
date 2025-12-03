@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TermeGestGetReserv\Type;
 
-class GetDisponibilitaByDayResult
+class GetDisponibilitaGiornoFasciaResult
 {
     private mixed $any;
 
