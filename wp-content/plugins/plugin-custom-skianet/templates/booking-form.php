@@ -37,14 +37,14 @@ $time_slots = Booking_Handler::get_time_slots();
         <!-- Data -->
         <div class="form-group">
             <label for="booking_date">Data:</label>
-            <input type="date" name="booking_date" id="booking_date" required 
-                   min="<?php echo date('Y-m-d'); ?>">
+            <input type="date" name="booking_date" id="booking_date" required disabled
+                   min="<?php echo esc_attr(date('Y-m-d')); ?>">
         </div>
 
         <!-- Tipo di Ingresso -->
         <div class="form-group">
             <label for="ticket_type">Tipo di Ingresso: <span class="required">*</span></label>
-            <select name="ticket_type" id="ticket_type" required>
+            <select name="ticket_type" id="ticket_type" required disabled>
                 <option value="">-- Seleziona tipo di ingresso --</option>
                 <?php foreach ($ticket_types as $value => $label): ?>
                     <option value="<?php echo esc_attr($value); ?>">
@@ -57,7 +57,7 @@ $time_slots = Booking_Handler::get_time_slots();
         <!-- Fascia Oraria -->
         <div class="form-group">
             <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
-            <select name="time_slot" id="time_slot" required>
+            <select name="time_slot" id="time_slot" required disabled>
                 <option value="">-- Seleziona una fascia oraria --</option>
                 <?php foreach ($time_slots as $value => $label): ?>
                     <option value="<?php echo esc_attr($value); ?>">
@@ -72,15 +72,16 @@ $time_slots = Booking_Handler::get_time_slots();
             <div class="form-group form-group-half">
                 <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
                 <input type="number" name="num_male" id="num_male" 
-                       min="0" max="20" value="0" required>
+                       min="0" max="20" value="0" required disabled>
             </div>
 
             <div class="form-group form-group-half">
                 <label for="num_female">Ingressi Donna: <span class="required">*</span></label>
                 <input type="number" name="num_female" id="num_female" 
-                       min="0" max="20" value="0" required>
+                       min="0" max="20" value="0" required disabled>
             </div>
-        </div> 
+        </div>
+
 
         <!-- Submit -->
         <div class="form-group">
