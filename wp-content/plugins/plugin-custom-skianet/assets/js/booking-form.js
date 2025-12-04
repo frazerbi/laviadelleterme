@@ -30,6 +30,11 @@
         });
         
         dateField.addEventListener('change', function() {
+            // Reset campi successivi quando cambia la data
+            ticketTypeField.value = '';
+            timeSlotField.value = '';
+            timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+            
             if (this.value && locationField.value) {
                 callAvailabilityAPI(locationField.value, this.value);
             } else {
