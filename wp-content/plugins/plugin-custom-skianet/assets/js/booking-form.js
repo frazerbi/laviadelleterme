@@ -122,8 +122,10 @@
                     console.log('Available slots:', apiData.available_slots);
                     console.log('Numero fasce disponibili:', apiData.available_slots ? apiData.available_slots.length : 0);
 
-                    hideMessage();
+                    // Mostra messaggio di successo
+                    showMessage('success', data.data.message || 'Disponibilità verificata!');
                     updateTimeSlots(apiData.available_slots);
+                    
                     ticketTypeField.disabled = false;
                 } else {
                     showMessage('error', data.data.message || 'Nessuna disponibilità per questa data.');
