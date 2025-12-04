@@ -36,9 +36,22 @@ $time_slots = Booking_Handler::get_time_slots();
 
         <!-- Data -->
         <div class="form-group">
-            <label for="booking_date">Data:</label>
-            <input type="date" name="booking_date" id="booking_date" required disabled
-                   min="<?php echo esc_attr(date('Y-m-d')); ?>">
+            <label for="booking_date">
+                Data Prenotazione:
+                <span class="label-hint">Seleziona la data desiderata</span>
+            </label>
+            <input 
+                type="date" 
+                name="booking_date" 
+                id="booking_date" 
+                required 
+                disabled
+                min="<?php echo esc_attr(date('Y-m-d')); ?>"
+                max="<?php echo esc_attr(date('Y-m-d', strtotime('+3 months'))); ?>"
+                placeholder="gg/mm/aaaa"
+                aria-label="Seleziona data prenotazione"
+            >
+            <small class="field-help">Seleziona prima una location per abilitare questo campo</small>
         </div>
 
         <!-- Tipo di Ingresso -->

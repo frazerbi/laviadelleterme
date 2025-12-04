@@ -16,11 +16,33 @@
         const submitBtn = form.querySelector('.btn-submit');
         const responseDiv = document.getElementById('booking-response');
         
+        // Apri calendario al click
+        dateField.addEventListener('click', function() {
+            if (!this.disabled) {
+                try {
+                    this.showPicker();
+                } catch (e) {
+                    // Fallback per browser che non supportano showPicker()
+                    this.focus();
+                }
+            }
+        });
+
+        // Opzionale: apri calendario al focus
+        dateField.addEventListener('focus', function() {
+            if (!this.disabled) {
+                try {
+                    this.showPicker();
+                } catch (e) {
+                    // Silenzioso se non supportato
+                }
+            }
+        });
+
         // Dati API
         let apiData = null;
         
         // === GESTIONE PROGRESSIVA DEI CAMPI ===
-        
         locationField.addEventListener('change', function() {
             dateField.disabled = !this.value;
             if (!this.value) {
