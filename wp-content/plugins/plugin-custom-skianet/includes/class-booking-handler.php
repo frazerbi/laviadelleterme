@@ -306,8 +306,6 @@ class Booking_Handler {
         // Chiama l'API TermeGest
         $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location_value);
 
-        error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
-
         // Verifica risultati
         if (empty($disponibilita)) {
             wp_send_json_error(array(
