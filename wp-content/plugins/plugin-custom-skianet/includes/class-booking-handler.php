@@ -34,22 +34,7 @@ class Booking_Handler {
         'giornaliero' => 'Giornaliero'
     );
 
-    /**
-     * Fasce orarie disponibili
-     */
-    private static $time_slots = array(
-        '09:00' => '09:00 - Mattina',
-        '10:00' => '10:00 - Mattina',
-        '11:00' => '11:00 - Tarda Mattina',
-        '12:00' => '12:00 - Mezzogiorno',
-        '13:00' => '13:00 - Primo Pomeriggio',
-        '14:00' => '14:00 - Pomeriggio',
-        '15:00' => '15:00 - Pomeriggio',
-        '16:00' => '16:00 - Tardo Pomeriggio',
-        '17:00' => '17:00 - Sera',
-        '18:00' => '18:00 - Sera'
-    );
-
+    
     /**
      * Istanza singleton
      */
@@ -90,7 +75,7 @@ class Booking_Handler {
      * Ottieni le fasce orarie disponibili
      */
     public static function get_time_slots() {
-        return self::$time_slots;
+        return array();
     }
 
     /**
@@ -232,9 +217,8 @@ class Booking_Handler {
             $errors->add('invalid_type', 'Seleziona un tipo di ingresso valido.');
         }
 
-        // Valida fascia oraria
-        $valid_slots = array_keys(self::$time_slots);
-        if (empty($time_slot) || !in_array($time_slot, $valid_slots)) {
+        // Valida fascia oraria        
+        if (empty($time_slot)) {
             $errors->add('invalid_time_slot', 'Seleziona una fascia oraria valida.');
         }
 
@@ -256,10 +240,6 @@ class Booking_Handler {
             $errors->add('too_many_guests', 'Numero massimo di ingressi: 20.');
         }
 
-        // Controlla disponibilità
-        if (!$this->check_availability($location, $booking_date, $time_slot)) {
-            $errors->add('not_available', 'La fascia oraria non è disponibile per questa data.');
-        }
 
         if ($errors->has_errors()) {
             return $errors;
@@ -334,23 +314,56 @@ class Booking_Handler {
 
         error_log('Disponibilità ricevute: ' . print_r($disponibilita, true));
 
+        // Verifica risultati
+        if (empty($disponibilita)) {
+            wp_send_json_error(array(
+                'message' => 'Nessuna disponibilità per la data selezionata.'
+            ));
+        }
+
+        // Formatta le fasce per il frontend
+        $available_slots = $this->format_available_slots($disponibilita);
+        
+        error_log('Available slots formattati: ' . print_r($available_slots, true));
+
         // Ritorna i dati
         wp_send_json_success(array(
             'message' => 'Disponibilità verificata con successo.',
             'disponibilita_day' => $disponibilita
         ));
+        
     }
 
-
     /**
-     * Verifica disponibilità
+     * Formatta le disponibilità per il frontend
+     * 
+     * @param array $disponibilita Array di oggetti disponibilità da TermeGest
+     * @return array Array formattato per JavaScript
      */
-    private function check_availability($location, $booking_date) {
-        // Qui puoi implementare la logica per verificare la disponibilità
-        // Ad esempio controllando il database per prenotazioni esistenti
+    private function format_available_slots(array $disponibilita): array {
+        $slots = array();
         
-        // Per ora ritorna sempre true
-        return true;
+        foreach ($disponibilita as $dispo) {
+            // Estrai l'ora dalla fascia (es. "Ingresso ore 9:00" -> "09:00")
+            $time = '';
+            if (isset($dispo->fascia) && preg_match('/(\d{1,2}):(\d{2})/', $dispo->fascia, $matches)) {
+                $hour = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+                $minute = $matches[2];
+                $time = $hour . ':' . $minute;
+            }
+            
+            // Aggiungi solo se ha tutti i dati necessari
+            if (!empty($time) && isset($dispo->iddispo, $dispo->disponibili)) {
+                $slots[] = array(
+                    'id' => $dispo->iddispo,
+                    'time' => $time,
+                    'disponibilita' => (int)$dispo->disponibili,
+                    'fascia_label' => $dispo->fascia ?? $time
+                );
+            }
+        }
+        
+        return $slots;
     }
     
 }
