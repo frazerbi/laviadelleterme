@@ -32,6 +32,7 @@
         dateField.addEventListener('change', function() {
             // Reset campi successivi quando cambia la data
             ticketTypeField.value = '';
+            ticketTypeField.selectedIndex = 0; // Torna alla prima opzione (placeholder)
             timeSlotField.value = '';
             timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
             
@@ -104,7 +105,6 @@
         }
         
         // === CHIAMATA API DISPONIBILITÀ ===
-        
         function callAvailabilityAPI(location, date) {
             showMessage('', 'Verifica disponibilità in corso...');
             disableFieldsFrom('ticket');
@@ -126,6 +126,15 @@
                     
                     console.log('Available slots:', apiData.available_slots);
                     console.log('Numero fasce disponibili:', apiData.available_slots ? apiData.available_slots.length : 0);
+
+                    const availableSlots = apiData.available_slots.filter(slot => slot.disponibilita > 0);
+
+                    if (availableSlots.length === 0) {
+                        // Nessuno slot disponibile
+                        showMessage('error', 'Nessuna fascia oraria disponibile per questa data.');
+                        disableFieldsFrom('ticket');
+                        return;
+                    }
 
                     // Mostra messaggio di successo
                     showMessage('success', data.data.message || 'Disponibilità verificata!');
