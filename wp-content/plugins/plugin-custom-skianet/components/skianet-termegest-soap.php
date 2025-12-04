@@ -42,27 +42,35 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         
         if (empty($encrypted_location)) {
             error_log("ERRORE: encrypted_location è vuota!");
-            $termeGestLogger->send('Error encrypting location: ' . $location);
             return [];
         }
-        
-        error_log("Location originale: {$location}");
+
         error_log("Location criptata: {$encrypted_location}");
 
         error_log("Creando client SOAP...");
+        
         $client = TermeGestGetReservClientFactory::factory('https://www.termegest.it/getReserv.asmx?WSDL');
+        
         error_log("Client SOAP creato con successo.");
                 
         $response = $client->getDisponibilitaGiornoFascia(
             new GetDisponibilitaGiornoFascia($year, $month, $day, $encrypted_location)
         );
-        
+
+        error_log("=== METODI DISPONIBILI SU RESPONSE ===");
         error_log("Response type: " . get_class($response));
-        
+        error_log("Response methods: " . print_r(get_class_methods($response), true));
+
+        // DUMP COMPLETO DELLA RESPONSE
+        error_log("Response dump completo:");
+        ob_start();
+        var_dump($response);
+        error_log(ob_get_clean());
+
         $disponibilita_result = $response->getGetDisponibilitaGiornoFasciaResult();
         
         if ($disponibilita_result === null) {
-            error_log("AVVISO: getGetDisponibilitaByDayResult ha ritornato NULL");
+            error_log("AVVISO: getGetDisponibilitaGiornoFasciaResult ha ritornato NULL");
             return [];
         }
         
@@ -70,7 +78,11 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         
         error_log("Chiamando getAny...");
         $raw_response = $disponibilita_result->getAny();
-        
+
+        error_log("=== RAW XML FROM TERME GEST (START) ===");
+        error_log(is_object($raw_response) ? $raw_response->saveXML() : (string)$raw_response);
+        error_log("=== RAW XML FROM TERME GEST (END) ===");
+
         if ($raw_response === null) {
             error_log("AVVISO: getAny ha ritornato NULL");
             return [];
@@ -82,29 +94,28 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
         error_log("Convertendo XML a oggetto PHP...");
         $result = (new AnyXML($raw_response))->convertXmlToPhpObject();
         
-        error_log("Conversione completata");
-        error_log("Result type: " . gettype($result));
-        error_log("Result is_array: " . (is_array($result) ? 'SI' : 'NO'));
-        error_log("Result count: " . (is_array($result) ? count($result) : 'N/A'));
-        error_log("Result content: " . print_r($result, true));
+        if (!is_array($result) || empty($result)) {
+            error_log("AVVISO: Risultato conversione non è array valido o vuoto");
+            return [];
+        }
+        
+        error_log("Conversione OK - Elementi trovati: " . count($result));
         
         error_log("=== END GET DISPONIBILITA BY DAY ===");
-        
+
         return $result;
 
     } catch (Throwable $throwable) {
+     
         error_log("=== EXCEPTION IN GET DISPONIBILITA BY DAY ===");
         error_log("Exception type: " . get_class($throwable));
         error_log("Exception message: " . $throwable->getMessage());
-        error_log("Exception trace: " . $throwable->getTraceAsString());
-        
         $termeGestLogger->send('Error getDisponibilitaByDay: ' . $throwable->getMessage());
         $termeGestLogger->flushLog();
 
         return [];
     }
 }
-
 /**
  * @return array|Disponibilita[]
  */
