@@ -119,9 +119,9 @@
                 if (data.success) {
                     apiData = data.data;
                     
-                    console.log('Disponibilità giorno:', apiData.disponibilita_day);
-                    console.log('Fasce disponibili:', apiData.fasce);
-                    
+                    console.log('Available slots:', apiData.available_slots);
+                    console.log('Numero fasce disponibili:', apiData.available_slots ? apiData.available_slots.length : 0);
+
                     hideMessage();
                     updateTimeSlots(apiData.available_slots);
                     ticketTypeField.disabled = false;
