@@ -289,12 +289,6 @@ class Booking_Handler {
         $day = (int) $date->format('d');
         $month = (int) $date->format('m');
         $year = (int) $date->format('Y');
-
-        if (empty($location)) {
-            wp_send_json_error(array(
-                'message' => 'Codice location non trovato.'
-            ));
-        }
     
         $location_value = $this->get_location_value_for_encryption($location);
 
@@ -329,7 +323,7 @@ class Booking_Handler {
         // Ritorna i dati
         wp_send_json_success(array(
             'message' => 'Disponibilità verificata con successo.',
-            'disponibilita_day' => $disponibilita
+            'available_slots' => $available_slots
         ));
         
     }
