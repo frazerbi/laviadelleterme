@@ -57,7 +57,10 @@ class Availability_Checker {
         // Cron giornaliero per aggiornare disponibilità
         add_action('termegest_check_availability', array($this, 'check_all_locations'));
 
-
+        // Registra cron se non esiste (controlla ad ogni page load)
+        if (!wp_next_scheduled('termegest_check_availability')) {
+            wp_schedule_event(time(), 'daily', 'termegest_check_availability');
+        }
     }
 
     /**
