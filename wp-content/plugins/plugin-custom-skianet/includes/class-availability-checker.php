@@ -101,6 +101,18 @@ class Availability_Checker {
      * Controlla disponibilità per una location (mese corrente + successivo)
      */
     private function check_location_availability($location) {
+
+        // Cripta la location PRIMA di usarla
+        $encryption = TermeGest_Encryption::get_instance();
+        $encrypted_location = $encryption->encrypt($location);
+        
+        if (empty($encrypted_location)) {
+            error_log("ERRORE: Impossibile criptare location: {$location}");
+            return;
+        }
+
+        error_log("Location criptata: {$encrypted_location}");
+
         // Step 1: Crea array con tutti i giorni dei 2 mesi
         $all_dates = $this->get_all_dates_for_two_months();
         
@@ -129,8 +141,9 @@ class Availability_Checker {
             }
             
             // Chiama API TermeGest per il mese
-            $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $location);
-            
+            // $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $location);
+            $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
+
             // LOG: Struttura dati
             error_log("=== STRUTTURA dispArr per {$location} - {$month}/{$year} ===");
             error_log("Tipo: " . gettype($dispArr));
