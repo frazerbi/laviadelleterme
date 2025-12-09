@@ -51,7 +51,7 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH .'/includes/class-booking-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-encryption.php';
-require_once PLUGIN_SKIANET_PATH . 'includes/class-availability-checker.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-availability-checker.php';
 
 // Hook activation - registra il cron
 register_activation_hook(__FILE__, function() {
