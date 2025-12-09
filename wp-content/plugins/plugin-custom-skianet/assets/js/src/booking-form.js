@@ -19,13 +19,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === VANILLA CALENDAR INTEGRATION ===
     let calendar = null;
+    let availabilityData = null;
 
     // Crea un wrapper per il calendario vicino all'input
     const calendarWrapper = document.createElement('div');
     calendarWrapper.className = 'vanilla-calendar-wrapper';
     dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
 
-    function initCalendar() {
+    // Mappa le location dai valori del form ai nomi dei file JSON
+    function mapLocationToFileName(location) {
+        const locationMap = {
+            'terme-genova': 'genova',
+            'terme-monterosa-spa': 'monterosa',
+            'terme-saint-vincent': 'saint-vincent'
+        };
+
+        return locationMap[location] || location;
+    }
+
+    // Funzione per recuperare il JSON delle disponibilità per location
+    async function fetchAvailabilityJSON(location) {
+        try {
+            // Normalizza il nome della location
+            const fileName = mapLocationToFileName(location);
+
+            // Costruisci il percorso del file JSON basato sulla location
+            const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
+
+            const response = await fetch(jsonPath);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Errore nel recupero del JSON availability:', error);
+            return null;
+        }
+    }
+
+    // Funzione per costruire l'array di date disabilitate dal JSON
+    function buildDisabledDatesArray(availabilityData) {
+        if (!availabilityData || !availabilityData.availability) {
+            return [];
+        }
+
+        // Filtra le date con availability = false e restituiscile come array
+        const disabledDates = Object.entries(availabilityData.availability)
+            .filter(([, isAvailable]) => !isAvailable)
+            .map(([date]) => date);
+
+        return disabledDates;
+    }
+
+    async function initCalendar(location) {
         if (calendar) return;
 
         // Range di date: oggi + 60 giorni
@@ -33,13 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const maxDate = new Date();
         maxDate.setDate(maxDate.getDate() + 60);
 
-        // Date da escludere (esempio: festività)
-        const disabledDates = [
-            '2025-12-25', // Natale
-            '2026-01-01', // Capodanno
-            '2026-01-06', // Epifania
-            // Aggiungi altre date da escludere qui
-        ];
+        // Recupera i dati di disponibilità dal JSON
+        availabilityData = await fetchAvailabilityJSON(location);
+
+        // Costruisci l'array delle date disabilitate
+        const disabledDates = buildDisabledDatesArray(availabilityData);
 
         const options = {
             locale: 'it',
@@ -81,14 +128,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mostra calendario al click sull'input
-    dateField.addEventListener('click', function(e) {
+    dateField.addEventListener('click', async function(e) {
         if (!this.disabled) {
             e.preventDefault();
 
             if (!calendar) {
-                initCalendar();
+                const selectedLocation = locationField.value;
+                if (selectedLocation) {
+                    await initCalendar(selectedLocation);
+                }
             }
-            calendar.show();
+            if (calendar) {
+                calendar.show();
+            }
         }
     });
 

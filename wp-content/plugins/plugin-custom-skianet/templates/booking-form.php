@@ -95,14 +95,14 @@ $time_slots = Booking_Handler::get_time_slots();
         </div>
 
 
+        <!-- Messaggio di risposta -->
+        <div id="booking-response" class="booking-response"></div>
+
         <!-- Submit -->
         <div class="form-group">
             <button type="submit" name="submit_booking" class="btn-submit">
                 Prenota Ora
             </button>
         </div>
-
-        <!-- Messaggio di risposta -->
-        <div id="booking-response" class="booking-response"></div>
     </form>
 </div>
