@@ -184,8 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
         numFemaleField.disabled = !isEnabled;
 
         if (!isEnabled) {
-            numMaleField.value = '0';
-            numFemaleField.value = '0';
+            numMaleField.value = '';
+            numFemaleField.value = '';
             submitBtn.disabled = true;
         } else {
             checkSubmitButton();
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (fields[from]) {
             fields[from].forEach(field => {
                 field.disabled = true;
-                field.value = field.type === 'number' ? '0' : '';
+                field.value = '';
             });
         }
 
