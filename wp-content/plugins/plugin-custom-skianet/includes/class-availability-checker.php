@@ -56,24 +56,8 @@ class Availability_Checker {
     private function init_hooks() {
         // Cron giornaliero per aggiornare disponibilità
         add_action('termegest_check_availability', array($this, 'check_all_locations'));
-        
-        // Registra cron se non esiste
-        if (!wp_next_scheduled('termegest_check_availability')) {
-            wp_schedule_event(time(), 'daily', 'termegest_check_availability');
-        }
 
-        // Hook per comando manuale via admin
-        add_action('admin_init', array($this, 'handle_manual_check'));
-    }
 
-    /**
-     * Comando manuale via URL
-     */
-    public function handle_manual_check() {
-        if (isset($_GET['termegest_check']) && current_user_can('manage_options')) {
-            $this->check_all_locations();
-            wp_die('✅ Controllo disponibilità completato! <a href="' . admin_url() . '">Torna alla dashboard</a>');
-        }
     }
 
     /**

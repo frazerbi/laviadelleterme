@@ -51,8 +51,17 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH .'/includes/class-booking-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-encryption.php';
-require_once plugin_dir_path(__FILE__) . 'includes/class-availability-checker.php';
+require_once PLUGIN_SKIANET_PATH . 'includes/class-availability-checker.php';
 
+// Hook activation - registra il cron
+register_activation_hook(__FILE__, function() {
+    if (!wp_next_scheduled('termegest_check_availability')) {
+        wp_schedule_event(time(), 'daily', 'termegest_check_availability');
+    }
+});
+
+// Hook deactivation - rimuovi il cron
+register_deactivation_hook(__FILE__, array('Availability_Checker', 'deactivate'));
 
 // Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');
