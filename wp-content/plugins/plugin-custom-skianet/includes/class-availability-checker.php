@@ -39,9 +39,9 @@ class Availability_Checker {
      * Costruttore
      */
     private function __construct() {
-        $upload_dir = wp_upload_dir();
-        $this->json_path = $upload_dir['basedir'] . '/' . self::JSON_DIR;
-        
+
+        $this->json_path = plugin_dir_path(PLUGIN_SKIANET_FILE) . '/assets/data';
+
         // Crea directory se non esiste
         if (!file_exists($this->json_path)) {
             wp_mkdir_p($this->json_path);
