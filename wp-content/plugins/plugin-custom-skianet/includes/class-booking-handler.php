@@ -65,6 +65,13 @@ class Booking_Handler {
     }
 
     /**
+     * Ottieni tutte le location da criptare (statico)
+     */
+    public static function get_locations_to_encrypt() {
+        return self::$locations_to_be_encrypted;
+    }
+
+    /**
      * Ottieni i tipi di ingresso disponibili
      */
     public static function get_ticket_types() {

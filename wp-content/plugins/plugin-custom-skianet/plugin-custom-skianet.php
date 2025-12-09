@@ -51,12 +51,17 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH .'/includes/class-booking-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-encryption.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-availability-checker.php';
+
 
 // Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');
 function init_booking_handler_plugin() {
     if (class_exists('Booking_Handler')) {
         Booking_Handler::get_instance();
+    }
+    if (class_exists('Availability_Checker')) {
+        Availability_Checker::get_instance();
     }
 }
 
