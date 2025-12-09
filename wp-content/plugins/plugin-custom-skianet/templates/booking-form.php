@@ -47,7 +47,7 @@ $time_slots = Booking_Handler::get_time_slots();
                 required 
                 disabled
                 min="<?php echo esc_attr(date('Y-m-d')); ?>"
-                max="<?php echo esc_attr(date('Y-m-d', strtotime('+3 months'))); ?>"
+                max="<?php echo esc_attr(date('Y-m-d', strtotime('+2 months'))); ?>"
                 placeholder="gg/mm/aaaa"
                 aria-label="Seleziona data prenotazione"
             >

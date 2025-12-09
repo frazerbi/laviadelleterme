@@ -86,8 +86,12 @@ function skianet_termegest_calendar_get_disponibilita(): void
     }
 
     do {
-
-        $dispArr = skianet_termegest_get_disponibilita($month, $year, 'p2', $location);
+        if ($month == 12 || $month == 1) {
+            $cat = 'pm';
+        } else {
+            $cat = 'p2';
+        }
+        $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $location);
 
         foreach ($dispArr as $disp) {
             /* @var Disponibilita $disp */
