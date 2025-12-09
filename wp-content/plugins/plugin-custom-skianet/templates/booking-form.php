@@ -51,7 +51,6 @@ $time_slots = Booking_Handler::get_time_slots();
                 placeholder="gg/mm/aaaa"
                 aria-label="Seleziona data prenotazione"
             >
-            <small class="field-help">Seleziona prima una location per abilitare questo campo</small>
         </div>
 
         <!-- Tipo di Ingresso -->

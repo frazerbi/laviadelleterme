@@ -20,17 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // === VANILLA CALENDAR INTEGRATION ===
     let calendar = null;
 
-    // Crea un container per il calendario (nascosto inizialmente)
-    const calendarContainer = document.createElement('div');
-    calendarContainer.id = 'vanilla-calendar';
-    calendarContainer.className = 'vanilla-calendar-light'; // Classe per il tema light
-    calendarContainer.style.display = 'none';
-    calendarContainer.style.position = 'absolute';
-    calendarContainer.style.zIndex = '1000';
-    calendarContainer.style.backgroundColor = '#fff';
-    calendarContainer.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    calendarContainer.style.borderRadius = '8px';
-    dateField.parentNode.appendChild(calendarContainer);
+    // Crea un wrapper per il calendario vicino all'input
+    const calendarWrapper = document.createElement('div');
+    calendarWrapper.className = 'vanilla-calendar-wrapper';
+    dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
 
     function initCalendar() {
         if (calendar) return;
@@ -48,79 +41,54 @@ document.addEventListener('DOMContentLoaded', function() {
             // Aggiungi altre date da escludere qui
         ];
 
-        console.log(disabledDates);
-
         const options = {
+            locale: 'it',
             selectedTheme: 'light',
-            disableDates: disabledDates, // Date disabilitate
+            selectionDatesMode: 'single',
             dateMin: today.toISOString().split('T')[0],
             dateMax: maxDate.toISOString().split('T')[0],
-            /* settings: {
-                range: {
-                },
-                selection: {
-                    day: 'single'
-                },
-                visibility: {
-                    theme: 'light'
-                }
-            }, */
-            /* settings: {
-                lang: 'it',
-                iso8601: false,
-                range: {
-                    min: today.toISOString().split('T')[0],
-                    max: maxDate.toISOString().split('T')[0],
-                },
-                selection: {
-                    day: 'single'
-                },
-                visibility: {
-                    theme: 'light'
-                }
-            }, */
-            /* actions: {
-                clickDay(_e, self) {
-                    const selectedDate = self.selectedDates[0];
-                    if (selectedDate) {
-                        dateField.value = selectedDate;
-                        calendarContainer.style.display = 'none';
+            disableDates: disabledDates,
+            disableDatesPast: true,
+            selectedDates: dateField.value ? [dateField.value] : [],
 
-                        // Trigger change event
-                        const changeEvent = new Event('change', { bubbles: true });
-                        dateField.dispatchEvent(changeEvent);
-                    }
+            onClickDate(self, event) {
+                // Ottieni la data cliccata dal data attribute (formato YYYY-MM-DD)
+                const clickedDate = self.context.selectedDates[0];
+                if (clickedDate) {
+                    const [year, month, day] = clickedDate.split('-');
+                    dateField.value = clickedDate;
+                    // Trigger dell'evento change per il form
+                    const changeEvent = new Event('change', { bubbles: true });
+                    dateField.dispatchEvent(changeEvent);
+                    // Chiudi il calendario
+                    self.hide();
                 }
-            } */
+            },
+
+            onShow() {
+                // Assicura che il calendario sia visibile con display: block
+                calendarWrapper.style.display = 'block';
+            },
+
+            onHide() {
+                // Imposta display: none per evitare che occupi spazio
+                calendarWrapper.style.display = 'none';
+            }
         };
-        console.log(options);
-        calendar = new Calendar(calendarContainer, options);
+
+        calendar = new Calendar(calendarWrapper, options);
         calendar.init();
     }
 
-    // Mostra/nascondi calendario al click sul campo data
+    // Mostra calendario al click sull'input
     dateField.addEventListener('click', function(e) {
         if (!this.disabled) {
             e.preventDefault();
-            if (calendarContainer.style.display === 'none') {
-                const rect = dateField.getBoundingClientRect();
-                calendarContainer.style.top = (rect.bottom + window.scrollY + 5) + 'px';
-                calendarContainer.style.left = rect.left + 'px';
-                calendarContainer.style.display = 'block';
 
-                if (!calendar) {
-                    initCalendar();
-                }
-            } else {
-                calendarContainer.style.display = 'none';
+            if (!calendar) {
+                initCalendar();
             }
-        }
-    });
-
-    // Nascondi calendario se si clicca fuori
-    document.addEventListener('click', function(e) {
-        if (!calendarContainer.contains(e.target) && e.target !== dateField) {
-            calendarContainer.style.display = 'none';
+            calendar.show();
         }
     });
 
