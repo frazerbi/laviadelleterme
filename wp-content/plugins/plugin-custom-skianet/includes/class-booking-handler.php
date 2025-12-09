@@ -115,18 +115,27 @@ class Booking_Handler {
      * Carica CSS e JS
      */
     public function enqueue_assets() {
+        // CSS di vanilla-calendar-pro (compilato da esbuild)
+        wp_enqueue_style(
+            'vanilla-calendar-bundle',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-form.min.css',
+            array(),
+            '1.1.0'
+        );
+
         wp_enqueue_style(
             'booking-form-style',
             plugin_dir_url(dirname(__FILE__)) . 'assets/css/booking-form.css',
-            array(),
+            array('vanilla-calendar-bundle'),
             '1.0.0'
         );
 
+        // Booking form script (compilato con esbuild, include vanilla-calendar-pro)
         wp_enqueue_script(
             'booking-form-script',
-            plugin_dir_url(dirname(__FILE__)) . 'assets/js/booking-form.js',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-form.min.js',
             array(),
-            '1.0.0',
+            '1.1.0',
             true
         );
 

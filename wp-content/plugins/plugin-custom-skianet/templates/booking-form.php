@@ -15,7 +15,7 @@ $time_slots = Booking_Handler::get_time_slots();
 
 ?>
 
-<div class="booking-form-wrapper">
+<div class="booking-form-wrapper skianet-booking-wrapper">
     <form id="booking-form" class="booking-form" method="post" action="">
         
         <input type="hidden" name="action" value="submit_booking_ajax">

@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+assets/js/dist/*.map
+
+# OS files
+.DS_Store

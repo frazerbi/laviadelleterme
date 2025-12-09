@@ -1,0 +1,17 @@
+{
+  "name": "plugin-custom-skianet",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "postcss": "^8.4.49",
+    "postcss-prefix-selector": "^1.16.1"
+  },
+  "dependencies": {
+    "vanilla-calendar-pro": "^3.0.5"
+  }
+}
