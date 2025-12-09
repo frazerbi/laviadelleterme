@@ -163,16 +163,24 @@ class Availability_Checker {
                     continue;
                 }
                 
-                // Parse data
-                $date_obj = new DateTime($dispo->data);
-                $date_key = $date_obj->format('Y-m-d');
+                // Parse data (formato: "2025-12-09 00:00:00")
+                $date_obj = DateTime::createFromFormat('Y-m-d H:i:s', $dispo->data);
+                if (!$date_obj) {
+                    error_log("ERRORE parsing data: {$dispo->data}");
+                    continue;
+                }
                 
-                // Verifica se c'è disponibilità
+                $date_key = $date_obj->format('Y-m-d'); // Es: "2025-12-09"
+                
+                // Se questo giorno è già disponibile, skip
+                if (isset($results[$date_key]) && $results[$date_key] === true) {
+                    continue;
+                }
+                
+                // Verifica se questa fascia ha disponibilità
                 if (isset($dispo->disponibili) && (int)$dispo->disponibili > 0) {
-                    $results[$date_key] = true;
-                    error_log("✅ {$date_key}: Disponibile ({$dispo->disponibili} posti)");
-                } else {
-                    error_log("❌ {$date_key}: Non disponibile");
+                    $results[$date_key] = true; // ✅ SALVA TRUE per questo giorno
+                    error_log("✅ {$date_key}: Disponibile");
                 }
             }
             
