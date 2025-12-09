@@ -69,6 +69,18 @@ class Availability_Checker {
     public function check_all_locations() {
         error_log('=== INIZIO CONTROLLO DISPONIBILITÀ ===');
         
+        // Verifica che Booking_Handler sia caricata
+        if (!class_exists('Booking_Handler')) {
+            error_log('ERRORE: Booking_Handler non caricata!');
+            return;
+        }
+        
+        // Verifica che il metodo esista
+        if (!method_exists('Booking_Handler', 'get_locations_to_encrypt')) {
+            error_log('ERRORE: Metodo get_locations_to_encrypt non trovato!');
+            return;
+        }
+
         // Prendi le location da Booking_Handler (unica fonte)
         $locations = Booking_Handler::get_locations_to_encrypt();
         
@@ -119,6 +131,14 @@ class Availability_Checker {
             // Chiama API TermeGest per il mese
             $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $location);
             
+            // LOG: Struttura dati
+            error_log("=== STRUTTURA dispArr per {$location} - {$month}/{$year} ===");
+            error_log("Tipo: " . gettype($dispArr));
+            error_log("Count: " . (is_array($dispArr) ? count($dispArr) : 'N/A'));
+            error_log("Dump completo: " . print_r($dispArr, true));
+            error_log("=== FINE STRUTTURA ===");
+
+
             if (empty($dispArr)) {
                 error_log("Nessuna disponibilità API per {$location} - {$month}/{$year}");
                 continue;

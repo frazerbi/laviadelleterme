@@ -69,7 +69,7 @@ class Booking_Handler {
      */
     public static function get_locations_to_encrypt() {
         return self::$locations_to_be_encrypted;
-    }
+    } 
 
     /**
      * Ottieni i tipi di ingresso disponibili
