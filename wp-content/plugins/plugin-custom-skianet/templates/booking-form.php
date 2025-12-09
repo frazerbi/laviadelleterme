@@ -84,13 +84,13 @@ $time_slots = Booking_Handler::get_time_slots();
             <div class="form-group form-group-half">
                 <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
                 <input type="number" name="num_male" id="num_male" 
-                       min="0" max="20" value="0" required disabled>
+                       min="0" max="20" placeholder="0" required disabled>
             </div>
 
             <div class="form-group form-group-half">
                 <label for="num_female">Ingressi Donna: <span class="required">*</span></label>
                 <input type="number" name="num_female" id="num_female" 
-                       min="0" max="20" value="0" required disabled>
+                       min="0" max="20" placeholder="0" required disabled>
             </div>
         </div>
 
