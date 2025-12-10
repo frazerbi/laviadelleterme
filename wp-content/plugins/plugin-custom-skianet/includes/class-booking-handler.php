@@ -323,7 +323,8 @@ class Booking_Handler {
                     'id' => $dispo->iddispo,
                     'time' => $time,
                     'disponibilita' => (int)$dispo->disponibili,
-                    'fascia_label' => $dispo->fascia ?? $time
+                    'fascia_label' => $dispo->fascia ?? $time,
+                    'categorie' => $dispo->categorie ?? ''
                 );
             }
         }

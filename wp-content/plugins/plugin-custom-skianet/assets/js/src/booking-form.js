@@ -285,9 +285,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         slots.forEach(slot => {
             if (slot.disponibilita > 0) {
-                console.log('Slot ID:', slot.id, 'Time:', slot.time); // ✅ Debug
+                console.log('Slot ID:', slot.id, 'Time:', slot.time); 
                 const option = document.createElement('option');
-                option.value = slot.id; // ✅ ID come value (80115, 80120, ecc.)
+                option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
                 option.dataset.time = slot.time;
                 timeSlotField.appendChild(option);
