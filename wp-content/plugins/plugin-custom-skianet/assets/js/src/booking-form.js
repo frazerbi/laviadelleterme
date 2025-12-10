@@ -188,6 +188,22 @@ document.addEventListener('DOMContentLoaded', function() {
             numFemaleField.value = '';
             submitBtn.disabled = true;
         } else {
+            const selectedOption = this.options[this.selectedIndex];
+            const categorie = selectedOption.dataset.categorie || '';
+
+            console.log('Categorie selezionate:', categorie);
+        
+            // Aggiungi campo hidden
+            let categorieInput = document.getElementById('selected_categorie');
+            if (!categorieInput) {
+                categorieInput = document.createElement('input');
+                categorieInput.type = 'hidden';
+                categorieInput.id = 'selected_categorie';
+                categorieInput.name = 'categorie';
+                form.appendChild(categorieInput);
+            }
+            categorieInput.value = categorie;
+            
             checkSubmitButton();
         }
     });
@@ -285,11 +301,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         slots.forEach(slot => {
             if (slot.disponibilita > 0) {
-                console.log('Slot ID:', slot.id, 'Time:', slot.time); 
+                console.log('Slot ID:', slot.id, 'Time:', slot.time, 'Categorie:', slot.categorie); 
                 const option = document.createElement('option');
                 option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
                 option.dataset.time = slot.time;
+                option.dataset.categorie = slot.categorie || ''; // ✅ Aggiungi categorie
                 timeSlotField.appendChild(option);
 
             }
