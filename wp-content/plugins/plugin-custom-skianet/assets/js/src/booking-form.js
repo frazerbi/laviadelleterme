@@ -286,10 +286,10 @@ document.addEventListener('DOMContentLoaded', function() {
         slots.forEach(slot => {
             if (slot.disponibilita > 0) {
                 const option = document.createElement('option');
-                option.value = slot.time;
+                option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
-                option.dataset.fasciaId = slot.id;
-                timeSlotField.appendChild(option);
+                option.dataset.time = slot.time;
+                timeSlotField.appendChild(option);    
             }
         });
     }
