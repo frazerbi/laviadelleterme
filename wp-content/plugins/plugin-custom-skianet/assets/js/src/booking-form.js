@@ -290,7 +290,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
                 option.dataset.time = slot.time;
-                timeSlotField.appendChild(option);    
+                timeSlotField.appendChild(option);
+
             }
         });
     }
