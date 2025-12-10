@@ -289,7 +289,7 @@ class Booking_Handler {
         // Formatta le fasce per il frontend
         $available_slots = $this->format_available_slots($disponibilita);
         
-        error_log('Available slots formattati: ' . print_r($available_slots, true));
+        // error_log('Available slots formattati: ' . print_r($available_slots, true));
 
         // Ritorna i dati
         wp_send_json_success(array(
