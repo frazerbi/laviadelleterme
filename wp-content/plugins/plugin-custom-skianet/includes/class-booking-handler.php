@@ -160,52 +160,9 @@ class Booking_Handler {
     }
 
     /**
-     * Gestisce il submit AJAX del form
-     */
-    public function handle_ajax_submission() {
-        // Verifica nonce
-        if (!isset($_POST['booking_form_nonce']) || 
-            !wp_verify_nonce($_POST['booking_form_nonce'], 'booking_form_action')) {
-            wp_send_json_error(array(
-                'message' => 'Errore di sicurezza. Riprova.'
-            ));
-        }
-
-        // Sanitizza i dati
-        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
-        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
-        $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
-        $time_slot = isset($_POST['time_slot']) ? sanitize_text_field($_POST['time_slot']) : '';
-        $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
-        $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
-
-        // Validazione
-        $validation = $this->validate_booking_data($location, $booking_date, $ticket_type, $time_slot, $num_male, $num_female);
-        
-        if (is_wp_error($validation)) {
-            wp_send_json_error(array(
-                'message' => $validation->get_error_message()
-            ));
-        }
-
-        // TODO: Salva la prenotazione
-        $booking_success = true;
-
-        if ($booking_success) {
-            wp_send_json_success(array(
-                'message' => 'Prenotazione effettuata con successo!'
-            ));
-        } else {
-            wp_send_json_error(array(
-                'message' => 'Errore durante il salvataggio. Riprova.'
-            ));
-        }
-    }
-
-    /**
      * Valida i dati del form
      */
-    private function validate_booking_data($location, $booking_date, $ticket_type, $time_slot, $num_male, $num_female) {
+    private function validate_booking_data($location, $booking_date, $ticket_type, $fascia_id, $num_male, $num_female) {
         $errors = new WP_Error();
 
         // Valida location
@@ -233,9 +190,9 @@ class Booking_Handler {
             $errors->add('invalid_type', 'Seleziona un tipo di ingresso valido.');
         }
 
-        // Valida fascia oraria        
-        if (empty($time_slot)) {
-            $errors->add('invalid_time_slot', 'Seleziona una fascia oraria valida.');
+        // Valida fascia oraria (ID)
+        if ($fascia_id <= 0) {
+            $errors->add('invalid_fascia', 'Seleziona una fascia oraria valida.');
         }
 
         // Valida numero ingressi
@@ -372,6 +329,71 @@ class Booking_Handler {
         }
         
         return $slots;
+    }
+
+    /**
+     * Gestisce il submit AJAX del form
+     */
+    public function handle_ajax_submission() {
+        // Verifica nonce
+        if (!isset($_POST['booking_form_nonce']) || 
+            !wp_verify_nonce($_POST['booking_form_nonce'], 'booking_form_action')) {
+            wp_send_json_error(array('message' => 'Errore di sicurezza. Riprova.'));
+        }
+
+        // Sanitizza e recupera TUTTI i dati
+        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
+        $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
+        $fascia_id = isset($_POST['time_slot']) ? intval($_POST['time_slot']) : 0;
+        $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
+        $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
+
+        // Log per debug
+        error_log('=== DATI PRENOTAZIONE ===');
+        error_log("Location: {$location}");
+        error_log("Data: {$booking_date}");
+        error_log("ID Fascia: {$fascia_id}");
+        error_log("Tipo Ingresso: {$ticket_type}");
+        error_log("Num Uomini: {$num_male}");
+        error_log("Num Donne: {$num_female}");
+        error_log("Totale: " . ($num_male + $num_female));
+
+        // Validazione
+        $validation = $this->validate_booking_data(
+            $location, 
+            $booking_date, 
+            $ticket_type, 
+            $fascia_id,
+            $num_male, 
+            $num_female
+        );
+        
+        if (is_wp_error($validation)) {
+            wp_send_json_error(array('message' => $validation->get_error_message()));
+        }
+
+        // TODO: Salva la prenotazione
+        // Qui avrai tutti i dati disponibili per salvarli
+        $booking_data = array(
+            'location' => $location,
+            'booking_date' => $booking_date,
+            'fascia_id' => $fascia_id,
+            'ticket_type' => $ticket_type,
+            'num_male' => $num_male,
+            'num_female' => $num_female,
+            'total_guests' => $num_male + $num_female
+        );
+        
+        error_log('Booking data: ' . print_r($booking_data, true));
+
+        $booking_success = true;
+
+        if ($booking_success) {
+            wp_send_json_success(array('message' => 'Prenotazione effettuata con successo!'));
+        } else {
+            wp_send_json_error(array('message' => 'Errore durante il salvataggio. Riprova.'));
+        }
     }
     
 }

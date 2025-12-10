@@ -295,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // === SUBMIT FORM ===
-
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -304,9 +303,6 @@ document.addEventListener('DOMContentLoaded', function() {
         hideMessage();
 
         const formData = new FormData(form);
-        if (apiData) {
-            formData.append('api_data', JSON.stringify(apiData));
-        }
 
         fetch(bookingFormData.ajaxurl, {
             method: 'POST',
@@ -319,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.reset();
                 disableFieldsFrom('date');
                 dateField.disabled = true;
+                locationField.focus();
             } else {
                 showMessage('error', data.data.message || 'Errore durante la prenotazione.');
                 submitBtn.disabled = false;
@@ -331,6 +328,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .finally(() => {
             submitBtn.textContent = 'Prenota Ora';
+            if (submitBtn.disabled) {
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                }, 2000);
+            }
         });
     });
 });
