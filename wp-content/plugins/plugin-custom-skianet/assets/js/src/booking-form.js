@@ -39,26 +39,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funzione per recuperare il JSON delle disponibilità per location
     async function fetchAvailabilityJSON(location) {
-        try {
-            // Normalizza il nome della location
-            const fileName = mapLocationToFileName(location);
+    try {
+        const fileName = mapLocationToFileName(location);
+        const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
 
-            // Costruisci il percorso del file JSON basato sulla location
-            const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
+        const response = await fetch(jsonPath);
 
-            const response = await fetch(jsonPath);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Errore nel recupero del JSON availability:', error);
+        if (!response.ok) {
+            console.error(`File non trovato: ${jsonPath}`);
+            // ✅ Mostra messaggio all'utente
+            showMessage('error', 'Impossibile caricare il calendario per questa location.');
             return null;
         }
+
+        const data = await response.json();
+        console.log(`JSON caricato per ${location}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Errore nel recupero del JSON availability:', error);
+        showMessage('error', 'Errore nel caricamento del calendario.');
+        return null;
     }
+}
 
     // Funzione per costruire l'array di date disabilitate dal JSON
     function buildDisabledDatesArray(availabilityData) {
@@ -152,7 +154,20 @@ document.addEventListener('DOMContentLoaded', function() {
         dateField.disabled = !this.value;
         if (!this.value) {
             dateField.value = '';
+
+            if (calendar) {
+                calendar.destroy();
+                calendar = null;
+            }
+
             disableFieldsFrom('date');
+        } else {
+            // ✅ Inizializza nuovo calendario con nuova location
+            if (calendar) {
+                calendar.destroy();
+                calendar = null;
+            }
+            initCalendar(this.value);
         }
     });
 

@@ -11,8 +11,6 @@ if (!defined('ABSPATH')) {
 // Ottieni i dati dalla classe
 $locations = Booking_Handler::get_available_locations();
 $ticket_types = Booking_Handler::get_ticket_types();
-$time_slots = Booking_Handler::get_time_slots();
-
 ?>
 
 <div class="booking-form-wrapper skianet-booking-wrapper">
@@ -71,11 +69,7 @@ $time_slots = Booking_Handler::get_time_slots();
             <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
             <select name="time_slot" id="time_slot" required disabled>
                 <option value="">-- Seleziona una fascia oraria --</option>
-                <?php foreach ($time_slots as $value => $label): ?>
-                    <option value="<?php echo esc_attr($value); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
-                <?php endforeach; ?>
+                <!-- Le opzioni vengono popolate dinamicamente da JavaScript -->
             </select>
         </div>
         
