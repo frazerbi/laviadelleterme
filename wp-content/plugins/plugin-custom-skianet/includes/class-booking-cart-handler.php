@@ -85,6 +85,9 @@ class Booking_Cart_Handler {
             
             // Rendi unico il cart item (così se aggiungi 2 prenotazioni diverse, sono 2 righe separate)
             $cart_item_data['unique_key'] = $booking_data['booking_id'];
+
+            unset($_SESSION['termegest_booking']);
+            error_log('Sessione prenotazione pulita dopo aggiunta al carrello');
         }
         
         return $cart_item_data;
