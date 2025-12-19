@@ -130,24 +130,28 @@ class Booking_Cart_Handler {
                 'value' => $formatted_date
             );
             
+            // ✅ ID Fascia Oraria
+            $item_data[] = array(
+                'key'   => 'ID Fascia',
+                'value' => $cart_item['booking_fascia_id']
+            );
+            
             $item_data[] = array(
                 'key'   => 'Tipo Ingresso',
                 'value' => $cart_item['booking_ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero'
             );
             
-            if ($cart_item['booking_num_male'] > 0) {
-                $item_data[] = array(
-                    'key'   => 'Ingressi Uomo',
-                    'value' => $cart_item['booking_num_male']
-                );
-            }
+            // ✅ Mostra sempre uomini (anche se 0)
+            $item_data[] = array(
+                'key'   => 'Ingressi Uomo',
+                'value' => $cart_item['booking_num_male']
+            );
             
-            if ($cart_item['booking_num_female'] > 0) {
-                $item_data[] = array(
-                    'key'   => 'Ingressi Donna',
-                    'value' => $cart_item['booking_num_female']
-                );
-            }
+            // ✅ Mostra sempre donne (anche se 0)
+            $item_data[] = array(
+                'key'   => 'Ingressi Donna',
+                'value' => $cart_item['booking_num_female']
+            );
             
             $item_data[] = array(
                 'key'   => 'Totale Ospiti',
@@ -215,12 +219,13 @@ class Booking_Cart_Handler {
             'booking_id' => $item->get_meta('_booking_id'),
             'location_name' => $item->get_meta('Location'),
             'booking_date' => $item->get_meta('_booking_date'),
-            'fascia_id' => $item->get_meta('Fascia ID'),
+            'fascia_id' => $item->get_meta('_booking_fascia_id'), // ✅ Usa il campo raw
             'ticket_type' => $item->get_meta('_booking_ticket_type'),
-            'num_male' => $item->get_meta('Ingressi Uomo'),
-            'num_female' => $item->get_meta('Ingressi Donna'),
-            'total_guests' => $item->get_meta('Totale Ospiti'),
+            'num_male' => (int)$item->get_meta('Ingressi Uomo'), // ✅ Cast a int
+            'num_female' => (int)$item->get_meta('Ingressi Donna'), // ✅ Cast a int
+            'total_guests' => (int)$item->get_meta('Totale Ospiti'),
             'categorie' => $item->get_meta('_booking_categorie')
         );
     }
+
 }
