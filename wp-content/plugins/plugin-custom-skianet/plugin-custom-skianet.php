@@ -66,12 +66,15 @@ register_deactivation_hook(__FILE__, array('Availability_Checker', 'deactivate')
 // Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');
 function init_booking_handler_plugin() {
+    
     if (class_exists('Booking_Handler')) {
         Booking_Handler::get_instance();
     }
+
     if (class_exists('Availability_Checker')) {
         Availability_Checker::get_instance();
     }
+
 }
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);

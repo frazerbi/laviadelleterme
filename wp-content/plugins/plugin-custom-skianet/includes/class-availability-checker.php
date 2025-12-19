@@ -56,7 +56,7 @@ class Availability_Checker {
     private function init_hooks() {
         // Cron giornaliero per aggiornare disponibilità
         add_action('termegest_check_availability', array($this, 'check_all_locations'));
-
+        
         // Registra cron se non esiste (controlla ad ogni page load)
         if (!wp_next_scheduled('termegest_check_availability')) {
             wp_schedule_event(time(), 'daily', 'termegest_check_availability');
@@ -67,8 +67,10 @@ class Availability_Checker {
      * Controlla disponibilità per tutte le location
      */
     public function check_all_locations() {
-        error_log('=== INIZIO CONTROLLO DISPONIBILITÀ ===');
-        
+        error_log('=== INIZIO CONTROLLO DISPONIBILITÀ [CRON] ===');
+        error_log('Timestamp: ' . current_time('mysql'));
+        error_log('Context: ' . (defined('DOING_CRON') ? 'CRON' : 'MANUAL'));
+                
         // Verifica che Booking_Handler sia caricata
         if (!class_exists('Booking_Handler')) {
             error_log('ERRORE: Booking_Handler non caricata!');
@@ -101,6 +103,17 @@ class Availability_Checker {
      * Controlla disponibilità per una location (mese corrente + successivo)
      */
     private function check_location_availability($location) {
+
+        if (!class_exists('TermeGest_Encryption')) {
+            error_log("ERRORE CRON: TermeGest_Encryption non caricata per {$location}");
+            return;
+        }
+
+        if (!function_exists('skianet_termegest_get_disponibilita')) {
+            error_log("ERRORE CRON: skianet_termegest_get_disponibilita non disponibile per {$location}");
+            return;
+        }
+
 
         // Cripta la location PRIMA di usarla
         $encryption = TermeGest_Encryption::get_instance();

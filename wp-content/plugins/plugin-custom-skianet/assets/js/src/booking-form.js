@@ -84,6 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const maxDate = new Date();
         maxDate.setDate(maxDate.getDate() + 60);
 
+        const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
+        console.log('Calendario range:', {
+            min: firstDayCurrentMonth.toISOString().split('T')[0],
+            max: lastDayNextMonth.toISOString().split('T')[0]
+        });
+
         // Recupera i dati di disponibilità dal JSON
         availabilityData = await fetchAvailabilityJSON(location);
 
@@ -94,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
             locale: 'it',
             selectedTheme: 'light',
             selectionDatesMode: 'single',
-            dateMin: today.toISOString().split('T')[0],
-            dateMax: maxDate.toISOString().split('T')[0],
+            dateMin: firstDayCurrentMonth.toISOString().split('T')[0], 
+            dateMax: lastDayNextMonth.toISOString().split('T')[0], 
             disableDates: disabledDates,
             disableDatesPast: true,
             selectedDates: dateField.value ? [dateField.value] : [],
@@ -103,14 +111,20 @@ document.addEventListener('DOMContentLoaded', function() {
             onClickDate(self, event) {
                 // Ottieni la data cliccata dal data attribute (formato YYYY-MM-DD)
                 const clickedDate = self.context.selectedDates[0];
-                if (clickedDate) {
+                if (clickedDate && !disabledDates.includes(clickedDate)) {
                     const [year, month, day] = clickedDate.split('-');
+
                     dateField.value = clickedDate;
                     // Trigger dell'evento change per il form
                     const changeEvent = new Event('change', { bubbles: true });
+                    
                     dateField.dispatchEvent(changeEvent);
+                    
                     // Chiudi il calendario
                     self.hide();
+                } else {
+                    showMessage('error', 'Data non disponibile. Seleziona un\'altra data.');
+                    self.update(); // Reset selezione
                 }
             },
 
