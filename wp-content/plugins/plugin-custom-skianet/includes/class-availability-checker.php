@@ -255,6 +255,19 @@ class Availability_Checker {
         $filename = $this->get_json_filename($location);
         $filepath = $this->json_path . '/' . $filename;
 
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        $caller_info = array();
+        foreach ($backtrace as $trace) {
+            if (isset($trace['file'], $trace['line'])) {
+                $caller_info[] = basename($trace['file']) . ':' . $trace['line'];
+            }
+        }
+        
+        error_log("=== SAVE JSON CHIAMATO ===");
+        error_log("Location: {$location}");
+        error_log("Timestamp: " . current_time('mysql'));
+        error_log("Chiamato da: " . implode(' -> ', $caller_info));
+
         if (file_exists($filepath)) {
             $old_timestamp = date('Y-m-d H:i:s', filemtime($filepath));
             unlink($filepath);
