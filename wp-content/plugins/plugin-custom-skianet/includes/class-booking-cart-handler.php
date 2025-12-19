@@ -50,6 +50,10 @@ class Booking_Cart_Handler {
         
         // 5. Mostra dati prenotazione nell'ordine (admin e email)
         add_filter('woocommerce_order_item_get_formatted_meta_data', array($this, 'format_order_item_meta'), 10, 2);
+        
+        // 6. Blocca modifica quantità per prodotti con prenotazione
+        add_filter('woocommerce_cart_item_quantity', array($this, 'disable_quantity_change'), 10, 3);
+    
     }
 
     /**
