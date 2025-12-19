@@ -145,7 +145,7 @@ class Booking_Redirect {
         if (!is_product()) {
             return;
         }
-        
+    
         wp_enqueue_script(
             'woocommerce-variation-preselect',
             plugin_dir_url(PLUGIN_SKIANET_FILE) . 'assets/js/woocommerce-variation-preselect.js',
@@ -153,6 +153,19 @@ class Booking_Redirect {
             '1.0.0',
             true
         );
+
+        $url_params = array();
+        if (isset($_GET['variation_id'])) {
+            $url_params['variation_id'] = sanitize_text_field($_GET['variation_id']);
+        }
+        if (isset($_GET['ticket_type'])) {
+            $url_params['ticket_type'] = sanitize_text_field($_GET['ticket_type']);
+        }
+        if (isset($_GET['total_guests'])) {
+            $url_params['total_guests'] = intval($_GET['total_guests']);
+        }
+        
+        wp_localize_script('woocommerce-variation-preselect', 'bookingParams', $url_params);
     }
 
 }
