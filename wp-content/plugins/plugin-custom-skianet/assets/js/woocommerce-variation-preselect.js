@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
                 
                 // ✅ BLOCCA il campo quantità
-                qtyInput.readOnly = true;
+                // qtyInput.readOnly = true;
                 qtyInput.style.pointerEvents = 'none';
                 qtyInput.style.opacity = '0.6';
                 qtyInput.style.cursor = 'not-allowed';
@@ -89,6 +89,69 @@ document.addEventListener('DOMContentLoaded', function() {
                 jQuery(variationForm).trigger('check_variations');
                 jQuery(variationForm).trigger('woocommerce_variation_select_change');
             }, 1000);
+        }
+
+        // STEP 3: Aggiorna visualizzazione prezzo con quantità
+        setTimeout(function() {
+            updatePriceDisplay(totalGuests);
+            
+            // Monitora cambiamenti prezzo (quando WooCommerce aggiorna)
+            const priceObserver = new MutationObserver(function() {
+                updatePriceDisplay(totalGuests);
+            });
+            
+            const priceContainer = document.querySelector('.woocommerce-variation-price');
+            if (priceContainer) {
+                priceObserver.observe(priceContainer, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        }, 1500);
+
+        // Funzione per aggiornare display prezzo
+        function updatePriceDisplay(quantity) {
+            const priceContainer = document.querySelector('.woocommerce-variation-price .price');
+            
+            if (!priceContainer) {
+                return;
+            }
+            
+            const priceAmount = priceContainer.querySelector('.woocommerce-Price-amount');
+            
+            if (!priceAmount) {
+                return;
+            }
+            
+            // Estrai il prezzo unitario
+            const priceText = priceAmount.textContent.trim();
+            const priceMatch = priceText.match(/[\d,.]+/);
+            
+            if (!priceMatch) {
+                return;
+            }
+            
+            const unitPrice = parseFloat(priceMatch[0].replace(',', '.'));
+            const totalPrice = (unitPrice * quantity).toFixed(2).replace('.', ',');
+            const currencySymbol = priceAmount.querySelector('.woocommerce-Price-currencySymbol')?.textContent || '€';
+            
+            // ✅ Crea nuovo HTML con quantità
+            const newPriceHTML = `
+                <span class="quantity-label">${quantity} × </span>
+                <span class="woocommerce-Price-amount amount unit-price">
+                    <bdi>${currencySymbol}${priceMatch[0]}</bdi>
+                </span>
+                <span class="total-separator"> = </span>
+                <span class="woocommerce-Price-amount amount total-price">
+                    <bdi><span class="woocommerce-Price-currencySymbol">${currencySymbol}</span>${totalPrice}</bdi>
+                </span>
+            `;
+            
+            // Sostituisci solo se non è già stato modificato
+            if (!priceContainer.querySelector('.quantity-label')) {
+                priceContainer.innerHTML = newPriceHTML;
+                console.log('Prezzo aggiornato:', `${quantity} × ${currencySymbol}${priceMatch[0]} = ${currencySymbol}${totalPrice}`);
+            }
         }
         
     }, 500);
