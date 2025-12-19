@@ -205,8 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             const selectedOption = this.options[this.selectedIndex];
             const categorie = selectedOption.dataset.categorie || '';
+            const disponibilita = selectedOption.dataset.disponibilita || '0';
 
             console.log('Categorie selezionate:', categorie);
+            console.log('Disponibilità fascia:', disponibilita);
         
             // Aggiungi campo hidden
             let categorieInput = document.getElementById('selected_categorie');
@@ -219,6 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             categorieInput.value = categorie;
             
+            let disponibilitaInput = document.getElementById('selected_disponibilita');
+            if (!disponibilitaInput) {
+                disponibilitaInput = document.createElement('input');
+                disponibilitaInput.type = 'hidden';
+                disponibilitaInput.id = 'selected_disponibilita';
+                disponibilitaInput.name = 'disponibilita';
+                form.appendChild(disponibilitaInput);
+            }
+            disponibilitaInput.value = disponibilita;
+
             checkSubmitButton();
         }
     });
@@ -321,7 +333,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
                 option.dataset.time = slot.time;
-                option.dataset.categorie = slot.categorie || ''; // ✅ Aggiungi categorie
+                option.dataset.categorie = slot.categorie || '';
+                option.dataset.disponibilita = slot.disponibilita;
                 timeSlotField.appendChild(option);
 
             }

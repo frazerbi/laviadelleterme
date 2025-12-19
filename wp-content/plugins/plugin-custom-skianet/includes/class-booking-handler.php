@@ -200,7 +200,6 @@ class Booking_Handler {
                 
     }   
 
-
     /**
      * Gestisce il submit AJAX del form
      */
@@ -219,6 +218,7 @@ class Booking_Handler {
         $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
         $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
         $categorie = isset($_POST['categorie']) ? sanitize_text_field($_POST['categorie']) : '';
+        $disponibilita = isset($_POST['disponibilita']) ? intval($_POST['disponibilita']) : 0; // ✅ Recupera disponibilità
 
         // Log per debug
         error_log('=== DATI PRENOTAZIONE ===');
@@ -255,6 +255,7 @@ class Booking_Handler {
             'num_male' => $num_male,
             'num_female' => $num_female,
             'total_guests' => $num_male + $num_female,
+            'disponibilita' => $disponibilita,
             'categorie' => $categorie,
             'user_id' => get_current_user_id(),
             'created_at' => current_time('mysql')
@@ -275,7 +276,7 @@ class Booking_Handler {
         }
     }
 
-        /**
+    /** 
      * Valida i dati del form
      */
     private function validate_booking_data($location, $booking_date, $ticket_type, $fascia_id, $num_male, $num_female) {
@@ -384,6 +385,14 @@ class Booking_Handler {
         // Genera un ID univoco per la prenotazione
         $booking_id = uniqid('booking_', true);
         
+        $posti_disponibili = $data['disponibilita'] ?? 0;
+        $posti_richiesti = $data['total_guests'];
+        
+        if ($posti_disponibili < $posti_richiesti) {
+            error_log("ERRORE: Posti insufficienti! Disponibili: {$posti_disponibili}, Richiesti: {$posti_richiesti}");
+            return false;
+        }
+
         // Prepara tutti i dati da salvare
         $booking_data = array(
             'booking_id' => $booking_id,
@@ -395,6 +404,7 @@ class Booking_Handler {
             'num_male' => $data['num_male'],
             'num_female' => $data['num_female'],
             'total_guests' => $data['total_guests'],
+            'disponibilita' => $posti_disponibili,
             'categorie' => $data['categorie'],
             'user_id' => $data['user_id'],
             'status' => 'pending',
