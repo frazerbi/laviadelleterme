@@ -267,12 +267,24 @@ class Booking_Handler {
         $booking_id = $this->save_booking($booking_data);
 
         if ($booking_id) {
-            wp_send_json_success(array(
-                'message' => 'Prenotazione effettuata con successo!',
-                'booking_id' => $booking_id
-            ));
+
+            $redirect_handler = Booking_Redirect::get_instance();
+            $redirect_url = $redirect_handler->redirect_to_product($booking_id, $booking_data);
+
+            if ($redirect_url) {
+                wp_send_json_success(array(
+                    'message' => 'Prenotazione effettuata con successo!',
+                    'booking_id' => $booking_id,
+                    'redirect_url' => $redirect_url  // ✅ Passa URL al frontend
+                ));
+            } else {
+                wp_send_json_error(array('message' => 'Errore nel redirect al prodotto.'));
+            }
+
         } else {
-            wp_send_json_error(array('message' => 'Errore durante il salvataggio. Riprova.'));
+            wp_send_json_error(array(
+                        'message' => 'Posti non più disponibili per questa fascia. Riprova con un\'altra fascia oraria.'
+            ));        
         }
     }
 

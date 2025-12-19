@@ -49,9 +49,10 @@ require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-my-account.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.php';
 
 // Carica la classe
-require_once PLUGIN_SKIANET_PATH .'/includes/class-booking-handler.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-encryption.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-availability-checker.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-redirect.php';
 
 // Hook activation - registra il cron
 register_activation_hook(__FILE__, function() {
@@ -75,6 +76,9 @@ function init_booking_handler_plugin() {
         Availability_Checker::get_instance();
     }
 
+    if (class_exists('Booking_Redirect')) {
+        Booking_Redirect::get_instance();
+    }
 }
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);

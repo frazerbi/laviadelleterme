@@ -359,6 +359,15 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const numMale = parseInt(numMaleField.value) || 0;
+        const numFemale = parseInt(numFemaleField.value) || 0;
+        const total = numMale + numFemale;
+
+        if (total === 0) {
+            showMessage('error', 'Seleziona almeno un ingresso.');
+            return;
+        }
+
         submitBtn.disabled = true;
         submitBtn.textContent = 'Invio in corso...';
         hideMessage();
@@ -377,6 +386,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 disableFieldsFrom('date');
                 dateField.disabled = true;
                 locationField.focus();
+
+                if (data.data.redirect_url) {
+                    setTimeout(() => {
+                        window.location.href = data.data.redirect_url;
+                    }, 1500); // Aspetta 1.5s per mostrare messaggio
+                } else {
+                    // Reset form se non c'è redirect
+                    form.reset();
+                    disableFieldsFrom('date');
+                    dateField.disabled = true;
+                }
+
             } else {
                 showMessage('error', data.data.message || 'Errore durante la prenotazione.');
                 submitBtn.disabled = false;
