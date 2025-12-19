@@ -161,7 +161,6 @@ class Availability_Checker {
             error_log("=== STRUTTURA dispArr per {$location} - {$month}/{$year} ===");
             error_log("Tipo: " . gettype($dispArr));
             error_log("Count: " . (is_array($dispArr) ? count($dispArr) : 'N/A'));
-            error_log("Dump completo: " . print_r($dispArr, true));
             error_log("=== FINE STRUTTURA ===");
 
 
