@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // ✅ BLOCCA il campo quantità
                 qtyInput.readOnly = true;
-                qtyInput.disabled = true;
                 qtyInput.style.pointerEvents = 'none';
                 qtyInput.style.opacity = '0.6';
                 qtyInput.style.cursor = 'not-allowed';
