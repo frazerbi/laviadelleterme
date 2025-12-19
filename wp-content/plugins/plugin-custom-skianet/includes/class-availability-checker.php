@@ -40,7 +40,7 @@ class Availability_Checker {
      */
     private function __construct() {
 
-        $this->json_path = plugin_dir_path(PLUGIN_SKIANET_FILE) . '/assets/data';
+        $this->json_path = plugin_dir_path(PLUGIN_SKIANET_FILE) . 'assets/data';
 
         // Crea directory se non esiste
         if (!file_exists($this->json_path)) {
