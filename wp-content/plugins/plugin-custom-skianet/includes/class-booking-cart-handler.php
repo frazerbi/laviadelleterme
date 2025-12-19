@@ -232,4 +232,27 @@ class Booking_Cart_Handler {
         );
     }
 
+    /**
+     * Disabilita modifica quantità per prodotti con prenotazione
+     */
+    public function disable_quantity_change($product_quantity, $cart_item_key, $cart_item) {
+        // Se il prodotto ha dati di prenotazione, mostra quantità come testo fisso
+        if (isset($cart_item['booking_id'])) {
+            $quantity = $cart_item['quantity'];
+            
+            // Mostra quantità come testo non modificabile con classe specifica
+            return sprintf(
+                '<div class="quantity quantity-readonly woocommerce-quantity" style="text-align: center; display: inline-block; padding: 8px 12px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;">
+                    <strong style="font-size: 16px; color: #333;">%s</strong>
+                    <input type="hidden" name="cart[%s][qty]" value="%s" />
+                </div>',
+                $quantity,
+                $cart_item_key,
+                $quantity
+            );
+        }
+        
+        return $product_quantity;
+    }
+
 }
