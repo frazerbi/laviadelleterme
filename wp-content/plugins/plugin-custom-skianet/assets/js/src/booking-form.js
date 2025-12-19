@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function mapLocationToFileName(location) {
         const locationMap = {
             'terme-genova': 'genova',
-            'terme-monterosa-spa': 'monterosa',
+            'terme-monterosa': 'monterosa',
             'terme-saint-vincent': 'saint-vincent'
         };
 
