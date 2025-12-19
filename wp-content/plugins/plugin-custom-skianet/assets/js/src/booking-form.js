@@ -165,24 +165,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === GESTIONE PROGRESSIVA DEI CAMPI ===
     locationField.addEventListener('change', function() {
-        dateField.disabled = !this.value;
-        if (!this.value) {
-            dateField.value = '';
+        // Reset campi successivi quando cambia la location
+        dateField.value = '';
+        ticketTypeField.value = '';
+        ticketTypeField.selectedIndex = 0;
+        timeSlotField.value = '';
+        timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+        numMaleField.value = '0';
+        numFemaleField.value = '0';
 
-            if (calendar) {
-                calendar.destroy();
-                calendar = null;
-            }
-
-            disableFieldsFrom('date');
-        } else {
-            // ✅ Inizializza nuovo calendario con nuova location
-            if (calendar) {
-                calendar.destroy();
-                calendar = null;
-            }
-            initCalendar(this.value);
+        if (calendar) {
+            calendar.destroy();
+            calendar = null;
+            availabilityData = null;
         }
+
+        apiData = null;
+
+        if (this.value) {
+            dateField.disabled = false;
+            // Inizializza nuovo calendario per la nuova location
+            initCalendar(this.value);
+        } else {
+            dateField.disabled = true;
+            disableFieldsFrom('date');
+        }
+
     });
 
     dateField.addEventListener('change', function() {
