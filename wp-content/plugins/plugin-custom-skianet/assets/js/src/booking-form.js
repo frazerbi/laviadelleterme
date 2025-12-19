@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let apiData = null;
 
     // === GESTIONE PROGRESSIVA DEI CAMPI ===
-    locationField.addEventListener('change', function() {
+    locationField.addEventListener('change', async function() {
         // Reset campi successivi quando cambia la location
         dateField.value = '';
         ticketTypeField.value = '';
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.value) {
             dateField.disabled = false;
             // Inizializza nuovo calendario per la nuova location
-            initCalendar(this.value);
+            await initCalendar(this.value);
         } else {
             dateField.disabled = true;
             disableFieldsFrom('date');
