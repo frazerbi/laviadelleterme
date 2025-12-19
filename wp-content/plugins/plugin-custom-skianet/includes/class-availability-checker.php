@@ -256,6 +256,11 @@ class Availability_Checker {
         $filename = $this->get_json_filename($location);
         $filepath = $this->json_path . '/' . $filename;
 
+        if (file_exists($filepath)) {
+            unlink($filepath);
+            error_log("File vecchio eliminato: {$filepath}");
+        }
+
         $json_data = array(
             'location' => $location,
             'generated_at' => current_time('mysql'),
@@ -264,11 +269,13 @@ class Availability_Checker {
 
         $result = file_put_contents(
             $filepath, 
-            json_encode($json_data, JSON_PRETTY_PRINT)
+            json_encode($json_data, JSON_PRETTY_PRINT),
+            LOCK_EX
         );
 
         if ($result !== false) {
             error_log("✅ JSON salvato: {$filepath}");
+            clearstatcache(true, $filepath);
         } else {
             error_log("❌ Errore salvataggio JSON: {$filepath}");
         }
