@@ -6,6 +6,7 @@ package-lock.json
 
 # ignore all /dist
 */dist/
+**/plugin-custom-skianet/assets/data/
 
 # ignore node dependency directories
 */node_modules/
@@ -24,4 +25,3 @@ ftp-kr.json
 .htaccess
 license.txt
 readme.html
-wp-content/plugins/plugin-custom-skianet/assets/data/availability-*.json
