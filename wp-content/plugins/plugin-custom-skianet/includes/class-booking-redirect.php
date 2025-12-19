@@ -49,7 +49,7 @@ class Booking_Redirect {
      * Costruttore
      */
     private function __construct() {
-        // Nessun hook necessario per ora
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_variation_script'));
     }
 
     /**
@@ -136,4 +136,23 @@ class Booking_Redirect {
 
         return $redirect_url;
     }
+
+    /**
+     * Carica script per pre-selezione variazione
+     */
+    public function enqueue_variation_script() {
+        // Solo su pagine prodotto
+        if (!is_product()) {
+            return;
+        }
+        
+        wp_enqueue_script(
+            'woocommerce-variation-preselect',
+            plugin_dir_path(PLUGIN_SKIANET_FILE) . 'assets/js/woocommerce-variation-preselect.js',
+            array('jquery'),
+            '1.0.0',
+            true
+        );
+    }
+
 }
