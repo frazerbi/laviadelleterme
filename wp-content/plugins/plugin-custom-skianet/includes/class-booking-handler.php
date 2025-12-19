@@ -11,19 +11,21 @@ if (!defined('ABSPATH')) {
 class Booking_Handler {
 
     /**
-     * Location disponibili
+     * Location disponibili (unica fonte di verità)
      */
-    private static $locations_to_be_encrypted = array(
-        'terme-saint-vincent' => 'Saint Vincent',
-        'terme-genova' => 'Genova',
-        'monterosa-spa' => 'Monterosa'
-    );
-
-
-    private static $locations_labels = array(
-        'terme-saint-vincent' => 'Terme di Saint-Vincent',
-        'terme-genova' => 'Terme di Genova',
-        'monterosa-spa' => 'Monterosa SPA'
+    private static $locations = array(
+        'terme-saint-vincent' => array(
+            'label' => 'Terme di Saint-Vincent',
+            'value' => 'Saint Vincent'
+        ),
+        'terme-genova' => array(
+            'label' => 'Terme di Genova',
+            'value' => 'Genova'
+        ),
+        'monterosa-spa' => array(
+            'label' => 'Monterosa SPA',
+            'value' => 'Monterosa'
+        )
     );
 
     /**
@@ -33,7 +35,6 @@ class Booking_Handler {
         '4h' => '4 Ore',
         'giornaliero' => 'Giornaliero'
     );
-
     
     /**
      * Istanza singleton
@@ -54,22 +55,26 @@ class Booking_Handler {
      * Ottieni le location per il form (slug => label)
      */
     public static function get_available_locations() {
-        return self::$locations_labels;
+        return array_map(function($loc) {
+            return $loc['label'];
+        }, self::$locations);
     }
 
     /**
-     * Ottieni il valore da criptare per TermeGest
-     */
-    private function get_location_value_for_encryption($location_slug) {
-        return self::$locations_to_be_encrypted[$location_slug] ?? '';
-    }
-
-    /**
-     * Ottieni tutte le location da criptare (statico)
+     * Ottieni tutte le location da criptare (statico per uso esterno)
      */
     public static function get_locations_to_encrypt() {
-        return self::$locations_to_be_encrypted;
-    } 
+        return array_map(function($loc) {
+            return $loc['value'];
+        }, self::$locations);
+    }
+
+    /**
+     * Ottieni il valore da criptare per una location specifica
+     */
+    private function get_location_value_for_encryption($location_slug) {
+        return self::$locations[$location_slug]['value'] ?? '';
+    }
 
     /**
      * Ottieni i tipi di ingresso disponibili
@@ -78,12 +83,6 @@ class Booking_Handler {
         return self::$ticket_types;
     }
 
-    /**
-     * Ottieni le fasce orarie disponibili
-     */
-    public static function get_time_slots() {
-        return array();
-    }
 
     /**
      * Costruttore
@@ -96,18 +95,18 @@ class Booking_Handler {
      * Inizializza gli hooks
      */
     private function init_hooks() {
-        // Shortcode per il form
+
+        add_action('init', function() {
+        if (!session_id()) {
+                session_start();
+            }
+        });
+
         add_shortcode('booking_form', array($this, 'render_booking_form'));
-        
-        // Hook per gestire il submit del form
         add_action('wp_ajax_submit_booking_ajax', array($this, 'handle_ajax_submission'));
         add_action('wp_ajax_nopriv_submit_booking_ajax', array($this, 'handle_ajax_submission'));
-        
-        // Hook AJAX per chiamata API esterna
         add_action('wp_ajax_check_availability_api', array($this, 'check_availability_api'));
         add_action('wp_ajax_nopriv_check_availability_api', array($this, 'check_availability_api'));
-
-        // Enqueue scripts e styles
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
     }
 
@@ -149,44 +148,152 @@ class Booking_Handler {
     }
 
     /**
-     * Renderizza il form tramite shortcode
+     * Effettua chiamata API per verificare disponibilità
      */
-    public function render_booking_form() {
-        ob_start();
+    public function check_availability_api() {
+
+        // Verifica nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
+            wp_send_json_error(array('message' => 'Errore di sicurezza.'));
+        }
+
+        // Sanitizza i dati
+        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';        
+
+        // Valida location
+        if (!$this->is_valid_location($location)) {
+            wp_send_json_error(array('message' => 'Location non valida.'));
+        }
+
+        // Valida e parse data
+        $date = $this->parse_date($booking_date);
+        if (is_wp_error($date)) {
+            wp_send_json_error(array('message' => $date->get_error_message()));
+        }
+
+        $location_value = $this->get_location_value_for_encryption($location);
+        if (empty($location_value)) {
+            wp_send_json_error(array('message' => 'Codice location non trovato.'));
+        }
+
+        $disponibilita = skianet_termegest_get_disponibilita_by_day(
+            (int) $date->format('d'),
+            (int) $date->format('m'),
+            (int) $date->format('Y'),
+            $location_value
+        );
+    
+        if (empty($disponibilita)) {
+            wp_send_json_error(array('message' => 'Nessuna disponibilità per la data selezionata.'));
+        }
         
-        include plugin_dir_path(dirname(__FILE__)) . 'templates/booking-form.php';
-        
-        return ob_get_clean();
-    }
+
+        // Formatta le fasce per il frontend
+        $available_slots = $this->format_available_slots($disponibilita);
+                        
+        // Ritorna i dati
+        wp_send_json_success(array(
+            'message' => 'Disponibilità verificata con successo.',
+            'available_slots' => $available_slots
+        ));
+                
+    }   
+
 
     /**
+     * Gestisce il submit AJAX del form
+     */
+    public function handle_ajax_submission() {
+        // Verifica nonce
+        if (!isset($_POST['booking_form_nonce']) || 
+            !wp_verify_nonce($_POST['booking_form_nonce'], 'booking_form_action')) {
+            wp_send_json_error(array('message' => 'Errore di sicurezza. Riprova.'));
+        }
+
+        // Sanitizza e recupera TUTTI i dati
+        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
+        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
+        $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
+        $fascia_id = isset($_POST['time_slot']) ? intval($_POST['time_slot']) : 0;
+        $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
+        $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
+        $categorie = isset($_POST['categorie']) ? sanitize_text_field($_POST['categorie']) : '';
+
+        // Log per debug
+        error_log('=== DATI PRENOTAZIONE ===');
+        error_log("Location: {$location}");
+        error_log("Data: {$booking_date}");
+        error_log("ID Fascia: {$fascia_id}");
+        error_log("Tipo Ingresso: {$ticket_type}");
+        error_log("Num Uomini: {$num_male}");
+        error_log("Num Donne: {$num_female}");
+        error_log("Categorie: {$categorie}");
+        error_log("Totale: " . ($num_male + $num_female));
+
+        // Validazione
+        $validation = $this->validate_booking_data(
+            $location, 
+            $booking_date, 
+            $ticket_type, 
+            $fascia_id,
+            $num_male, 
+            $num_female
+        );
+        
+        if (is_wp_error($validation)) {
+            wp_send_json_error(array('message' => $validation->get_error_message()));
+        }
+
+        // Prepara dati per la prenotazione
+        $booking_data = array(
+            'location' => $location,
+            'location_name' => $this->get_location_value_for_encryption($location),
+            'booking_date' => $booking_date,
+            'fascia_id' => $fascia_id,
+            'ticket_type' => $ticket_type,
+            'num_male' => $num_male,
+            'num_female' => $num_female,
+            'total_guests' => $num_male + $num_female,
+            'categorie' => $categorie,
+            'user_id' => get_current_user_id(),
+            'created_at' => current_time('mysql')
+        );
+        
+        error_log('Booking data: ' . print_r($booking_data, true));
+
+        // Salva la prenotazione
+        $booking_id = $this->save_booking($booking_data);
+
+        if ($booking_id) {
+            wp_send_json_success(array(
+                'message' => 'Prenotazione effettuata con successo!',
+                'booking_id' => $booking_id
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Errore durante il salvataggio. Riprova.'));
+        }
+    }
+
+        /**
      * Valida i dati del form
      */
     private function validate_booking_data($location, $booking_date, $ticket_type, $fascia_id, $num_male, $num_female) {
         $errors = new WP_Error();
 
         // Valida location
-        $valid_locations = array_keys(self::$locations_labels);
-        if (empty($location) || !in_array($location, $valid_locations)) {
+        if (!$this->is_valid_location($location)) {
             $errors->add('invalid_location', 'Seleziona una location valida.');
         }
 
         // Valida data
-        if (empty($booking_date)) {
-            $errors->add('empty_date', 'Inserisci una data.');
-        } else {
-            $date = DateTime::createFromFormat('Y-m-d', $booking_date);
-            $today = new DateTime();
-            $today->setTime(0, 0, 0);
-            
-            if (!$date || $date < $today) {
-                $errors->add('invalid_date', 'Inserisci una data valida (non nel passato).');
-            }
+        $date = $this->parse_date($booking_date);
+        if (is_wp_error($date)) {
+            $errors->add($date->get_error_code(), $date->get_error_message());
         }
 
         // Valida tipo ingresso
-        $valid_types = array_keys(self::$ticket_types);
-        if (empty($ticket_type) || !in_array($ticket_type, $valid_types)) {
+        if (!$this->is_valid_ticket_type($ticket_type)) {
             $errors->add('invalid_type', 'Seleziona un tipo di ingresso valido.');
         }
 
@@ -197,11 +304,11 @@ class Booking_Handler {
 
         // Valida numero ingressi
         if ($num_male < 0 || $num_male > 10) {
-            $errors->add('invalid_num_male', 'Numero ingressi uomo non valido (0-20).');
+            $errors->add('invalid_num_male', 'Numero ingressi uomo non valido (0-10).');
         }
 
         if ($num_female < 0 || $num_female > 10) {
-            $errors->add('invalid_num_female', 'Numero ingressi donna non valido (0-20).');
+            $errors->add('invalid_num_female', 'Numero ingressi donna non valido (0-10).');
         }
 
         $total_guests = $num_male + $num_female;
@@ -213,90 +320,23 @@ class Booking_Handler {
             $errors->add('too_many_guests', 'Numero massimo di ingressi: 20.');
         }
 
-
         if ($errors->has_errors()) {
             return $errors;
         }
 
+
         return true;
     }
-
-    /**
-     * Effettua chiamata API per verificare disponibilità
-     */
-    public function check_availability_api() {
-        // Verifica nonce
-        if (!isset($_POST['nonce']) || 
-            !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
-            wp_send_json_error(array(
-                'message' => 'Errore di sicurezza.'
-            ));
-        }
-
-        // Sanitizza i dati
-        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
-        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
-
-        // Valida i dati base
-        if (empty($location) ) {
-            wp_send_json_error(array(
-                'message' => 'Location e data sono obbligatori.'
-            ));
-        }
-
-        // Valida location
-        if (!array_key_exists($location, self::$locations_labels)) {
-            wp_send_json_error(array(
-                'message' => 'Location non valida.'
-            ));
-        }
-
-        // Converti la data in giorno, mese, anno
-        $date = DateTime::createFromFormat('Y-m-d', $booking_date);
-        if (!$date) {
-            wp_send_json_error(array(
-                'message' => 'Data non valida.'
-            ));
-        }
-
-        $day = (int) $date->format('d');
-        $month = (int) $date->format('m');
-        $year = (int) $date->format('Y');
     
-        $location_value = $this->get_location_value_for_encryption($location);
-
-        if (empty($location_value)) {
-            error_log('ERRORE: Valore location non trovato per - ' . $location);
-            wp_send_json_error(array(
-                'message' => 'Codice location non trovato.'
-            ));
-        }
+    /**
+     * Renderizza il form tramite shortcode
+     */
+    public function render_booking_form() {
+        ob_start();
         
-        error_log("Location value per criptazione: {$location_value}");
+        include plugin_dir_path(dirname(__FILE__)) . 'templates/booking-form.php';
         
-        error_log("Data convertita - Day: {$day}, Month: {$month}, Year: {$year}");
-
-        // Chiama l'API TermeGest
-        $disponibilita = skianet_termegest_get_disponibilita_by_day($day, $month, $year, $location_value);
-
-        // Verifica risultati
-        if (empty($disponibilita)) {
-            wp_send_json_error(array(
-                'message' => 'Nessuna disponibilità per la data selezionata.'
-            ));
-        }
-
-        // Formatta le fasce per il frontend
-        $available_slots = $this->format_available_slots($disponibilita);
-        
-        // error_log('Available slots formattati: ' . print_r($available_slots, true));
-
-        // Ritorna i dati
-        wp_send_json_success(array(
-            'message' => 'Disponibilità verificata con successo.',
-            'available_slots' => $available_slots
-        ));
-        
+        return ob_get_clean();
     }
 
     /**
@@ -333,68 +373,96 @@ class Booking_Handler {
     }
 
     /**
-     * Gestisce il submit AJAX del form
+     * Salva la prenotazione nella sessione
      */
-    public function handle_ajax_submission() {
-        // Verifica nonce
-        if (!isset($_POST['booking_form_nonce']) || 
-            !wp_verify_nonce($_POST['booking_form_nonce'], 'booking_form_action')) {
-            wp_send_json_error(array('message' => 'Errore di sicurezza. Riprova.'));
+    private function save_booking($data) {
+        // Avvia sessione se non già avviata
+        if (!session_id()) {
+            session_start();
         }
-
-        // Sanitizza e recupera TUTTI i dati
-        $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
-        $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
-        $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
-        $fascia_id = isset($_POST['time_slot']) ? intval($_POST['time_slot']) : 0;
-        $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
-        $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
-
-        // Log per debug
-        error_log('=== DATI PRENOTAZIONE ===');
-        error_log("Location: {$location}");
-        error_log("Data: {$booking_date}");
-        error_log("ID Fascia: {$fascia_id}");
-        error_log("Tipo Ingresso: {$ticket_type}");
-        error_log("Num Uomini: {$num_male}");
-        error_log("Num Donne: {$num_female}");
-        error_log("Totale: " . ($num_male + $num_female));
-
-        // Validazione
-        $validation = $this->validate_booking_data(
-            $location, 
-            $booking_date, 
-            $ticket_type, 
-            $fascia_id,
-            $num_male, 
-            $num_female
-        );
         
-        if (is_wp_error($validation)) {
-            wp_send_json_error(array('message' => $validation->get_error_message()));
-        }
-
-        // TODO: Salva la prenotazione
-        // Qui avrai tutti i dati disponibili per salvarli
+        // Genera un ID univoco per la prenotazione
+        $booking_id = uniqid('booking_', true);
+        
+        // Prepara tutti i dati da salvare
         $booking_data = array(
-            'location' => $location,
-            'booking_date' => $booking_date,
-            'fascia_id' => $fascia_id,
-            'ticket_type' => $ticket_type,
-            'num_male' => $num_male,
-            'num_female' => $num_female,
-            'total_guests' => $num_male + $num_female
+            'booking_id' => $booking_id,
+            'location' => $data['location'],
+            'location_name' => $data['location_name'],
+            'booking_date' => $data['booking_date'],
+            'fascia_id' => $data['fascia_id'],
+            'ticket_type' => $data['ticket_type'],
+            'num_male' => $data['num_male'],
+            'num_female' => $data['num_female'],
+            'total_guests' => $data['total_guests'],
+            'categorie' => $data['categorie'],
+            'user_id' => $data['user_id'],
+            'status' => 'pending',
+            'created_at' => $data['created_at'],
+            'session_timestamp' => time()
         );
         
-        error_log('Booking data: ' . print_r($booking_data, true));
+        // Salva nella sessione
+        $_SESSION['termegest_booking'] = $booking_data;
+        
+        error_log('Prenotazione salvata in sessione: ' . print_r($booking_data, true));
+        
+        return $booking_id;
+    }
 
-        $booking_success = true;
-
-        if ($booking_success) {
-            wp_send_json_success(array('message' => 'Prenotazione effettuata con successo!'));
-        } else {
-            wp_send_json_error(array('message' => 'Errore durante il salvataggio. Riprova.'));
+    /**
+     * Parse e valida una data
+     */
+    private function parse_date($booking_date) {
+        if (empty($booking_date)) {
+            return new WP_Error('empty_date', 'Inserisci una data.');
         }
+        
+        $date = DateTime::createFromFormat('Y-m-d', $booking_date);
+        $today = new DateTime();
+        $today->setTime(0, 0, 0);
+        
+        if (!$date || $date < $today) {
+            return new WP_Error('invalid_date', 'Inserisci una data valida (non nel passato).');
+        }
+        
+        return $date;
+    }
+
+    /**
+     * Recupera la prenotazione dalla sessione
+     */
+    private function get_booking_from_session() {
+        if (!session_id()) {
+            session_start();
+        }
+        
+        return $_SESSION['termegest_booking'] ?? null;
+    }
+
+    /**
+     * Cancella la prenotazione dalla sessione
+     */
+    private function clear_booking_session() {
+        if (!session_id()) {
+            session_start();
+        }
+        
+        unset($_SESSION['termegest_booking']);
     }
     
+    /**
+     * Verifica se la location è valida
+     */
+    private function is_valid_location($location) {
+        return !empty($location) && array_key_exists($location, self::$locations);
+    }
+
+    /**
+     * Verifica se il tipo di ingresso è valido
+     */
+    private function is_valid_ticket_type($ticket_type) {
+        return !empty($ticket_type) && array_key_exists($ticket_type, self::$ticket_types);
+    }
+
 }
