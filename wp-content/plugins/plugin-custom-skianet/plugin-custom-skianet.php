@@ -72,10 +72,6 @@ function init_booking_handler_plugin() {
         Booking_Handler::get_instance();
     }
 
-    if (class_exists('Availability_Checker')) {
-        Availability_Checker::get_instance();
-    }
-
     if (class_exists('Booking_Redirect')) {
         Booking_Redirect::get_instance();
     }
