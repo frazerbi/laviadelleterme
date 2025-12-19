@@ -75,6 +75,11 @@ function init_booking_handler_plugin() {
     if (class_exists('Booking_Redirect')) {
         Booking_Redirect::get_instance();
     }
+
+    if (class_exists('Availability_Checker')) {
+        Availability_Checker::get_instance();
+    }
+    
 }
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);
