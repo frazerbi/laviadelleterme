@@ -148,7 +148,7 @@ class Booking_Redirect {
         
         wp_enqueue_script(
             'woocommerce-variation-preselect',
-            plugin_dir_path(PLUGIN_SKIANET_FILE) . 'assets/js/woocommerce-variation-preselect.js',
+            PLUGIN_SKIANET_FILE . 'assets/js/woocommerce-variation-preselect.js',
             array('jquery'),
             '1.0.0',
             true
