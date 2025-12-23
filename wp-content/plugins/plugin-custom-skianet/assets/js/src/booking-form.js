@@ -291,8 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isChristmas) {
                 // ✅ PERIODO NATALIZIO - Blocca "giornaliero"
                 giornalieroOption.disabled = true;
-                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)';
-                
+                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)'; 
+
                 // Se era selezionato, resettalo a 4h
                 if (ticketTypeField.value === 'giornaliero') {
                     ticketTypeField.value = '4h';
