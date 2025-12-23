@@ -143,7 +143,8 @@ class Booking_Handler {
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('booking_form_nonce'),
             'success_message' => __('Prenotazione effettuata con successo!', 'text-domain'),
-            'error_message' => __('Si è verificato un errore. Riprova.', 'text-domain')
+            'error_message' => __('Si è verificato un errore. Riprova.', 'text-domain'),
+            'christmas_dates' => $this->get_christmas_dates()
         ));
     }
 
@@ -304,6 +305,11 @@ class Booking_Handler {
         if (is_wp_error($date)) {
             $errors->add($date->get_error_code(), $date->get_error_message());
         }
+
+        if ($this->is_christmas_period($booking_date) && $ticket_type === 'giornaliero') {
+            $errors->add('invalid_ticket_natale', 'Nel periodo natalizio è disponibile solo l\'ingresso 4 ore.');
+        }
+
 
         // Valida tipo ingresso
         if (!$this->is_valid_ticket_type($ticket_type)) {
@@ -487,4 +493,49 @@ class Booking_Handler {
         return !empty($ticket_type) && array_key_exists($ticket_type, self::$ticket_types);
     }
 
+    /**
+     * Ottieni array di date del periodo natalizio (25 dic - 6 gen)
+     */
+    private function get_christmas_dates() {
+        $dates = array();
+        $current_year = (int) date('Y');
+        
+        // 25-31 Dicembre anno corrente
+        for ($day = 25; $day <= 31; $day++) {
+            $dates[] = sprintf('%04d-12-%02d', $current_year, $day);
+        }
+        
+        // 1-6 Gennaio anno successivo
+        $next_year = $current_year + 1;
+        for ($day = 1; $day <= 6; $day++) {
+            $dates[] = sprintf('%04d-01-%02d', $next_year, $day);
+        }
+        
+        return $dates;
+    }
+
+    /**
+     * Verifica se una data è nel periodo natalizio
+     */
+    private function is_christmas_period($date_string) {
+        $date = DateTime::createFromFormat('Y-m-d', $date_string);
+        if (!$date) {
+            return false;
+        }
+        
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
+        
+        // 25-31 Dicembre
+        if ($month === 12 && $day >= 25) {
+            return true;
+        }
+        
+        // 1-6 Gennaio
+        if ($month === 1 && $day <= 6) {
+            return true;
+        }
+        
+        return false;
+    }
 }

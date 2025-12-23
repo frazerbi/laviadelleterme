@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
 
+    // Array delle date natalizie dal backend
+    const christmasDates = bookingFormData.christmas_dates || [];
+
     // === VANILLA CALENDAR INTEGRATION ===
     let calendar = null;
     let availabilityData = null;
@@ -35,6 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         return locationMap[location] || location;
+    }
+
+    /**
+     * Verifica se una data è nel periodo natalizio
+     */
+    function isChristmasPeriod(dateString) {
+        return christmasDates.includes(dateString);
     }
 
     // Funzione per recuperare il JSON delle disponibilità per location
@@ -180,15 +190,17 @@ document.addEventListener('DOMContentLoaded', function() {
             availabilityData = null;
         }
 
+        hideMessage();
+
         apiData = null;
 
         if (this.value) {
-            dateField.disabled = false;
             // Inizializza nuovo calendario per la nuova location
             await initCalendar(this.value);
+            dateField.disabled = false; 
         } else {
             dateField.disabled = true;
-            disableFieldsFrom('date');
+            disableFieldsFrom('ticket');
         }
 
     });
@@ -201,6 +213,9 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
 
         if (this.value && locationField.value) {
+
+            handleTicketTypeOptions(this.value);
+
             callAvailabilityAPI(locationField.value, this.value);
         } else {
             disableFieldsFrom('ticket');
@@ -261,7 +276,36 @@ document.addEventListener('DOMContentLoaded', function() {
     numFemaleField.addEventListener('input', checkSubmitButton);
 
     // === FUNZIONI HELPER ===
-
+    /**
+     * Gestisci visibilità opzione "giornaliero" in base alla data
+     */
+    function handleTicketTypeOptions(selectedDate) {
+        if (!ticketTypeField || !selectedDate) {
+            return;
+        }
+        
+        const isChristmas = isChristmasPeriod(selectedDate);
+        const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
+        
+        if (giornalieroOption) {
+            if (isChristmas) {
+                // ✅ PERIODO NATALIZIO - Blocca "giornaliero"
+                giornalieroOption.disabled = true;
+                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)';
+                
+                // Se era selezionato, resettalo a 4h
+                if (ticketTypeField.value === 'giornaliero') {
+                    ticketTypeField.value = '4h';
+                }
+                
+                console.log('Periodo natalizio - Solo 4 ore disponibile');
+            } else {
+                // ✅ PERIODO NORMALE - Abilita "giornaliero"
+                giornalieroOption.disabled = false;
+                giornalieroOption.textContent = 'Giornaliero';
+            }
+        }
+    }
     function disableFieldsFrom(from) {
         apiData = null;
 
