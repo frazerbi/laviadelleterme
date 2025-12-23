@@ -27,6 +27,10 @@ class Booking_Redirect {
                 '4h' => 229,           // Variazione ID 1
                 'giornaliero' => 230  // Variazione ID 2
             )
+        ),
+        'natale' => array(
+            'product_id' => 27370,
+            'variations' => array()  // Nessuna variazione
         )
     );
 
@@ -53,6 +57,31 @@ class Booking_Redirect {
     }
 
     /**
+     * Verifica se una data è nel periodo natalizio (25 dic - 6 gen)
+     */
+    private function is_christmas_period($date_string) {
+        $date = DateTime::createFromFormat('Y-m-d', $date_string);
+        if (!$date) {
+            return false;
+        }
+        
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
+        
+        // 25-31 Dicembre
+        if ($month === 12 && $day >= 25) {
+            return true;
+        }
+        
+        // 1-6 Gennaio
+        if ($month === 1 && $day <= 6) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
      * Verifica se una data è weekend (sabato o domenica)
      */
     private function is_weekend($date_string) {
@@ -70,6 +99,18 @@ class Booking_Redirect {
      * Ottieni Product ID e Variation ID
      */
     private function get_product_config($booking_date, $ticket_type) {
+
+        // Controlla se è periodo natalizio
+        if ($this->is_christmas_period($booking_date)) {
+            error_log("Data: {$booking_date} - Tipo giorno: NATALE");
+            
+            return array(
+                'product_id' => self::$product_config['natale']['product_id'],
+                'variation_id' => null, // ✅ Nessuna variazione
+                'day_type' => 'natale'
+            );
+        }
+
         // Determina se è weekend o feriale
         $day_type = $this->is_weekend($booking_date) ? 'weekend' : 'feriale';
         
@@ -122,7 +163,6 @@ class Booking_Redirect {
         // Aggiungi parametri query string
         $redirect_url = add_query_arg(array(
             'booking_id' => $booking_id,
-            'variation_id' => $variation_id,
             'location' => $booking_data['location'],
             'date' => $booking_data['booking_date'],
             'fascia_id' => $booking_data['fascia_id'],
@@ -131,6 +171,10 @@ class Booking_Redirect {
             'total_guests' => $booking_data['total_guests'],
             'ticket_type' => $booking_data['ticket_type']
         ), $product_url);
+
+        if ($variation_id) {
+            $url_params['variation_id'] = $variation_id;
+        }
 
         error_log("Redirect URL: {$redirect_url}");
 
