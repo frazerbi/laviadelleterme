@@ -117,55 +117,34 @@ class Booking_Cart_Handler {
      * Mostra dati prenotazione nel carrello
      */
     public function display_booking_data_in_cart($item_data, $cart_item) {
+
         if (isset($cart_item['booking_id'])) {
             // Formatta la data in italiano
             $date = DateTime::createFromFormat('Y-m-d', $cart_item['booking_date']);
             $formatted_date = $date ? $date->format('d/m/Y') : $cart_item['booking_date'];
             
+            // ✅ Prenotazione + Location (una riga)
             $item_data[] = array(
                 'key'   => 'Prenotazione',
-                'value' => '#' . substr($cart_item['booking_id'], -8)
+                'value' => $cart_item['booking_location_name'] . ' - ' . $formatted_date
             );
             
-            $item_data[] = array(
-                'key'   => 'Location',
-                'value' => $cart_item['booking_location_name']
-            );
+            // ✅ Ospiti (compatto)
+            $guests_text = '';
+            if ($cart_item['booking_num_male'] > 0 && $cart_item['booking_num_female'] > 0) {
+                $guests_text = sprintf('%d uomo, %d donna', $cart_item['booking_num_male'], $cart_item['booking_num_female']);
+            } elseif ($cart_item['booking_num_male'] > 0) {
+                $guests_text = sprintf('%d %s', $cart_item['booking_num_male'], $cart_item['booking_num_male'] === 1 ? 'uomo' : 'uomini');
+            } elseif ($cart_item['booking_num_female'] > 0) {
+                $guests_text = sprintf('%d %s', $cart_item['booking_num_female'], $cart_item['booking_num_female'] === 1 ? 'donna' : 'donne');
+            }
             
             $item_data[] = array(
-                'key'   => 'Data',
-                'value' => $formatted_date
-            );
-            
-            // ✅ ID Fascia Oraria
-            $item_data[] = array(
-                'key'   => 'ID Fascia',
-                'value' => $cart_item['booking_fascia_id']
-            );
-            
-            $item_data[] = array(
-                'key'   => 'Tipo Ingresso',
-                'value' => $cart_item['booking_ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero'
-            );
-            
-            // ✅ Mostra sempre uomini (anche se 0)
-            $item_data[] = array(
-                'key'   => 'Ingressi Uomo',
-                'value' => $cart_item['booking_num_male']
-            );
-            
-            // ✅ Mostra sempre donne (anche se 0)
-            $item_data[] = array(
-                'key'   => 'Ingressi Donna',
-                'value' => $cart_item['booking_num_female']
-            );
-            
-            $item_data[] = array(
-                'key'   => 'Totale Ospiti',
-                'value' => $cart_item['booking_total_guests']
+                'key'   => 'Ospiti',
+                'value' => $guests_text
             );
         }
-        
+            
         return $item_data;
     }
 
