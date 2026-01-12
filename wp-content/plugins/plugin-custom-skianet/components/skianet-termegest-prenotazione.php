@@ -45,7 +45,7 @@ function skianet_termegest_get_category_from_ticket(string $code): ?string
     
 }
 
-add_action('woocommerce_payment_complete', 'skianet_termegest_send_order_to_termegest', 10, 2);
+// add_action('woocommerce_payment_complete', 'skianet_termegest_send_order_to_termegest', 10, 2);
 function skianet_termegest_send_order_to_termegest($orderId): void
 {   
     error_log("funzione chiamata");
