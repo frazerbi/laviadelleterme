@@ -57,6 +57,9 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-cart-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-code-assignment.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-termegest-sync.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-handler.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-status.php';
+
+
 
 // Hook activation - registra il cron
 register_activation_hook(__FILE__, function() {
@@ -92,6 +95,13 @@ function init_booking_handler_plugin() {
         Booking_Code_Assignment::get_instance();
     }
     
+    if (class_exists('Booking_Termegest_Sync')) {
+        Booking_Termegest_Sync::get_instance();
+    }
+    
+    if (class_exists('Booking_Order_Status')) {
+        Booking_Order_Status::get_instance();
+    }
 }
 
 add_action('wp_loaded', 'skianet_plugin_loaded', \PHP_INT_MAX);
