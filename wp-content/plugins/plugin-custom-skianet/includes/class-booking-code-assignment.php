@@ -84,7 +84,8 @@ class Booking_Code_Assignment {
             error_log("Avvio sincronizzazione TermeGest...");
             
             $sync = Booking_TermeGest_Sync::get_instance();
-            $sync->sync_booking_to_termegest($order_id);
+            $sync->sync_order_to_termegest($order_id);
+            
         } else {
             error_log("⚠️ Booking_TermeGest_Sync non disponibile");
         }
