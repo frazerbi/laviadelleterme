@@ -23,11 +23,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // === VANILLA CALENDAR INTEGRATION ===
     let calendar = null;
     let availabilityData = null;
+    let calendarWrapper = null;
 
-    // Crea un wrapper per il calendario vicino all'input
-    const calendarWrapper = document.createElement('div');
-    calendarWrapper.className = 'vanilla-calendar-wrapper';
-    dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
+    // Funzione per creare/ricreare il wrapper del calendario
+    function createCalendarWrapper() {
+        // Rimuovi il wrapper esistente se presente
+        if (calendarWrapper && calendarWrapper.parentNode) {
+            calendarWrapper.parentNode.removeChild(calendarWrapper);
+        }
+
+        // Crea un nuovo wrapper
+        calendarWrapper = document.createElement('div');
+        calendarWrapper.className = 'vanilla-calendar-wrapper';
+        dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
+
+        return calendarWrapper;
+    }
+
+    // Crea il wrapper iniziale
+    createCalendarWrapper();
 
     // add bottoni + e - per i campi numerici
     handleNumbersInput(numMaleField);
@@ -172,6 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calendar = new Calendar(calendarWrapper, options);
         calendar.init();
+        console.log('Calendario inizializzato per location:', location);
+        console.log(calendar);
     }
 
     // Mostra calendario al click sull'input
@@ -215,9 +231,11 @@ document.addEventListener('DOMContentLoaded', function() {
         apiData = null;
 
         if (this.value) {
+            // Ricrea completamente il wrapper del calendario
+            createCalendarWrapper();
             // Inizializza nuovo calendario per la nuova location
             await initCalendar(this.value);
-            dateField.disabled = false; 
+            dateField.disabled = false;
         } else {
             dateField.disabled = true;
             disableFieldsFrom('ticket');
