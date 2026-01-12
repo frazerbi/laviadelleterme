@@ -29,6 +29,27 @@ document.addEventListener('DOMContentLoaded', function() {
     calendarWrapper.className = 'vanilla-calendar-wrapper';
     dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
 
+    // add bottoni + e - per i campi numerici
+    handleNumbersInput(numMaleField);
+    handleNumbersInput(numFemaleField);
+    verifyNumberFieldsState();
+
+    // enable/ disable + / - buttons based on number input disabled check
+    function verifyNumberFieldsState() {
+        [numMaleField, numFemaleField].forEach(field => {
+            const wrap = field.parentElement;
+            const btnUp = wrap.querySelector('.btn-up');
+            const btnDown = wrap.querySelector('.btn-down');
+            if (field.disabled) {
+                btnUp.disabled = true;
+                btnDown.disabled = true;
+            } else {
+                btnUp.disabled = false;
+                btnDown.disabled = false;
+            }
+        });
+    }
+
     // Mappa le location dai valori del form ai nomi dei file JSON
     function mapLocationToFileName(location) {
         const locationMap = {
@@ -183,7 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
         numMaleField.value = '0';
         numFemaleField.value = '0';
-
         if (calendar) {
             calendar.destroy();
             calendar = null;
@@ -234,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const isEnabled = !!this.value;
         numMaleField.disabled = !isEnabled;
         numFemaleField.disabled = !isEnabled;
-
+        verifyNumberFieldsState();
         if (!isEnabled) {
             numMaleField.value = '';
             numFemaleField.value = '';
@@ -323,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         submitBtn.disabled = true;
+        verifyNumberFieldsState();
     }
 
     function checkSubmitButton() {
@@ -338,6 +359,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hideMessage() {
         responseDiv.style.display = 'none';
+    }
+
+    function handleNumbersInput(field) {
+        const wrap = document.createElement('div');
+        wrap.className = 'number-input-wrapper';
+        field.parentNode.insertBefore(wrap, field);
+        wrap.appendChild(field);
+        const btnUp = document.createElement('button');
+        btnUp.type = 'button';
+        btnUp.className = 'btn-number btn-up';
+        btnUp.textContent = '+';    
+        const btnDown = document.createElement('button');
+        btnDown.type = 'button';
+        btnDown.className = 'btn-number btn-down';
+        btnDown.textContent = '−';    
+        wrap.appendChild(btnDown);
+        wrap.appendChild(btnUp);
+        btnUp.addEventListener('click', function() {
+            let currentValue = parseInt(field.value) || 0; 
+            if (currentValue < field.max) {
+                field.value = currentValue + 1;
+                field.dispatchEvent(new Event('input'));
+            }
+        });
+        btnDown.addEventListener('click', function() {
+            let currentValue = parseInt(field.value) || 0; 
+            if (currentValue > field.min) {
+                field.value = currentValue - 1;
+                field.dispatchEvent(new Event('input'));
+            }
+        });
     }
 
     // === CHIAMATA API DISPONIBILITÀ ===
