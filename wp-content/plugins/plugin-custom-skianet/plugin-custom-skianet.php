@@ -39,13 +39,13 @@ add_filter('auto_update_translation', '__return_true');
 require_once PLUGIN_SKIANET_PATH.'/vendor/autoload.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-definitions.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-soap.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-location-select.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-disponibilita.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-booking.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-actions-booking-form.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-custom-fields.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-prenotazione.php';
-require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-my-account.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-location-select.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-disponibilita.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-shortcode-booking.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-actions-booking-form.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-custom-fields.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-termegest-prenotazione.php';
+// require_once PLUGIN_SKIANET_PATH.'/components/skianet-custom-my-account.php';
 require_once PLUGIN_SKIANET_PATH.'/components/skianet-email-failed-prenotazione.php';
 
 // Carica la classe
@@ -129,7 +129,7 @@ function skianet_plugin_load_textdomain(): void
     );
 }
 
-add_action('wp_enqueue_scripts', 'skianet_termegest_calendar_enqueue_scripts', \PHP_INT_MAX);
+// add_action('wp_enqueue_scripts', 'skianet_termegest_calendar_enqueue_scripts', \PHP_INT_MAX);
 function skianet_termegest_calendar_enqueue_scripts(): void
 {
     skianet_termegest_calendar_check_dependencies();
@@ -243,7 +243,7 @@ function skianet_termegest_calendar_check_dependencies(): bool
     return true;
 }
 
-add_action('elementor_pro/forms/actions/register', 'skianet_termegest_calendar_form_disponibilita_action', \PHP_INT_MAX);
+// add_action('elementor_pro/forms/actions/register', 'skianet_termegest_calendar_form_disponibilita_action', \PHP_INT_MAX);
 function skianet_termegest_calendar_form_disponibilita_action(Form_Actions_Registrar $formActionsRegistrar): void
 {
     require_once PLUGIN_SKIANET_PATH.'/components/skianet-disponibilita-book-dialog-action.php';
