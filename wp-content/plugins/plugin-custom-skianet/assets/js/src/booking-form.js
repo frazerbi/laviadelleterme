@@ -256,8 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
         numFemaleField.disabled = !isEnabled;
         verifyNumberFieldsState();
         if (!isEnabled) {
-            numMaleField.value = '';
-            numFemaleField.value = '';
+            numMaleField.value = '0';
+            numFemaleField.value = '0';
             submitBtn.disabled = true;
         } else {
             const selectedOption = this.options[this.selectedIndex];
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (fields[from]) {
             fields[from].forEach(field => {
                 field.disabled = true;
-                field.value = '';
+                field.value = field.type === 'tel' ? '0' : '';
             });
         }
 
