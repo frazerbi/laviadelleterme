@@ -34,7 +34,7 @@ class Booking_Email_Notification {
 
     /**
      * Inizializza hooks
-     */
+     */ 
     private function init_hooks() {
         // Invia email quando ordine diventa "Booked"
         add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
