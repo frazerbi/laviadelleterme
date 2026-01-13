@@ -70,7 +70,7 @@ class Booking_Redirect {
     /**
      * Verifica se una data è nel periodo natalizio (25 dic - 6 gen)
      */
-    public function is_christmas_period($date_string) {
+    public static function is_christmas_period($date_string) {
         $date = DateTime::createFromFormat('Y-m-d', $date_string);
         if (!$date) {
             return false;
@@ -95,7 +95,7 @@ class Booking_Redirect {
     /**
      * Verifica se una data è weekend (sabato o domenica)
      */
-    public function is_weekend($date_string) {
+    public static function is_weekend($date_string) {
         $date = DateTime::createFromFormat('Y-m-d', $date_string);
         if (!$date) {
             return false;
@@ -112,7 +112,7 @@ class Booking_Redirect {
     public function get_product_config($booking_date, $ticket_type) {
 
         // Controlla se è periodo natalizio
-        if ($this->is_christmas_period($booking_date)) {
+        if (self::is_christmas_period($booking_date)) {
             error_log("Data: {$booking_date} - Tipo giorno: NATALE");
             
             return array(
@@ -125,7 +125,7 @@ class Booking_Redirect {
         }
 
         // Determina se è weekend o feriale
-        $day_type = $this->is_weekend($booking_date) ? 'weekend' : 'feriale';
+        $day_type = self::is_weekend($booking_date) ? 'weekend' : 'feriale';
         
         error_log("Data: {$booking_date} - Tipo giorno: {$day_type}");
         
