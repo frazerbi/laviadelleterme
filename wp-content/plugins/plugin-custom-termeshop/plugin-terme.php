@@ -26,8 +26,8 @@ require_once PLUGIN_TERME_PATH . 'config.php';
 
 // Include other plugin components
 require_once( PLUGIN_TERME_PATH . 'Order Management/add_status.php' );
-require_once( PLUGIN_TERME_PATH . 'Order Management/autocomplete-order.php' );
-require_once( PLUGIN_TERME_PATH . 'Order Management/codes-to-termegest.php' );
+// require_once( PLUGIN_TERME_PATH . 'Order Management/autocomplete-order.php' );
+// require_once( PLUGIN_TERME_PATH . 'Order Management/codes-to-termegest.php' );
 // require_once( PLUGIN_TERME_PATH . 'Order Management/send-emails.php' );
 require_once( PLUGIN_TERME_PATH . 'Order Management/send-emails-to-admin.php' );
 require_once( PLUGIN_TERME_PATH . 'Order Management/send-email-not-booked.php' );
