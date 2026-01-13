@@ -258,6 +258,23 @@ class Booking_TermeGest_Sync {
      * Invia setPrenotazione
      */
     private function send_prenotazione($code, $booking_data, $customer, $is_male, $protection, $order_id, $order_notes) {
+        
+            // Log parametri per debug
+            error_log("SetPrenotazione params:");
+            error_log("  idDisponibilita: " . (int)$booking_data['fascia_id']);
+            error_log("  codice: {$code}");
+            error_log("  Cognome: {$customer['last_name']} (" . strlen($customer['last_name']) . " chars)");
+            error_log("  Nome: {$customer['first_name']} (" . strlen($customer['first_name']) . " chars)");
+            error_log("  Telefono: {$customer['phone']} (" . strlen($customer['phone']) . " chars)");
+            error_log("  Note: {$order_notes} (" . strlen($order_notes) . " chars)");
+            error_log("  Provincia: '{$customer['state']}' (" . strlen($customer['state']) . " chars)");
+            error_log("  uomodonna: " . ($is_male ? 'true' : 'false'));
+            error_log("  Email: {$customer['email']} (" . strlen($customer['email']) . " chars)");
+            error_log("  AllInclusive: false");
+            error_log("  Categoria: {$booking_data['categorie']} (" . strlen($booking_data['categorie']) . " chars)");
+            error_log("  CodControllo: '' (vuoto)");
+            error_log("  Protection: " . strlen($protection) . " chars");
+            
         try {
             $response = skianet_termegest_set_prenotazione(
                 (int)$booking_data['fascia_id'],
