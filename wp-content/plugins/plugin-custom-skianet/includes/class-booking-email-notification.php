@@ -38,11 +38,29 @@ class Booking_Email_Notification {
     private function init_hooks() {
         // Invia email quando ordine diventa "Booked"
         add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
-        
+        add_action('woocommerce_thankyou', array($this, 'send_on_thankyou_test'), 10, 2);
+
         // Azioni manuali admin
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
         add_action('woocommerce_order_action_send_booking_confirmation', array($this, 'send_to_customer'));
         add_action('woocommerce_order_action_send_booking_confirmation_to_admin', array($this, 'send_to_admin'));
+    }
+
+    /**
+     * Test hook per thankyou page
+     * ⚠️ SOLO PER TEST - Commentare in produzione
+     */
+    public function send_on_thankyou_test($order_id) {
+        error_log("=== TEST THANKYOU: Ordine {$order_id} ===");
+        
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            error_log("Ordine {$order_id} non trovato");
+            return;
+        }
+        
+        // Invia email test
+        $this->send_booking_details($order);
     }
 
     /**
