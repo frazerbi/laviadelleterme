@@ -539,7 +539,7 @@ class Booking_Handler {
         return false;
     }
 
-    /**
+    /** 
      * Recupera codici licenza per un item (metodo statico per uso condiviso)
      */
     public static function get_item_license_codes($order_id, $product_id, $variation_id) {
