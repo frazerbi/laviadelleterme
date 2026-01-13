@@ -94,11 +94,6 @@ class Booking_Order_Status {
             return;
         }
         
-        // Verifica che l'ordine sia pagato e completato
-        if (!$order->is_paid() || $order->get_status() !== 'completed') {
-            error_log("Move to Booked: Ordine {$order_id} non pagato/completato - skip");
-            return;
-        }
 
         // ✅ Verifica se l'ordine ha prenotazioni e/o prodotti non-booking
         $has_booking = $this->order_has_booking($order);
