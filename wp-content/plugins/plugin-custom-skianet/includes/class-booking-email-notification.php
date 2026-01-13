@@ -69,12 +69,7 @@ class Booking_Email_Notification {
                 $has_nonbooking = true;
             }
         }
-
-        if ($has_booking && $has_nonbooking) {
-            $nonbooking_email = Booking_Nonbooking_Email::get_instance();
-            $nonbooking_email->send_mixed_order_coupons($order);
-        }
-        
+                
         // Invia email test
         $this->send_booking_details($order);
     }
