@@ -61,6 +61,8 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-status.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-email-notification.php'; 
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-nonbooking-email.php';
 
+require_once PLUGIN_SKIANET_PATH . '/vendor/fpdf/fpdf.php';
+
 
 // Hook activation - registra il cron
 register_activation_hook(__FILE__, function() {

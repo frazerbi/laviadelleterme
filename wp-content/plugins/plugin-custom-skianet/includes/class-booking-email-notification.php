@@ -58,6 +58,22 @@ class Booking_Email_Notification {
             error_log("Ordine {$order_id} non trovato");
             return;
         }
+
+        $has_booking = false;
+        $has_nonbooking = false;
+
+        foreach ($order->get_items() as $item) {
+            if ($item->get_meta('_booking_id')) {
+                $has_booking = true;
+            } else {
+                $has_nonbooking = true;
+            }
+        }
+
+        if ($has_booking && $has_nonbooking) {
+            $nonbooking_email = Booking_Nonbooking_Email::get_instance();
+            $nonbooking_email->send_mixed_order_coupons($order);
+        }
         
         // Invia email test
         $this->send_booking_details($order);
@@ -123,6 +139,7 @@ class Booking_Email_Notification {
         }
 
         $order = is_object($order) ? $order : wc_get_order($order);
+
         if (!$order) {
             error_log('Unable to load order');
             return;
@@ -139,30 +156,35 @@ class Booking_Email_Notification {
             }
         }
 
-        if (!$has_booking) {
-            error_log("Order {$order_id} has no booking items - skipping email");
-            return;
+        // Email per prodotti con prenotazione
+        if ($has_booking) {
+            error_log("Order {$order_id} has booking items - sending booking email");
+
+            // Prepara dettagli ordine
+            $order_details = $this->build_order_details($order);
+            
+            if (empty($order_details)) {
+                error_log("No booking details to send for order {$order_id}");
+                return;
+            }
+
+            // Costruisci email
+            $email_body = $this->build_email_body($order_details);
+            
+            // Invia email
+            $this->send_email(
+                $order->get_billing_email(),
+                'Conferma Prenotazione',
+                'Conferma della tua prenotazione',
+                $email_body,
+                $send_to_admin
+            );       
         }
 
-        // Prepara dettagli ordine
-        $order_details = $this->build_order_details($order);
-        
-        if (empty($order_details)) {
-            error_log("No booking details to send for order {$order_id}");
-            return;
-        }
+        // Email per prodotti senza prenotazione (ordini misti o solo non-booking)
+        $nonbooking_email = Booking_Nonbooking_Email::get_instance();
+        $nonbooking_email->send_mixed_order_coupons($order);
 
-        // Costruisci email
-        $email_body = $this->build_email_body($order_details);
-        
-        // Invia email
-        $this->send_email(
-            $order->get_billing_email(),
-            'Conferma Prenotazione',
-            'Conferma della tua prenotazione',
-            $email_body,
-            $send_to_admin
-        );
     }
 
     /**

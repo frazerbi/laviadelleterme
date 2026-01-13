@@ -373,10 +373,6 @@ class Booking_Nonbooking_Email {
         }
     }
 
-    /**
-     * Invia coupon per ordini misti (solo prodotti senza prenotazione)
-     * Chiamato direttamente da Booking_Order_Status
-     */
     public function send_mixed_order_coupons($order) {
         error_log("=== INVIO COUPON PER ORDINE MISTO ===");
         
