@@ -1,0 +1,284 @@
+<?php
+/**
+ * Gestisce l'invio delle email di conferma prenotazione
+ */
+
+// Previeni accesso diretto
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class Booking_Email_Notification {
+
+    /**
+     * Istanza singleton
+     */
+    private static $instance = null;
+
+    /**
+     * Ottieni l'istanza della classe
+     */
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * Costruttore
+     */
+    private function __construct() {
+        $this->init_hooks();
+    }
+
+    /**
+     * Inizializza hooks
+     */
+    private function init_hooks() {
+        // Invia email quando ordine diventa "Booked"
+        add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
+        
+        // Azioni manuali admin
+        add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
+        add_action('woocommerce_order_action_send_booking_confirmation', array($this, 'send_to_customer'));
+        add_action('woocommerce_order_action_send_booking_confirmation_to_admin', array($this, 'send_to_admin'));
+    }
+
+    /**
+     * Invia email quando ordine diventa "Booked"
+     */
+    public function send_on_status_booked($order_id, $order) {
+        $this->send_booking_details($order);
+    }
+
+    /**
+     * Aggiungi azioni al dropdown ordine admin
+     */
+    public function add_order_actions($actions) {
+        $actions['send_booking_confirmation'] = 'Send Booking Confirmation To Customer';
+        $actions['send_booking_confirmation_to_admin'] = 'Send Booking Confirmation To Admin';
+        return $actions;
+    }
+
+    /**
+     * Invia email al cliente (azione manuale)
+     */
+    public function send_to_customer($order) {
+        if (!$order) {
+            error_log('No order object provided for customer email');
+            return;
+        }
+        
+        try {
+            $this->send_booking_details($order);
+        } catch (Exception $e) {
+            error_log("Error sending booking email: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Invia email all'admin (azione manuale)
+     */
+    public function send_to_admin($order) {
+        if (!$order) {
+            error_log('No order object provided for admin email');
+            return;
+        }
+        
+        try {
+            $this->send_booking_details($order, true);
+        } catch (Exception $e) {
+            error_log("Error sending admin booking email: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Invia email con dettagli prenotazione
+     */
+    private function send_booking_details($order, $send_to_admin = false) {
+        error_log('send_booking_details called');
+
+        if (!$order) {
+            error_log('Order object is not valid');
+            return;
+        }
+
+        $order = is_object($order) ? $order : wc_get_order($order);
+        if (!$order) {
+            error_log('Unable to load order');
+            return;
+        }
+
+        $order_id = $order->get_id();
+        
+        // Verifica se l'ordine ha prenotazioni
+        $has_booking = false;
+        foreach ($order->get_items() as $item) {
+            if ($item->get_meta('_booking_id')) {
+                $has_booking = true;
+                break;
+            }
+        }
+
+        if (!$has_booking) {
+            error_log("Order {$order_id} has no booking items - skipping email");
+            return;
+        }
+
+        // Prepara dettagli ordine
+        $order_details = $this->build_order_details($order);
+        
+        if (empty($order_details)) {
+            error_log("No booking details to send for order {$order_id}");
+            return;
+        }
+
+        // Costruisci email
+        $email_body = $this->build_email_body($order_details);
+        
+        // Invia email
+        $this->send_email(
+            $order->get_billing_email(),
+            'Conferma Prenotazione',
+            'Conferma della tua prenotazione',
+            $email_body,
+            $send_to_admin
+        );
+    }
+
+    /**
+     * Costruisce i dettagli dell'ordine
+     */
+    private function build_order_details($order) {
+        $order_details = array();
+
+        foreach ($order->get_items() as $item) {
+            $booking_id = $item->get_meta('_booking_id');
+            
+            if (!$booking_id) {
+                continue; // Skip prodotti senza prenotazione
+            }
+            
+            // Recupera codici
+            $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
+        
+            // ✅ Usa metodo condiviso
+            $codes = Booking_Cart_Handler::get_item_license_codes(
+                $order->get_id(), 
+                $item->get_product_id(), 
+                $item->get_variation_id()
+            );
+        
+
+            // Formatta data
+            $date = DateTime::createFromFormat('Y-m-d', $booking_data['booking_date']);
+            $formatted_date = $date ? $date->format('d/m/Y') : $booking_data['booking_date'];
+            
+            // Costruisci dettaglio
+            $detail = "<div style='margin-bottom: 15px; padding: 10px; border-left: 3px solid #0074A0;'>";
+            $detail .= "<strong>Prodotto:</strong> <span style='color: #0074A0;'>" . $item->get_name() . "</span><br>";
+            $detail .= "<strong>Quantità:</strong> <span style='color: #0074A0;'>" . $item->get_quantity() . "</span><br>";
+            $detail .= "<strong>Totale:</strong> <span style='color: #0074A0;'>€" . $item->get_total() . "</span><br>";
+            
+            // Codici
+            if (!empty($codes)) {
+                $detail .= "<strong>Codici Coupon:</strong> <span style='color: #0074A0;'>" . implode(", ", $codes) . "</span><br>";
+            }
+            
+            // Dati prenotazione
+            $detail .= "<strong>Location:</strong> <span style='color: #0074A0;'>" . $booking_data['location_name'] . "</span><br>";
+            $detail .= "<strong>Data:</strong> <span style='color: #0074A0;'>" . $formatted_date . "</span><br>";
+            $detail .= "<strong>Tipo Ingresso:</strong> <span style='color: #0074A0;'>" . ($booking_data['ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero') . "</span><br>";
+            
+            // Ospiti
+            if ($booking_data['num_male'] > 0) {
+                $detail .= "<strong>Uomini:</strong> <span style='color: #0074A0;'>" . $booking_data['num_male'] . "</span><br>";
+            }
+            if ($booking_data['num_female'] > 0) {
+                $detail .= "<strong>Donne:</strong> <span style='color: #0074A0;'>" . $booking_data['num_female'] . "</span><br>";
+            }
+            
+            $detail .= "</div>";
+            
+            $order_details[] = $detail;
+        }
+
+        return $order_details;
+    }
+
+    /**
+     * Costruisce il corpo dell'email
+     */
+    private function build_email_body($order_details) {
+        $order_details_text = implode("<br>", $order_details);
+        
+        $policy_info = "<br><br><strong>Dichiarazioni e Informative:</strong><br>";
+        $policy_info .= "<p>Il Sottoscritto/a <strong>DICHIARA</strong> sotto la propria responsabilità di avere preso visione delle norme comportamentali per i servizi offerti dalla struttura, a disposizione alla reception della spa, ed in particolare:</p>";
+        $policy_info .= "<ul>";
+        $policy_info .= "<li>Di essere a conoscenza che l'uso di sauna e bagno turco non sono idonei a coloro che hanno disturbi di pressione arteriosa e presenza di patologia a carico del sistema venoso superficiale e profondo.</li>";
+        $policy_info .= "<li>Dichiara altresì di godere di sana e robusta costituzione e di essersi sottoposto di recente a visita medica per accertare la propria idoneità fisica ed esonera pertanto la struttura da qualsiasi responsabilità.</li>";
+        $policy_info .= "<li>Dichiara di non accusare sintomi quali: febbre, tosse, difficoltà respiratorie.</li>";
+        $policy_info .= "<li>Dichiara di non aver soggiornato in zone e/o Paesi con presunta trasmissione comunitaria.</li>";
+        $policy_info .= "</ul>";
+        $policy_info .= "<p><strong>Politica di cancellazione:</strong> È possibile cancellare la prenotazione fino a 48 ORE prima, dopo non è più possibile ed il coupon sarà riscattato in automatico.</p>";
+        $policy_info .= "<p>Ai sensi degli articoli 13 e 23 del DLgs. 196/03, del Regolamento EU 679/2016 e del Dlgs 101/2018 (Codice sulla protezione dei dati personali), l'interessato dichiara di essere stato adeguatamente informato ed esprime il proprio consenso all'utilizzo dei dati personali che lo riguardano, con particolare riferimento ai dati che la legge definisce come \"sensibili\", nei limiti di quanto indicato nell'informativa.</p>";
+        $policy_info .= "<p>Dichiaro di avere preso visione del regolamento interno che definisce le modalità per la custodia dei valori accettandone i contenuti.</p>";
+
+        $email_body = "<p>Grazie per la tua prenotazione. Di seguito i dettagli dell'ordine:</p><br>";
+        $email_body .= $order_details_text . $policy_info;
+        
+        return $email_body;
+    }
+
+    /**
+     * Invia email
+     */
+    private function send_email($to_email, $subject, $heading, $body, $send_to_admin = false) {
+        $recipient = $send_to_admin ? 'francesco.zerbinato@gmail.com' : $to_email;
+
+        if (!$recipient) {
+            error_log('No email address provided');
+            return;
+        }
+        
+        $mailer = WC()->mailer();
+        $wrapped_message = $mailer->wrap_message($heading, $body);
+        $wc_email = new WC_Email();
+        $html_message = $wc_email->style_inline($wrapped_message);
+        
+        try {
+            $mailer->send($recipient, $subject, $html_message);
+            error_log("Booking email sent to {$recipient}");
+        } catch (Exception $e) {
+            error_log("Error sending email to {$recipient}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Recupera codici licenza
+     */
+    private function get_license_codes($order_id, $product_id, $variation_id) {
+        global $wpdb;
+        
+        $check_id = $variation_id > 0 ? $variation_id : $product_id;
+        
+        $query = $wpdb->prepare(
+            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
+            WHERE order_id = %d AND product_id = %d",
+            $order_id,
+            $check_id
+        );
+        
+        $results = $wpdb->get_results($query);
+        
+        $codes = array();
+        foreach ($results as $row) {
+            if (!empty($row->license_code1)) {
+                $codes[] = $row->license_code1;
+            }
+        }
+        
+        return $codes;
+    }
+}
