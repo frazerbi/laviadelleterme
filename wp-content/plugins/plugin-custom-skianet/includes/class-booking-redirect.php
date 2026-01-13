@@ -70,7 +70,7 @@ class Booking_Redirect {
     /**
      * Verifica se una data è nel periodo natalizio (25 dic - 6 gen)
      */
-    private function is_christmas_period($date_string) {
+    public function is_christmas_period($date_string) {
         $date = DateTime::createFromFormat('Y-m-d', $date_string);
         if (!$date) {
             return false;
@@ -95,7 +95,7 @@ class Booking_Redirect {
     /**
      * Verifica se una data è weekend (sabato o domenica)
      */
-    private function is_weekend($date_string) {
+    public function is_weekend($date_string) {
         $date = DateTime::createFromFormat('Y-m-d', $date_string);
         if (!$date) {
             return false;
@@ -109,7 +109,7 @@ class Booking_Redirect {
     /**
      * Ottieni Product ID e Variation ID
      */
-    private function get_product_config($booking_date, $ticket_type) {
+    public function get_product_config($booking_date, $ticket_type) {
 
         // Controlla se è periodo natalizio
         if ($this->is_christmas_period($booking_date)) {
