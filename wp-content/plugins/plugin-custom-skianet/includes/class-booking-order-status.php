@@ -99,15 +99,25 @@ class Booking_Order_Status {
             error_log("Move to Booked: Ordine {$order_id} non pagato/completato - skip");
             return;
         }
+
+        // ✅ Verifica se l'ordine ha prenotazioni e/o prodotti non-booking
+        $has_booking = $this->order_has_booking($order);
+        $has_nonbooking = $this->order_has_nonbooking($order);
         
-        // ✅ Verifica se l'ordine ha prenotazioni TermeGest
-        if ($this->order_has_booking($order)) {
+        if ($has_booking) {
             error_log("✅ Ordine {$order_id} CON prenotazioni → Booked");
             $order->update_status('booked', 'Ordine con prenotazioni TermeGest.');
+            
+            // ✅ Se ci sono ANCHE prodotti non-booking, invia coupon per quelli
+            if ($has_nonbooking) {
+                error_log("✅ Ordine {$order_id} è MISTO - invio anche coupon non-booking");
+                $this->send_nonbooking_coupons_for_mixed_order($order);
+            }
         } else {
             error_log("✅ Ordine {$order_id} SENZA prenotazioni → Not-Booked");
             $order->update_status('not-booked', 'Ordine senza prenotazioni.');
         }
+
     }
 
     /**
@@ -123,5 +133,35 @@ class Booking_Order_Status {
         }
         
         return false;
+    }
+
+    /**
+     * Verifica se l'ordine contiene prodotti SENZA prenotazione
+     */
+    private function order_has_nonbooking($order) {
+        foreach ($order->get_items() as $item) {
+            if (!$item->get_meta('_booking_id')) {
+                error_log("Item {$item->get_id()} NON ha prenotazione: " . $item->get_name());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Invia coupon per prodotti non-booking in ordini misti
+     */
+    private function send_nonbooking_coupons_for_mixed_order($order) {
+        if (!class_exists('Booking_Nonbooking_Email')) {
+            error_log("⚠️ Booking_Nonbooking_Email non disponibile");
+            return;
+        }
+        
+        try {
+            $nonbooking_email = Booking_Nonbooking_Email::get_instance();
+            $nonbooking_email->send_mixed_order_coupons($order);
+        } catch (Exception $e) {
+            error_log("❌ Errore invio coupon ordine misto: " . $e->getMessage());
+        }
     }
 }
