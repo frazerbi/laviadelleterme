@@ -144,7 +144,7 @@ class Booking_Handler {
             'nonce' => wp_create_nonce('booking_form_nonce'),
             'success_message' => __('Prenotazione effettuata con successo!', 'text-domain'),
             'error_message' => __('Si è verificato un errore. Riprova.', 'text-domain'),
-            'christmas_dates' => Booking_Redirect::get_christmas_dates()
+            'christmas_dates' => $this->get_christmas_dates()
         ));
     }
 
