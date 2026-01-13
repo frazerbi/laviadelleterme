@@ -58,7 +58,8 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-code-assignment.php'
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-termegest-sync.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-status.php';
-
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-email-notification.php'; 
+require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-nonbooking-email.php';
 
 
 // Hook activation - registra il cron
@@ -101,6 +102,14 @@ function init_booking_handler_plugin() {
     
     if (class_exists('Booking_Order_Status')) {
         Booking_Order_Status::get_instance();
+    }
+
+    if (class_exists('Booking_Email_Notification')) {
+        Booking_Email_Notification::get_instance();
+    }
+    
+    if (class_exists('Booking_Nonbooking_Email')) {
+        Booking_Nonbooking_Email::get_instance();
     }
 }
 
