@@ -11,26 +11,37 @@ if (!defined('ABSPATH')) {
 class Booking_Redirect {
 
     /**
-     * Product ID e variazioni in base a giorno settimana + ticket_type
+     * Product ID, variazioni e categoria TermeGest in base a giorno settimana + ticket_type
      */
     private static $product_config = array(
         'feriale' => array(
             'product_id' => 14,
             'variations' => array(
-                '4h' => 225,           // Variazione ID 1
-                'giornaliero' => 224   // Variazione ID 2
+                '4h' => 225,           // P1: Ingresso Lunedì - Venerdì - Mezza giornata
+                'giornaliero' => 224   // P3: Ingresso Lunedì - Venerdì - Giornaliero
+            ),
+            'categories' => array(
+                '4h' => 'P1',          // ✅ Categoria TermeGest
+                'giornaliero' => 'P3'
             )
         ),
         'weekend' => array(
             'product_id' => 228,
             'variations' => array(
-                '4h' => 229,           // Variazione ID 1
-                'giornaliero' => 230  // Variazione ID 2
+                '4h' => 229,           // P2: Ingresso Lunedì - Domenica - Mezza giornata
+                'giornaliero' => 230   // P4: Ingresso Lunedì - Domenica - Giornaliero
+            ),
+            'categories' => array(
+                '4h' => 'P2',          // ✅ Categoria TermeGest
+                'giornaliero' => 'P4'
             )
         ),
         'natale' => array(
             'product_id' => 27370,
-            'variations' => array()  // Nessuna variazione
+            'variations' => array(),  // Nessuna variazione
+            'categories' => array(
+                '4h' => 'PM'           // ✅ PM: Ingresso Lunedì - Domenica 4 Ore Per Festività Natalizie
+            )
         )
     );
 
@@ -107,7 +118,9 @@ class Booking_Redirect {
             return array(
                 'product_id' => self::$product_config['natale']['product_id'],
                 'variation_id' => null, // ✅ Nessuna variazione
-                'day_type' => 'natale'
+                'day_type' => 'natale',
+                'category' => self::$product_config['natale']['categories']['4h'] // ✅ PM
+
             );
         }
 
@@ -127,7 +140,8 @@ class Booking_Redirect {
         return array(
             'product_id' => $config['product_id'],
             'variation_id' => $config['variations'][$ticket_type],
-            'day_type' => $day_type
+            'day_type' => $day_type,
+            'category' => $config['categories'][$ticket_type] // ✅ P1/P2/P3/P4
         );
     }
 

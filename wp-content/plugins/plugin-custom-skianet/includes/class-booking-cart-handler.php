@@ -81,7 +81,7 @@ class Booking_Cart_Handler {
             $cart_item_data['booking_num_male'] = $booking_data['num_male'];
             $cart_item_data['booking_num_female'] = $booking_data['num_female'];
             $cart_item_data['booking_total_guests'] = $booking_data['total_guests'];
-            $cart_item_data['booking_categorie'] = $booking_data['categorie'];
+            $cart_item_data['booking_categorie'] = $booking_data['category'];
             
             // Rendi unico il cart item (così se aggiungi 2 prenotazioni diverse, sono 2 righe separate)
             $cart_item_data['unique_key'] = $booking_data['booking_id'];
@@ -107,7 +107,7 @@ class Booking_Cart_Handler {
             $cart_item['booking_num_male'] = $values['booking_num_male'];
             $cart_item['booking_num_female'] = $values['booking_num_female'];
             $cart_item['booking_total_guests'] = $values['booking_total_guests'];
-            $cart_item['booking_categorie'] = $values['booking_categorie'];
+            $cart_item['booking_categorie'] = $values['booking_category'];
         }
         
         return $cart_item;
@@ -165,6 +165,8 @@ class Booking_Cart_Handler {
             $item->add_meta_data('_booking_date', $values['booking_date'], true); // Raw per API
             
             $item->add_meta_data('Fascia ID', $values['booking_fascia_id'], true);
+            $item->add_meta_data('_booking_fascia_id', $values['booking_fascia_id'], true); // ✅ Aggiungi raw
+
             $item->add_meta_data('Tipo Ingresso', $values['booking_ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero', true);
             $item->add_meta_data('_booking_ticket_type', $values['booking_ticket_type'], true);
             
@@ -176,8 +178,9 @@ class Booking_Cart_Handler {
                 $item->add_meta_data('Ingressi Donna', $values['booking_num_female'], true);
             }
             
-            $item->add_meta_data('Totale Ospiti', $values['booking_total_guests'], true);
-            $item->add_meta_data('_booking_categorie', $values['booking_categorie'], true);
+            // ✅ Salva categoria TermeGest (P1/P2/P3/P4/PM)
+            $item->add_meta_data('Categoria', $values['booking_category'], true); // Visibile
+            $item->add_meta_data('_booking_category', $values['booking_category'], true); // Raw per API
             
             error_log('Dati prenotazione salvati nell\'ordine: ' . $values['booking_id']);
         }
@@ -210,7 +213,7 @@ class Booking_Cart_Handler {
             'num_male' => (int)$item->get_meta('Ingressi Uomo'), // ✅ Cast a int
             'num_female' => (int)$item->get_meta('Ingressi Donna'), // ✅ Cast a int
             'total_guests' => (int)$item->get_meta('Totale Ospiti'),
-            'categorie' => $item->get_meta('_booking_categorie')
+            'categorie' => $item->get_meta('_booking_category')
         );
     }
 
