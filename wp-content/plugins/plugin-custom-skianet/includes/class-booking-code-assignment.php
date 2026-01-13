@@ -87,7 +87,7 @@ class Booking_Code_Assignment {
             $sync->sync_order_to_termegest($order_id);
             
         } else {
-            error_log("⚠️ Booking_TermeGest_Sync non disponibile");
+            error_log("⚠️  Booking_TermeGest_Sync non disponibile");
         }
     }
 }
