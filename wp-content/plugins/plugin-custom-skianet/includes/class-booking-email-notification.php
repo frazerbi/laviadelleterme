@@ -38,7 +38,7 @@ class Booking_Email_Notification {
     private function init_hooks() {
         // Invia email quando ordine diventa "Booked"
         add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
-        add_action('woocommerce_thankyou', array($this, 'send_on_thankyou_test'), 10, 2);
+        add_action('woocommerce_thankyou', array($this, 'send_on_thankyou_test'), 10, 1);
 
         // Azioni manuali admin
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
@@ -178,6 +178,10 @@ class Booking_Email_Notification {
                 continue; // Skip prodotti senza prenotazione
             }
             
+            if (!class_exists('Booking_Cart_Handler')) {
+                error_log('Booking_Cart_Handler NON caricata');
+            }
+
             // Recupera codici
             $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
         
@@ -273,30 +277,4 @@ class Booking_Email_Notification {
         }
     }
 
-    /**
-     * Recupera codici licenza
-     */
-    private function get_license_codes($order_id, $product_id, $variation_id) {
-        global $wpdb;
-        
-        $check_id = $variation_id > 0 ? $variation_id : $product_id;
-        
-        $query = $wpdb->prepare(
-            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
-            WHERE order_id = %d AND product_id = %d",
-            $order_id,
-            $check_id
-        );
-        
-        $results = $wpdb->get_results($query);
-        
-        $codes = array();
-        foreach ($results as $row) {
-            if (!empty($row->license_code1)) {
-                $codes[] = $row->license_code1;
-            }
-        }
-        
-        return $codes;
-    }
 }

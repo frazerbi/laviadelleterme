@@ -236,5 +236,31 @@ class Booking_Cart_Handler {
         
         return $product_quantity;
     }
-
+    
+    /** 
+     * Recupera codici licenza per un item (metodo statico per uso condiviso)
+     */
+    public static function get_item_license_codes($order_id, $product_id, $variation_id) {
+        global $wpdb;
+        
+        $check_id = $variation_id > 0 ? $variation_id : $product_id;
+        
+        $query = $wpdb->prepare(
+            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
+            WHERE order_id = %d AND product_id = %d",
+            $order_id,
+            $check_id
+        );
+        
+        $results = $wpdb->get_results($query);
+        
+        $codes = array();
+        foreach ($results as $row) {
+            if (!empty($row->license_code1)) {
+                $codes[] = trim($row->license_code1);
+            }
+        }
+        
+        return $codes;
+    }
 }
