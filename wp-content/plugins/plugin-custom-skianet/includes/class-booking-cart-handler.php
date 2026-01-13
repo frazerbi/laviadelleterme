@@ -81,7 +81,7 @@ class Booking_Cart_Handler {
             $cart_item_data['booking_num_male'] = $booking_data['num_male'];
             $cart_item_data['booking_num_female'] = $booking_data['num_female'];
             $cart_item_data['booking_total_guests'] = $booking_data['total_guests'];
-            $cart_item_data['booking_categorie'] = $booking_data['category'];
+            $cart_item_data['booking_category'] = $booking_data['category'];
             
             // Rendi unico il cart item (così se aggiungi 2 prenotazioni diverse, sono 2 righe separate)
             $cart_item_data['unique_key'] = $booking_data['booking_id'];
@@ -107,7 +107,7 @@ class Booking_Cart_Handler {
             $cart_item['booking_num_male'] = $values['booking_num_male'];
             $cart_item['booking_num_female'] = $values['booking_num_female'];
             $cart_item['booking_total_guests'] = $values['booking_total_guests'];
-            $cart_item['booking_categorie'] = $values['booking_category'];
+            $cart_item['booking_category'] = $values['booking_category'];
         }
         
         return $cart_item;
