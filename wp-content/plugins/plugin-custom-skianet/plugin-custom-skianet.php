@@ -56,7 +56,7 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-redirect.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-cart-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-code-assignment.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-termegest-sync.php';
-require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-handler.php';
+// require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-handler.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-status.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-email-notification.php'; 
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-nonbooking-email.php';
