@@ -261,6 +261,11 @@ class Booking_TermeGest_Sync {
      */
     private function send_prenotazione($code, $booking_data, $customer, $is_male, $protection, $order_id, $order_notes) {
         
+            // Estrai categoria validata (sempre array tipo ['p3'])
+            $categoria = is_array($booking_data['categorie'])
+                ? $booking_data['categorie'][0]
+                : $booking_data['categorie'];
+
             // Log parametri per debug
             error_log("SetPrenotazione params:");
             error_log("  idDisponibilita: " . (int)$booking_data['fascia_id']);
