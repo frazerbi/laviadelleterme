@@ -1,162 +1,218 @@
-document.addEventListener('DOMContentLoaded', function() {
+function getVars() {
+    const TICKET_TYPE_LABELS = {
+        '4h': '4 ore',
+        'giornaliero': 'Giornaliero'
+    };
+    const LOCATION_LABELS = {
+        'terme-saint-vincent': 'Terme di Saint-Vincent',
+        'terme-genova': 'Terme di Genova',
+        'monterosa-spa': 'Monterosa SPA'
+    };
+
     const urlParams = new URLSearchParams(window.location.search);
-    const variationId = urlParams.get('variation_id');
+    const locationId = urlParams.get('location');
+    const dateParam = urlParams.get('date');
     const ticketType = urlParams.get('ticket_type');
     const totalGuests = parseInt(urlParams.get('total_guests')) || 1;
-    
-    if (!variationId && !ticketType) {
-        console.log('Nessuna variazione da pre-selezionare');
+
+    const niceDate = dateParam ? dateParam.split('-').reverse().join('/') : null;
+    const locationLabel = LOCATION_LABELS[locationId] || null;
+    const ticketTypeLabel = TICKET_TYPE_LABELS[ticketType] || null;
+
+    return {
+        'location': locationLabel,
+        'date': niceDate,
+        'ticket': ticketTypeLabel,
+        'guests': totalGuests
+    }
+}
+
+function selectVariation(ticketType) {
+    return new Promise((resolve, reject) => {
+        if (!ticketType) {
+            reject(new Error('ticketType non specificato'));
+            return;
+        }
+
+        // jQuery necessario per compatibilità WooCommerce
+        if (typeof jQuery === 'undefined') {
+            reject(new Error('jQuery non disponibile'));
+            return;
+        }
+
+        jQuery(document).ready(function($) {
+            const checkForm = setInterval(function() {
+                const $select = $('[name="attribute_pa_tipologia-ingressi"]');
+
+                if ($select.length === 0) {
+                    return;
+                }
+
+                clearInterval(checkForm);
+
+                let valueToSelect = null;
+
+                $select.find('option').each(function() {
+                    const optionValue = $(this).val();
+                    const optionText = $(this).text().toLowerCase();
+
+                    if (ticketType === '4h' && (optionValue.includes('4') || optionText.includes('4'))) {
+                        valueToSelect = optionValue;
+                    } else if (ticketType === 'giornaliero' && (optionValue.includes('giornalier') || optionText.includes('giornalier'))) {
+                        valueToSelect = optionValue;
+                    }
+                });
+
+                if (!valueToSelect) {
+                    reject(new Error(`Nessuna opzione trovata per ticketType: ${ticketType}`));
+                    return;
+                }
+
+                $select.val(valueToSelect).trigger('change');
+                resolve(true);
+            }, 100);
+
+            setTimeout(function() {
+                clearInterval(checkForm);
+                reject(new Error('Timeout: select variazioni non trovata'));
+            }, 10000);
+        });
+    });
+}
+
+// jQuery necessario per intercettare eventi custom WooCommerce (found_variation, show_variation)
+// che non sono eventi DOM nativi e non possono essere ascoltati con addEventListener()
+function waitForVariationPrice() {
+    return new Promise((resolve, reject) => {
+        if (typeof jQuery === 'undefined') {
+            reject(new Error('jQuery non disponibile'));
+            return;
+        }
+
+        jQuery(document).ready(function($) {
+            const $variationForm = $('.variations_form');
+            if ($variationForm.length === 0) {
+                reject(new Error('Form variazioni non trovato'));
+                return;
+            }
+
+            let stabilizeTimer = null;
+
+            // show_variation può triggerare più volte, aspetta che il prezzo si stabilizzi
+            $variationForm.on('show_variation', function(event, variation) {
+                if (stabilizeTimer) {
+                    clearTimeout(stabilizeTimer);
+                }
+
+                stabilizeTimer = setTimeout(function() {
+                    const priceContainer = document.querySelector('.woocommerce-variation-price');
+
+                    if (priceContainer && priceContainer.innerHTML.trim()) {
+                        resolve({
+                            html: priceContainer.innerHTML,
+                            element: priceContainer,
+                            price: variation.display_price,
+                            priceHtml: variation.price_html,
+                            variation: variation
+                        });
+                    } else {
+                        reject(new Error('Container prezzo non trovato nel DOM'));
+                    }
+                }, 500);
+            });
+
+            $variationForm.trigger('check_variations');
+
+            setTimeout(function() {
+                if (stabilizeTimer) {
+                    clearTimeout(stabilizeTimer);
+                }
+                reject(new Error('Timeout: nessun evento show_variation ricevuto'));
+            }, 10000);
+        });
+    });
+}
+
+function setQuantity(guests) {
+    const qtyInput = document.querySelector('.product input[name="quantity"]');
+
+    if (qtyInput && guests) {
+        qtyInput.value = guests;
+        qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
+function setLocationImage(locationId) {
+    const imageColumn = document.getElementById('colonna-img-prodotto');
+
+    if (imageColumn && locationId) {
+        const imagePath = `/wp-content/plugins/plugin-custom-skianet/assets/img/strutture/fig_${locationId}.jpg`;
+        imageColumn.style.backgroundImage = `url('${imagePath}')`;
+    }
+}
+
+function buildDataUI(data) {
+    const container = document.createElement('div');
+    container.className = 'custom-data-ui';
+
+    const list = document.createElement('ul');
+
+    for (const [key, value] of Object.entries(data)) {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${key}: ${value}`;
+        list.appendChild(listItem);
+    }
+
+    container.appendChild(list);
+
+    const variationsForm = document.querySelector('.product .variations_form');
+    if (variationsForm) {
+        variationsForm.insertBefore(container, variationsForm.firstChild);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const productElement = document.querySelector('.product');
+    if (!productElement) {
+        console.error('Elemento prodotto non trovato');
         return;
     }
     
-    console.log('Pre-selezione:', { variationId, ticketType, totalGuests });
-    
-    const waitForVariations = setInterval(function() {
-        const variationForm = document.querySelector('.variations_form');
-        
-        if (!variationForm) {
-            return;
-        }
-        
-        const selectFields = variationForm.querySelectorAll('select[name^="attribute_"]');
-        
-        if (selectFields.length === 0) {
-            return;
-        }
-        
-        console.log('Trovati', selectFields.length, 'campi variazione');
-        clearInterval(waitForVariations);
-        
-        // STEP 1: Seleziona la variazione
-        selectFields.forEach(function(select) {
-            const options = select.querySelectorAll('option');
-            
-            options.forEach(function(option) {
-                const optionValue = option.value;
-                
-                if (ticketType === '4h' && optionValue.toLowerCase().includes('4')) {
-                    option.selected = true;
-                    console.log('Selezionato 4 ore:', optionValue);
-                } else if (ticketType === 'giornaliero' && (optionValue.toLowerCase().includes('giornaliero') || optionValue.toLowerCase().includes('giorno'))) {
-                    option.selected = true;
-                    console.log('Selezionato giornaliero:', optionValue);
-                }
-            });
-            
-            select.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            // ✅ BLOCCA il campo variazione
-            select.disabled = true;
-            select.style.pointerEvents = 'none';
-            select.style.opacity = '0.6';
-            select.style.cursor = 'not-allowed';
-        });
-        
-        // STEP 2: Imposta e blocca la quantità
-        setTimeout(function() {
-            const qtyInput = variationForm.querySelector('input[name="quantity"]') || 
-                           variationForm.querySelector('.qty') ||
-                           document.querySelector('input.qty');
-            
-            if (qtyInput) {
-                qtyInput.value = totalGuests;
-                console.log('Quantità impostata:', totalGuests);
-                
-                qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
-                
-                // ✅ BLOCCA il campo quantità
-                // qtyInput.readOnly = true;
-                qtyInput.style.pointerEvents = 'none';
-                qtyInput.style.opacity = '0.6';
-                qtyInput.style.cursor = 'not-allowed';
-                qtyInput.style.backgroundColor = '#f5f5f5';
-                
-                // ✅ BLOCCA anche i pulsanti +/- se esistono
-                const qtyButtons = document.querySelectorAll('.quantity .plus, .quantity .minus');
-                qtyButtons.forEach(function(btn) {
-                    btn.style.pointerEvents = 'none';
-                    btn.style.opacity = '0.4';
-                    btn.style.cursor = 'not-allowed';
-                });
-            } else {
-                console.warn('Campo quantità non trovato');
-            }
-        }, 1000);
-        
-        // Trigger WooCommerce events
-        if (typeof jQuery !== 'undefined') {
-            setTimeout(function() {
-                jQuery(variationForm).trigger('check_variations');
-                jQuery(variationForm).trigger('woocommerce_variation_select_change');
-            }, 1000);
+    productElement.classList.add('loadingData');
+    const data = getVars();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationId = urlParams.get('location');
+    const ticketType = urlParams.get('ticket_type');
+
+    setQuantity(data.guests);
+    setLocationImage(locationId);
+    if (!ticketType) {
+        console.error('Parametro ticket_type non specificato nell\'URL');
+        productElement.classList.remove('loadingData');
+        return;
+    }
+
+    try {
+        await selectVariation(ticketType);
+        const priceData = await waitForVariationPrice();
+        data.price = priceData.price;
+
+        const hasNullOrUndefined = Object.values(data).some(value => value === null || value === undefined);
+
+        if (hasNullOrUndefined) {
+            // c'è qualche problema con i dati
+            console.error('Dati incompleti:', data);
+            // TODO gestire l'errore: nascondere il bottone di carrello e inserire un bottone back
         }
 
-        // STEP 3: Aggiorna visualizzazione prezzo con quantità
-        setTimeout(function() {
-            updatePriceDisplay(totalGuests);
-            
-            // Monitora cambiamenti prezzo (quando WooCommerce aggiorna)
-            const priceObserver = new MutationObserver(function() {
-                updatePriceDisplay(totalGuests);
-            });
-            
-            const priceContainer = document.querySelector('.woocommerce-variation-price');
-            if (priceContainer) {
-                priceObserver.observe(priceContainer, {
-                    childList: true,
-                    subtree: true
-                });
-            }
-        }, 1500);
+        productElement.classList.remove('loadingData');
+        productElement.classList.add('customDataLoaded');
+        // Ora sistemo la UI
+        buildDataUI(data);
 
-        // Funzione per aggiornare display prezzo
-        function updatePriceDisplay(quantity) {
-            const priceContainer = document.querySelector('.woocommerce-variation-price .price');
-            
-            if (!priceContainer) {
-                return;
-            }
-            
-            const priceAmount = priceContainer.querySelector('.woocommerce-Price-amount');
-            
-            if (!priceAmount) {
-                return;
-            }
-            
-            // Estrai il prezzo unitario
-            const priceText = priceAmount.textContent.trim();
-            const priceMatch = priceText.match(/[\d,.]+/);
-            
-            if (!priceMatch) {
-                return;
-            }
-            
-            const unitPrice = parseFloat(priceMatch[0].replace(',', '.'));
-            const totalPrice = (unitPrice * quantity).toFixed(2).replace('.', ',');
-            const currencySymbol = priceAmount.querySelector('.woocommerce-Price-currencySymbol')?.textContent || '€';
-            
-            // ✅ Crea nuovo HTML con quantità
-            const newPriceHTML = `
-                <span class="quantity-label">${quantity} × </span>
-                <span class="woocommerce-Price-amount amount unit-price">
-                    <bdi>${currencySymbol}${priceMatch[0]}</bdi>
-                </span>
-                <span class="total-separator"> = </span>
-                <span class="woocommerce-Price-amount amount total-price">
-                    <bdi><span class="woocommerce-Price-currencySymbol">${currencySymbol}</span>${totalPrice}</bdi>
-                </span>
-            `;
-            
-            // Sostituisci solo se non è già stato modificato
-            if (!priceContainer.querySelector('.quantity-label')) {
-                priceContainer.innerHTML = newPriceHTML;
-                console.log('Prezzo aggiornato:', `${quantity} × ${currencySymbol}${priceMatch[0]} = ${currencySymbol}${totalPrice}`);
-            }
-        }
-        
-    }, 500);
-    
-    setTimeout(function() {
-        clearInterval(waitForVariations);
-    }, 10000);
+    } catch (error) {
+        console.error('Errore:', error.message);
+        productElement.classList.remove('loadingData');
+    }
 });
