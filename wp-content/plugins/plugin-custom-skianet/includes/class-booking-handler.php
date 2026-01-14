@@ -248,16 +248,16 @@ class Booking_Handler {
 
         // Prepara dati per la prenotazione
         $booking_data = array(
-            'location' => $location,
+            'location' => $validation['location'],
             'location_name' => $this->get_location_value_for_encryption($location),
-            'booking_date' => $booking_date,
-            'fascia_id' => $fascia_id,
-            'ticket_type' => $ticket_type,
-            'num_male' => $num_male,
-            'num_female' => $num_female,
-            'total_guests' => $num_male + $num_female,
+            'booking_date' => $validation['booking_date'],
+            'fascia_id' => $validation['fascia_id'],
+            'ticket_type' => $validation['ticket_type'],
+            'num_male' => $validation['num_male'],
+            'num_female' => $validation['num_female'],
+            'total_guests' => $validation['total_guests'],
             'disponibilita' => $disponibilita,
-            'categorie' => $categorie,
+            'categorie' => $validation['categorie'], 
             'user_id' => get_current_user_id(),
             'created_at' => current_time('mysql')
         );
@@ -267,27 +267,26 @@ class Booking_Handler {
         // Salva la prenotazione
         $booking_id = $this->save_booking($booking_data);
 
-        if ($booking_id) {
-
-            // va passata anche la categoria giusta, che tenga conto delle festività e mapparla per gestire redirect corretto
-            $redirect_handler = Booking_Redirect::get_instance();
-            $redirect_url = $redirect_handler->redirect_to_product($booking_id, $booking_data);
-
-            if ($redirect_url) {
-                wp_send_json_success(array(
-                    'message' => 'Prenotazione effettuata con successo!',
-                    'booking_id' => $booking_id,
-                    'redirect_url' => $redirect_url  // ✅ Passa URL al frontend
-                ));
-            } else {
-                wp_send_json_error(array('message' => 'Errore nel redirect al prodotto.'));
-            }
-
-        } else {
+        if (!$booking_id) {
             wp_send_json_error(array(
-                        'message' => 'Posti non più disponibili per questa fascia. Riprova con un\'altra fascia oraria.'
-            ));        
+                'message' => 'Posti non più disponibili per questa fascia. Riprova con un\'altra fascia oraria.'
+            ));
         }
+
+        // Redirect
+        $redirect_handler = Booking_Redirect::get_instance();
+        $redirect_url = $redirect_handler->redirect_to_product($booking_id, $booking_data);
+
+        if (!$redirect_url) {
+            wp_send_json_error(array('message' => 'Errore nel redirect al prodotto.'));
+        }
+
+        wp_send_json_success(array(
+            'message'      => 'Prenotazione effettuata con successo!',
+            'booking_id'   => $booking_id,
+            'redirect_url' => $redirect_url
+        ));
+
     }
 
     /** 
@@ -347,8 +346,18 @@ class Booking_Handler {
             return $errors;
         }
 
-
-        return true;
+        // 🎉 RITORNA I DATI VALIDATI
+        return array(
+            'location'      => $location,
+            'booking_date'  => $booking_date,
+            'ticket_type'   => $ticket_type,
+            'fascia_id'     => $fascia_id,
+            'num_male'      => $num_male,
+            'num_female'    => $num_female,
+            'categorie'     => $categorie, // ← QUI LA CATEGORIA FILTRATA
+            'total_guests'  => $total_guests
+        );
+    
     }
     
     /**
