@@ -95,6 +95,8 @@ class Booking_TermeGest_Sync {
         // Recupera dati prenotazione
         $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
         
+        error_log('=== BOOKING DATA FROM ORDER ITEM === ' . var_export($booking_data, true));
+        error_log(print_r($booking_data, true));
         // Valida numero codici
         if (count($codes) !== (int)$booking_data['total_guests']) {
             error_log("⚠️ Codici: " . count($codes) . " vs Ospiti: " . $booking_data['total_guests']);
