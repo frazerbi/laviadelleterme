@@ -83,7 +83,6 @@ class Booking_Handler {
         return self::$ticket_types;
     }
 
-
     /**
      * Costruttore
      */

@@ -37,7 +37,7 @@ class Booking_Nonbooking_Email {
      */
     private function init_hooks() {
         // Invia email quando ordine diventa "Not-Booked"
-        add_action('woocommerce_order_status_not-booked', array($this, 'send_on_status_not_booked'), 10, 2);
+        add_action('woocommerce_order_status_changed', array($this, 'send_on_status_not_booked'), 10, 4);
         
         // Azioni manuali admin
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
@@ -48,8 +48,10 @@ class Booking_Nonbooking_Email {
     /**
      * Invia email quando ordine diventa "Not-Booked"
      */
-    public function send_on_status_not_booked($order_id, $order) {
-        $this->send_coupon_email($order);
+    public function send_on_status_not_booked($order_id, $old_status, $new_status, $order) {
+        if ($new_status === 'not-booked') {
+            $this->send_coupon_email($order);
+        }
     }
 
     /**

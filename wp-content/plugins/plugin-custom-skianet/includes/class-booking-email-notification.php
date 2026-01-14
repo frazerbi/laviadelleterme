@@ -37,7 +37,8 @@ class Booking_Email_Notification {
      */ 
     private function init_hooks() {
         // Invia email quando ordine diventa "Booked"
-        add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
+        // add_action('woocommerce_order_status_booked', array($this, 'send_on_status_booked'), 10, 2);
+        add_action('woocommerce_order_status_changed', array($this, 'send_on_status_booked'), 10, 4);
         // add_action('woocommerce_thankyou', array($this, 'send_on_thankyou_test'), 10, 1);
 
         // Azioni manuali admin
@@ -77,8 +78,10 @@ class Booking_Email_Notification {
     /**
      * Invia email quando ordine diventa "Booked"
      */
-    public function send_on_status_booked($order_id, $order) {
-        $this->send_booking_details($order);
+    public function send_on_status_booked($order_id, $old_status, $new_status, $order) {
+        if ($new_status === 'booked') {
+            $this->send_booking_details($order);
+        }
     }
 
     /**
