@@ -20,12 +20,15 @@ $ticket_types = Booking_Handler::get_ticket_types();
         <?php wp_nonce_field('booking_form_action', 'booking_form_nonce'); ?>
         
         <!-- Location -->
-        <div class="form-group">
+        <div class="form-group visualradio-group">
             <legend for="location">Seleziona Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
-                    <label for="location_<?php echo esc_attr($value); ?>">
-                        <span><?php echo esc_html($label); ?></span>
-                        <input type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>"" required>
+                    <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
+                        <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required>
+                        <span class="visualradio-label"><?php echo esc_html($label); ?></span>
+                        <figure class="visualradio-thumb">
+                            <img src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__))); ?>assets/img/strutture/thumb_<?php echo esc_attr($value); ?>.jpg" alt="<?php echo esc_html($label); ?> thumb">
+                        </figure>
                     </label>
                 <?php endforeach; ?>
         </div>
@@ -93,7 +96,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         <!-- Submit -->
         <div class="form-group">
             <button type="submit" name="submit_booking" class="btn-submit">
-                Prenota Ora
+                Prosegui con la prenotazione
             </button>
         </div>
     </form>
