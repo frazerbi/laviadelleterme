@@ -14,34 +14,25 @@ class Booking_Redirect {
      * Product ID, variazioni e categoria TermeGest in base a giorno settimana + ticket_type
      */
     private static $product_config = array(
-        'feriale' => array(
-            'product_id' => 14,
-            'variations' => array(
-                '4h' => 225,           // P1: Ingresso Lunedì - Venerdì - Mezza giornata
-                'giornaliero' => 224   // P3: Ingresso Lunedì - Venerdì - Giornaliero
-            ),
-            'categories' => array(
-                '4h' => 'P1',          // ✅ Categoria TermeGest
-                'giornaliero' => 'P3'
-            )
+        'p1' => array(
+            'product_id'   => 14,
+            'variation_id' => 225
         ),
-        'weekend' => array(
-            'product_id' => 228,
-            'variations' => array(
-                '4h' => 229,           // P2: Ingresso Lunedì - Domenica - Mezza giornata
-                'giornaliero' => 230   // P4: Ingresso Lunedì - Domenica - Giornaliero
-            ),
-            'categories' => array(
-                '4h' => 'P2',          // ✅ Categoria TermeGest
-                'giornaliero' => 'P4'
-            )
+        'p2' => array(
+            'product_id'   => 228,
+            'variation_id' => 229
         ),
-        'natale' => array(
-            'product_id' => 27370,
-            'variations' => array(),  // Nessuna variazione
-            'categories' => array(
-                '4h' => 'PM'           // ✅ PM: Ingresso Lunedì - Domenica 4 Ore Per Festività Natalizie
-            )
+        'p3' => array(
+            'product_id'   => 14,
+            'variation_id' => 224
+        ),
+        'p4' => array(
+            'product_id'   => 228,
+            'variation_id' => 230
+        ),
+        'pm' => array(
+            'product_id'   => 27370,
+            'variation_id' => null
         )
     );
 
@@ -93,102 +84,62 @@ class Booking_Redirect {
     }
 
     /**
-     * Verifica se una data è weekend (sabato o domenica)
+     * Ottieni mapping prodotto da categoria TermeGest
      */
-    public static function is_weekend($date_string) {
-        $date = DateTime::createFromFormat('Y-m-d', $date_string);
-        if (!$date) {
+    private function get_product_mapping_from_category($category) {
+
+        $category = strtolower($category);
+
+        if (!isset(self::$product_config[$category])) {
+            error_log("Categoria {$category} non trovata in product_config");
             return false;
         }
-        
-        $day_of_week = (int) $date->format('N'); // 1 (lunedì) - 7 (domenica)
-        
-        return ($day_of_week === 6 || $day_of_week === 7); // Sabato o Domenica
+
+        return self::$product_config[$category];
     }
 
     /**
-     * Ottieni Product ID e Variation ID
-     */
-    public function get_product_config($booking_date, $ticket_type) {
-
-        // Controlla se è periodo natalizio
-        if (self::is_christmas_period($booking_date)) {
-            error_log("Data: {$booking_date} - Tipo giorno: NATALE");
-            
-            return array(
-                'product_id' => self::$product_config['natale']['product_id'],
-                'variation_id' => null, // ✅ Nessuna variazione
-                'day_type' => 'natale',
-                'category' => self::$product_config['natale']['categories']['4h'] // ✅ PM
-
-            );
-        }
-
-        // Determina se è weekend o feriale
-        $day_type = self::is_weekend($booking_date) ? 'weekend' : 'feriale';
-        
-        error_log("Data: {$booking_date} - Tipo giorno: {$day_type}");
-        
-        // Ottieni configurazione
-        $config = self::$product_config[$day_type];
-        
-        if (!isset($config['variations'][$ticket_type])) {
-            error_log("ERRORE: Nessuna variazione trovata per {$ticket_type}");
-            return null;
-        }
-        
-        return array(
-            'product_id' => $config['product_id'],
-            'variation_id' => $config['variations'][$ticket_type],
-            'day_type' => $day_type,
-            'category' => $config['categories'][$ticket_type] // ✅ P1/P2/P3/P4
-        );
-    }
-
-    /**
-     * Redirect al prodotto WooCommerce
+     * Genera URL di redirect al prodotto WooCommerce
      */
     public function redirect_to_product($booking_id, $booking_data) {
-        $config = $this->get_product_config(
-            $booking_data['booking_date'],
-            $booking_data['ticket_type']
-        );
 
-        if (!$config) {
-            error_log("ERRORE: Impossibile ottenere configurazione prodotto");
+        $category = is_array($booking_data['categorie']) ? $booking_data['categorie'][0] : $booking_data['categorie'];
+
+        $mapping = $this->get_product_mapping_from_category($category);
+
+        if (!$mapping) {
+            error_log("ERRORE: impossibile mappare categoria {$category}");
             return false;
         }
 
-        $product_id = $config['product_id'];
-        $variation_id = $config['variation_id'];
+        $product_id   = $mapping['product_id'];
+        $variation_id = $mapping['variation_id'];
 
-        // Verifica che il prodotto esista
         $product = wc_get_product($product_id);
         if (!$product) {
-            error_log("ERRORE: Prodotto ID {$product_id} non trovato in WooCommerce");
+            error_log("ERRORE: Prodotto ID {$product_id} non trovato");
             return false;
         }
 
-        error_log("Prodotto: {$product_id}, Variazione: {$variation_id}, Giorno: {$config['day_type']}");
-
-        // Costruisci URL prodotto con parametri
         $product_url = get_permalink($product_id);
-        
-        // Aggiungi parametri query string
-        $redirect_url = add_query_arg(array(
-            'booking_id' => $booking_id,
-            'location' => $booking_data['location'],
-            'date' => $booking_data['booking_date'],
-            'fascia_id' => $booking_data['fascia_id'],
-            'num_male' => $booking_data['num_male'],
-            'num_female' => $booking_data['num_female'],
-            'total_guests' => $booking_data['total_guests'],
-            'ticket_type' => $booking_data['ticket_type']
-        ), $product_url);
 
-        if ($variation_id) {
-            $url_params['variation_id'] = $variation_id;
+        // Parametri URL
+        $params = array(
+            'booking_id'   => $booking_id,
+            'location'     => $booking_data['location'],
+            'date'         => $booking_data['booking_date'],
+            'fascia_id'    => $booking_data['fascia_id'],
+            'num_male'     => $booking_data['num_male'],
+            'num_female'   => $booking_data['num_female'],
+            'total_guests' => $booking_data['total_guests'],
+            'ticket_type'  => $booking_data['ticket_type']
+        );
+
+       if (!empty($variation_id)) {
+            $params['variation_id'] = $variation_id;
         }
+
+        $redirect_url = add_query_arg($params, $product_url);
 
         error_log("Redirect URL: {$redirect_url}");
 
