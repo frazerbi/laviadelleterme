@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const data = await response.json();
-        console.log(`JSON caricato per ${location}:`, data);
+        //console.log(`JSON caricato per ${location}:`, data);
         return data;
     } catch (error) {
         console.error('Errore nel recupero del JSON availability:', error);
@@ -132,10 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
-        console.log('Calendario range:', {
+        /*console.log('Calendario range:', {
             min: firstDayCurrentMonth.toISOString().split('T')[0],
             max: lastDayNextMonth.toISOString().split('T')[0]
-        });
+        });*/
 
         // Recupera i dati di disponibilità dal JSON
         availabilityData = await fetchAvailabilityJSON(location);
@@ -186,8 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calendar = new Calendar(calendarWrapper, options);
         calendar.init();
-        console.log('Calendario inizializzato per location:', location);
-        console.log(calendar);
+        //console.log('Calendario inizializzato per location:', location);
+        //console.log(calendar);
     }
 
     // Mostra calendario al click sull'input
@@ -262,8 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     ticketTypeField.addEventListener('change', function() {
         timeSlotField.disabled = !this.value;
+        timeSlotField.value = '';
         if (!this.value) {
-            timeSlotField.value = '';
             disableFieldsFrom('time');
         }
     });
@@ -282,8 +282,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const categorie = selectedOption.dataset.categorie || '';
             const disponibilita = selectedOption.dataset.disponibilita || '0';
 
-            console.log('Categorie selezionate:', categorie);
-            console.log('Disponibilità fascia:', disponibilita);
+            //console.log('Categorie selezionate:', categorie);
+            //console.log('Disponibilità fascia:', disponibilita);
         
             // Aggiungi campo hidden
             let categorieInput = document.getElementById('selected_categorie');
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ticketTypeField.value = '4h';
                 }
                 
-                console.log('Periodo natalizio - Solo 4 ore disponibile');
+                //console.log('Periodo natalizio - Solo 4 ore disponibile');
             } else {
                 // ✅ PERIODO NORMALE - Abilita "giornaliero"
                 giornalieroOption.disabled = false;
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         slots.forEach(slot => {
             if (slot.disponibilita > 0) {
-                console.log('Slot ID:', slot.id, 'Time:', slot.time, 'Categorie:', slot.categorie); 
+                //console.log('Slot ID:', slot.id, 'Time:', slot.time, 'Categorie:', slot.categorie); 
                 const option = document.createElement('option');
                 option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
