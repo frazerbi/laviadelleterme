@@ -127,7 +127,10 @@ class Booking_Redirect {
         $params = array(
             'location'     => $booking_data['location'],
             'date'         => $booking_data['booking_date'],
-            'total_guests' => $booking_data['total_guests']
+            'num_male'     => $booking_data['num_male'],
+            'num_female'   => $booking_data['num_female'],
+            'total_guests' => $booking_data['total_guests'],
+            'ticket_type'  => $booking_data['ticket_type']
         );
 
        if (!empty($variation_id)) {
