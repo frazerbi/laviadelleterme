@@ -238,7 +238,8 @@ class Booking_Handler {
             $ticket_type, 
             $fascia_id,
             $num_male, 
-            $num_female
+            $num_female,
+            $categorie
         );
         
         if (is_wp_error($validation)) {
@@ -268,6 +269,7 @@ class Booking_Handler {
 
         if ($booking_id) {
 
+            // va passata anche la categoria giusta, che tenga conto delle festività e mapparla per gestire redirect corretto
             $redirect_handler = Booking_Redirect::get_instance();
             $redirect_url = $redirect_handler->redirect_to_product($booking_id, $booking_data);
 
@@ -291,7 +293,7 @@ class Booking_Handler {
     /** 
      * Valida i dati del form
      */
-    private function validate_booking_data($location, $booking_date, $ticket_type, $fascia_id, $num_male, $num_female) {
+    private function validate_booking_data($location, $booking_date, $ticket_type, $fascia_id, $num_male, $num_female, $categorie) {
         $errors = new WP_Error();
 
         // Valida location
@@ -305,9 +307,13 @@ class Booking_Handler {
             $errors->add($date->get_error_code(), $date->get_error_message());
         }
 
-        if (Booking_Redirect::is_christmas_period($booking_date) && $ticket_type === 'giornaliero') {
-            $errors->add('invalid_ticket_natale', 'Nel periodo natalizio è disponibile solo l\'ingresso 4 ore.');
+        $category_check = $this->validate_category($categorie, $booking_date, $ticket_type);
+
+        if (is_wp_error($category_check)) {
+            wp_send_json_error(array('message' => $category_check->get_error_message()));
         }
+
+        $categorie = $category_check; // ['p1'], ['p3'], ['p2'], ['p4'] o ['pm']
 
         // Valida tipo ingresso
         if (!$this->is_valid_ticket_type($ticket_type)) {
@@ -542,5 +548,85 @@ class Booking_Handler {
         
         return $dates;
     }
+
+    /**
+     * Valida e seleziona la categoria corretta in base alle priorità:
+     * 1) Se periodo natalizio → ritorna solo ['pm']
+     * 2) Se presenti p1/p3 → mappa in base al ticket_type
+     *      - ticket 4h        → p1
+     *      - ticket giornaliero → p3
+     * 3) Se NON presenti p1/p3 → cerca p2/p4 e mappa:
+     *      - ticket 4h        → p2
+     *      - ticket giornaliero → p4
+     */
+    private function validate_category($categorie_raw, $booking_date, $ticket_type) {
+
+        // --- 1. CONTROLLO PERIODO NATALIZIO ---
+        if (Booking_Redirect::is_christmas_period($booking_date)) {
+            return array('pm');
+        }
+
+        // --- 2. NORMALIZZA E FILTRA CATEGORIE ---
+        // Converti la stringa in array (es: "p1,p3,p4")
+        $categorie = array_map('trim', explode(',', $categorie_raw));
+
+        // Categorie riconosciute
+        $allowed = array('p1', 'p2', 'p3', 'p4');
+        $categorie = array_intersect($categorie, $allowed);
+
+        if (empty($categorie)) {
+            return new WP_Error('invalid_category', 'Nessuna categoria valida trovata.');
+        }
+
+        // --- 3. CONTROLLA PRIMA p1 / p3 ---
+        $has_p1 = in_array('p1', $categorie, true);
+        $has_p3 = in_array('p3', $categorie, true);
+
+        if ($has_p1 || $has_p3) {
+            if ($ticket_type === '4h') {
+                if ($has_p1) {
+                    return array('p1');
+                }
+                // se tipo 4h ma non c'è p1, non può usare p3
+                return new WP_Error('invalid_category', 'Categoria p1 non disponibile per il biglietto 4 ore.');
+            }
+
+            if ($ticket_type === 'giornaliero') {
+                if ($has_p3) {
+                    return array('p3');
+                }
+                // se tipo giornaliero ma non c'è p3, non può usare p1
+                return new WP_Error('invalid_category', 'Categoria p3 non disponibile per il biglietto giornaliero.');
+            }
+
+            return new WP_Error('invalid_ticket', 'Tipo di biglietto non valido.');
+        }
+
+        // --- 4. SE NON CI SONO p1/p3 → CONTROLLA p2 / p4 ---
+        $has_p2 = in_array('p2', $categorie, true);
+        $has_p4 = in_array('p4', $categorie, true);
+
+        if ($has_p2 || $has_p4) {
+            if ($ticket_type === '4h') {
+                if ($has_p2) {
+                    return array('p2');
+                }
+                return new WP_Error('invalid_category', 'Categoria p2 non disponibile per il biglietto 4 ore.');
+            }
+
+            if ($ticket_type === 'giornaliero') {
+                if ($has_p4) {
+                    return array('p4');
+                }
+                return new WP_Error('invalid_category', 'Categoria p4 non disponibile per il biglietto giornaliero.');
+            }
+
+            return new WP_Error('invalid_ticket', 'Tipo di biglietto non valido.');
+        }
+
+        // --- 5. NESSUNA CATEGORIA COMPATIBILE ---
+        return new WP_Error('invalid_category', 'Categorie non valide o non compatibili con il tipo di biglietto.');
+    }
+
 
 }
