@@ -37,7 +37,7 @@ class Booking_Nonbooking_Email {
      */
     private function init_hooks() {
         // Invia email quando ordine diventa "Not-Booked"
-        add_action('woocommerce_thankyou', array($this, 'send_on_status_not_booked'), 10, 1);
+        // add_action('woocommerce_thankyou', array($this, 'send_on_status_not_booked'), 10, 1);
         
         // Azioni manuali admin
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
