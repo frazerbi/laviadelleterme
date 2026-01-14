@@ -21,15 +21,13 @@ $ticket_types = Booking_Handler::get_ticket_types();
         
         <!-- Location -->
         <div class="form-group">
-            <label for="location">Seleziona Location:</label>
-            <select name="location" id="location" required>
-                <option value="">-- Scegli una location --</option>
+            <legend for="location">Seleziona Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
-                    <option value="<?php echo esc_attr($value); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
+                    <label for="location_<?php echo esc_attr($value); ?>">
+                        <span><?php echo esc_html($label); ?></span>
+                        <input type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>"" required>
+                    </label>
                 <?php endforeach; ?>
-            </select>
         </div>
 
         <!-- Data -->

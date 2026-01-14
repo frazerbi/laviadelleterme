@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!form) return;
 
     // Campi del form
-    const locationField = document.getElementById('location');
+    const locationRadios = document.querySelectorAll('input[name="location"]');
     const dateField = document.getElementById('booking_date');
     const ticketTypeField = document.getElementById('ticket_type');
     const timeSlotField = document.getElementById('time_slot');
@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const numFemaleField = document.getElementById('num_female');
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
+
+    // Helper per ottenere la location selezionata
+    function getSelectedLocation() {
+        const selectedRadio = document.querySelector('input[name="location"]:checked');
+        return selectedRadio ? selectedRadio.value : '';
+    }
 
     // Array delle date natalizie dal backend
     const christmasDates = bookingFormData.christmas_dates || [];
@@ -189,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
 
             if (!calendar) {
-                const selectedLocation = locationField.value;
+                const selectedLocation = getSelectedLocation();
                 if (selectedLocation) {
                     await initCalendar(selectedLocation);
                 }
@@ -204,36 +210,39 @@ document.addEventListener('DOMContentLoaded', function() {
     let apiData = null;
 
     // === GESTIONE PROGRESSIVA DEI CAMPI ===
-    locationField.addEventListener('change', async function() {
-        // Reset campi successivi quando cambia la location
-        dateField.value = '';
-        ticketTypeField.value = '';
-        ticketTypeField.selectedIndex = 0;
-        timeSlotField.value = '';
-        timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
-        numMaleField.value = '0';
-        numFemaleField.value = '0';
-        if (calendar) {
-            calendar.destroy();
-            calendar = null;
-            availabilityData = null;
-        }
+    locationRadios.forEach(radio => {
+        radio.addEventListener('change', async function() {
+            // Reset campi successivi quando cambia la location
+            // Reset campi successivi quando cambia la location
+            dateField.value = '';
+            ticketTypeField.value = '';
+            ticketTypeField.selectedIndex = 0;
+            timeSlotField.value = '';
+            timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+            numMaleField.value = '0';
+            numFemaleField.value = '0';
+            if (calendar) {
+                calendar.destroy();
+                calendar = null;
+                availabilityData = null;
+            }
 
-        hideMessage();
+            hideMessage();
 
-        apiData = null;
+            apiData = null;
 
-        if (this.value) {
-            // Ricrea completamente il wrapper del calendario
-            createCalendarWrapper();
-            // Inizializza nuovo calendario per la nuova location
-            await initCalendar(this.value);
-            dateField.disabled = false;
-        } else {
-            dateField.disabled = true;
-            disableFieldsFrom('ticket');
-        }
+            if (this.value) {
+                // Ricrea completamente il wrapper del calendario
+                createCalendarWrapper();
+                // Inizializza nuovo calendario per la nuova location
+                await initCalendar(this.value);
+                dateField.disabled = false;
+            } else {
+                dateField.disabled = true;
+                disableFieldsFrom('ticket');
+            }
 
+        });
     });
 
     dateField.addEventListener('change', function() {
@@ -243,11 +252,12 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.value = '';
         timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
 
-        if (this.value && locationField.value) {
+        const selectedLocation = getSelectedLocation();
+        if (this.value && selectedLocation) {
 
             handleTicketTypeOptions(this.value);
 
-            callAvailabilityAPI(locationField.value, this.value);
+            callAvailabilityAPI(selectedLocation, this.value);
         } else {
             disableFieldsFrom('ticket');
         }
@@ -500,7 +510,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.reset();
                 disableFieldsFrom('date');
                 dateField.disabled = true;
-                locationField.focus();
+
+                // Focus sul primo radio button della location
+                const firstLocationRadio = document.querySelector('input[name="location"]');
+                if (firstLocationRadio) {
+                    firstLocationRadio.focus();
+                }
 
                 if (data.data.redirect_url) {
                     setTimeout(() => {
