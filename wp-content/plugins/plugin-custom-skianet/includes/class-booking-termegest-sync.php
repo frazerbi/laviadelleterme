@@ -278,8 +278,7 @@ class Booking_TermeGest_Sync {
             error_log("  uomodonna: " . ($is_male ? 'true' : 'false'));
             error_log("  Email: {$customer['email']} (" . strlen($customer['email']) . " chars)");
             error_log("  AllInclusive: false");
-            error_log("  Categoria: {$booking_data['categorie']} (" . strlen($booking_data['categorie']) . " chars)");
-            error_log("  CodControllo: '' (vuoto)");
+            error_log(" Categoria: {$categoria} (" . strlen($categoria) . " chars)");
             error_log("  Protection: " . strlen($protection) . " chars");
             
         try {
@@ -294,7 +293,7 @@ class Booking_TermeGest_Sync {
                 $is_male,
                 $customer['email'],
                 false,
-                $booking_data['categorie'],
+                $categoria,
                 '',
                 $protection
             );
