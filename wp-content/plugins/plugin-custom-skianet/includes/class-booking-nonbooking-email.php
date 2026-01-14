@@ -37,7 +37,7 @@ class Booking_Nonbooking_Email {
      */
     private function init_hooks() {
         // Invia email quando ordine diventa "Not-Booked"
-        add_action('woocommerce_order_status_changed', array($this, 'send_on_status_not_booked'), 10, 4);
+        add_action('woocommerce_thankyou', array($this, 'send_on_status_not_booked'), 10, 1);
         
         // Azioni manuali admin
         add_action('woocommerce_order_actions', array($this, 'add_order_actions'));
@@ -48,10 +48,16 @@ class Booking_Nonbooking_Email {
     /**
      * Invia email quando ordine diventa "Not-Booked"
      */
-    public function send_on_status_not_booked($order_id, $old_status, $new_status, $order) {
-        if ($new_status === 'not-booked') {
-            $this->send_coupon_email($order);
+    public function send_on_status_not_booked($order_id) {
+        $order = wc_get_order($order_id);
+
+        if (!$order) {
+            error_log("Ordine {$order_id} non trovato");
+            return;
         }
+
+        $this->send_coupon_email($order);    
+    
     }
 
     /**
@@ -166,7 +172,7 @@ class Booking_Nonbooking_Email {
         $product_id = $item->get_product_id();
         $variation_id = $item->get_variation_id();
         $product_name = $item->get_name();
-
+        
         // Recupera codici licenza        
         $codes = Booking_Cart_Handler::get_item_license_codes($order_id, $product_id, $variation_id);
     

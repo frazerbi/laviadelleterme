@@ -247,7 +247,7 @@ class Booking_Cart_Handler {
         global $wpdb;
         
         $check_id = $variation_id > 0 ? $variation_id : $product_id;
-        
+
         $query = $wpdb->prepare(
             "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
             WHERE order_id = %d AND product_id = %d",
