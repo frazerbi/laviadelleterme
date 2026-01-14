@@ -133,10 +133,6 @@ class Booking_Redirect {
             'ticket_type'  => $booking_data['ticket_type']
         );
 
-       if (!empty($variation_id)) {
-            $params['variation_id'] = $variation_id;
-        }
-
         $redirect_url = add_query_arg($params, $product_url);
 
         error_log("Redirect URL: {$redirect_url}");
