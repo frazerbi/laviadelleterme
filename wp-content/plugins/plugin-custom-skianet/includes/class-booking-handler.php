@@ -414,37 +414,6 @@ class Booking_Handler {
             error_log("ERRORE: Posti insufficienti! Disponibili: {$posti_disponibili}, Richiesti: {$posti_richiesti}");
             return false;
         }
-        
-        // ✅ Calcola categoria attesa
-        $redirect = Booking_Redirect::get_instance();
-        $product_config = $redirect->get_product_config($data['booking_date'], $data['ticket_type']);
-        
-        if (!$product_config || !isset($product_config['category'])) {
-            error_log("ERRORE: Impossibile ottenere categoria per data {$data['booking_date']} e tipo {$data['ticket_type']}");
-            return false;
-        }
-        
-        $expected_category = $product_config['category']; // P1/P2/P3/P4/PM
-
-        $categorie_from_api = $data['categorie'] ?? ''; // Es: ",p1,p2,p3,pm,"
-
-        if (!empty($categorie_from_api)) {
-            // Converte in array e controlla presenza
-            $categories_array = array_map('trim', explode(',', strtolower($categorie_from_api)));
-            $has_category = in_array(strtolower($expected_category), $categories_array);
-            
-            if (!$has_category) {
-                error_log("⚠️ WARNING: Categoria attesa '{$expected_category}' non trovata in categorie API: {$categorie_from_api}");
-                // ✅ Puoi decidere se:
-                // - Continuare comunque (trust del nostro calcolo)
-                // - Bloccare la prenotazione (trust dell'API)
-                // Per ora continuiamo con warning
-            } else {
-                error_log("✅ Categoria '{$expected_category}' verificata in categorie API");
-            }
-        }
-        
-        $category = $expected_category;
 
         // Prepara tutti i dati da salvare
         $booking_data = array(
@@ -458,7 +427,7 @@ class Booking_Handler {
             'num_female' => $data['num_female'],
             'total_guests' => $data['total_guests'],
             'disponibilita' => $posti_disponibili,
-            'category' => $category,
+            'category' => $data['categorie'],
             'user_id' => $data['user_id'],
             'status' => 'pending',
             'created_at' => $data['created_at'],
