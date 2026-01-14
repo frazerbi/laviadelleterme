@@ -152,7 +152,10 @@ document.addEventListener('DOMContentLoaded', function() {
             disableDates: disabledDates,
             disableDatesPast: true,
             selectedDates: dateField.value ? [dateField.value] : [],
-
+            onShow() {
+                // Assicura che il calendario sia visibile con display: block
+                calendarWrapper.style.display = 'block';
+            },
             onClickDate(self, event) {
                 // Ottieni la data cliccata dal data attribute (formato YYYY-MM-DD)
                 const clickedDate = self.context.selectedDates[0];
@@ -164,24 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const changeEvent = new Event('change', { bubbles: true });
                     
                     dateField.dispatchEvent(changeEvent);
-                    
-                    // Chiudi il calendario
-                    self.hide();
+                    console.log('Data selezionata:', clickedDate);
+                    // Chiudi il calendario - il metodo hide non funziona con questa configurazione
+                    calendarWrapper.style.display = 'none';
                 } else {
                     showMessage('error', 'Data non disponibile. Seleziona un\'altra data.');
                     self.update(); // Reset selezione
                 }
             },
-
-            onShow() {
-                // Assicura che il calendario sia visibile con display: block
-                calendarWrapper.style.display = 'block';
-            },
-
-            onHide() {
-                // Imposta display: none per evitare che occupi spazio
-                calendarWrapper.style.display = 'none';
-            }
         };
 
         calendar = new Calendar(calendarWrapper, options);
