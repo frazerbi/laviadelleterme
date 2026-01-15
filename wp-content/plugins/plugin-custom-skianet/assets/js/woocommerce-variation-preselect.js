@@ -56,7 +56,7 @@ function selectVariation(ticketType) {
                 const optionValue = $(this).val();
                 const optionText = $(this).text().toLowerCase();
 
-                if (ticketType === '4h' && (optionValue.includes('mezz') || optionText.includes('giornat'))) {
+                if (ticketType === '4h' && (optionValue.includes('mezza-giornata') )) {
                     valueToSelect = optionValue;
                 } else if (ticketType === 'giornaliero' && (optionValue.includes('giornalier') || optionText.includes('giornalier'))) {
                     valueToSelect = optionValue;
