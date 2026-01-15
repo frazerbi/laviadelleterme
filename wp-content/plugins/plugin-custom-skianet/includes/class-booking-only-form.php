@@ -24,7 +24,7 @@ class Booking_Code_Form_Handler {
      * Costruttore - registra hooks e shortcode
      */
     private function __construct() {
-        add_shortcode('booking_form_code', array($this, 'render_booking_only_form_code'));
+        add_shortcode('render_booking_only_form_code', array($this, 'render_booking_only_form_code'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
         add_action('wp_ajax_check_availability_api', array($this, 'check_availability_api'));
         add_action('wp_ajax_nopriv_check_availability_api', array($this, 'check_availability_api'));
