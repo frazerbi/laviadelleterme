@@ -56,7 +56,14 @@ class Booking_Code_Form_Handler {
         if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'render_booking_only_form_code')) {
             return;
         }
-        
+
+        wp_enqueue_style(
+            'booking-form-css',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/css/booking-form.css',
+            array(),
+            '1.0.0'
+        );
+
         // Booking form script (compilato con esbuild, include vanilla-calendar-pro)
         wp_enqueue_script(
             'booking-only-form-script',
