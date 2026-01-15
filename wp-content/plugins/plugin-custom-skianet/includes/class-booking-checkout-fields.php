@@ -59,17 +59,18 @@ class Booking_Checkout_Fields {
         }
 
         ?>
-        <div class="health-certificate-wrapper" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border: 2px solid #0074A0; border-radius: 5px;">
-            <h3 style="margin-top: 0; color: #0074A0;">
+        <div class="health-certificate-wrapper" style="margin: 20px 0; border: 2px solid #0074A0; border-radius: 5px; background: #f8f9fa;">
+            <h3 style="margin: 0; padding: 15px; color: #0074A0; background: #fff; border-bottom: 2px solid #0074A0; border-radius: 5px 5px 0 0; font-family: 'Muli', Sans-serif;">
                 <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
             </h3>
             
-            <div style="font-size: 13px; line-height: 1.7; margin-bottom: 20px; color: #333;">
+            <!-- Area scrollabile con testo -->
+            <div class="health-certificate-content" style="max-height: 25vh; overflow-y: auto; padding: 15px; font-family: 'Muli', Sans-serif; font-size: 1rem; line-height: 1.7; color: #333; background: #fff;">
                 <p style="margin-bottom: 15px;">
                     <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'text-domain'); ?></strong>
                 </p>
                 
-                <ol style="padding-left: 20px; margin-bottom: 15px;">
+                <ol style="padding-left: 20px; margin-bottom: 0;">
                     <li style="margin-bottom: 12px;">
                         <?php _e('trovarsi in condizioni psicofisiche idonee a usufruire dei trattamenti di benessere offerti dalle Strutture compresi bagno turco, sauna, vasche idromassaggio e, in particolare:', 'text-domain'); ?>
                         <ul style="margin-top: 8px; padding-left: 20px; list-style-type: disc;">
@@ -95,23 +96,23 @@ class Booking_Checkout_Fields {
                         <?php _e('essere a conoscenza dell\'obbligo di indossare ciabattine durante il soggiorno nelle Strutture;', 'text-domain'); ?>
                     </li>
                     
-                    <li style="margin-bottom: 12px;">
+                    <li style="margin-bottom: 0;">
                         <?php _e('esonerare da qualsivoglia responsabilità le Strutture, i suoi dipendenti e collaboratori per eventuali danni, malesseri o conseguenze derivanti da informazioni incomplete, inesatte o omesse sul proprio stato di salute; dal mancato rispetto delle indicazioni fornite dal personale delle Strutture da condizioni personali non risultanti dalla presente dichiarazione o non conosciute.', 'text-domain'); ?>
                     </li>
                 </ol>
             </div>
             
-            <!-- Checkbox Dichiarazione -->
-            <div style="padding: 12px; background: #fff; border: 1px solid #dee2e6; border-radius: 4px;">
-                <label for="health_certificate_accepted" style="display: flex; align-items: flex-start; cursor: pointer;">
+            <!-- Checkbox in fondo -->
+            <div style="padding: 15px; background: #f8f9fa; border-top: 1px solid #dee2e6; border-radius: 0 0 5px 5px;">
+                <label for="health_certificate_accepted" style="display: flex; align-items: flex-start; cursor: pointer; font-family: 'Muli', Sans-serif; font-size: 1rem;">
                     <input 
                         type="checkbox" 
                         name="health_certificate_accepted" 
                         id="health_certificate_accepted" 
                         value="1" 
-                        style="margin-right: 10px; margin-top: 4px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
+                        style="margin-right: 10px; margin-top: 4px; min-width: 18px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
                     />
-                    <span style="font-size: 14px; font-weight: 600; color: #333;">
+                    <span style="font-weight: 600; color: #333;">
                         <?php _e('Confermo di dichiarare e accettare quanto sopra.', 'text-domain'); ?>
                         <span style="color: #d9534f;">*</span>
                     </span>
@@ -120,16 +121,59 @@ class Booking_Checkout_Fields {
         </div>
 
         <style>
+            /* Scrollbar personalizzata per area testo */
+            .health-certificate-content::-webkit-scrollbar {
+                width: 8px;
+            }
+            .health-certificate-content::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 4px;
+            }
+            .health-certificate-content::-webkit-scrollbar-thumb {
+                background: #0074A0;
+                border-radius: 4px;
+            }
+            .health-certificate-content::-webkit-scrollbar-thumb:hover {
+                background: #005a7d;
+            }
+            
+            /* Focus sul checkbox */
             .health-certificate-wrapper input[type="checkbox"]:focus {
                 outline: 2px solid #0074A0;
                 outline-offset: 2px;
             }
+            
+            /* Hover sulla label */
             .health-certificate-wrapper label:hover span {
                 color: #0074A0;
+            }
+            
+            /* Responsive: altezza minima per mobile */
+            @media (max-width: 768px) {
+                .health-certificate-content {
+                    max-height: 30vh;
+                    font-size: 0.9rem;
+                }
+                .health-certificate-wrapper h3 {
+                    font-size: 1.1rem;
+                    padding: 12px;
+                }
+                .health-certificate-wrapper label {
+                    font-size: 0.9rem;
+                }
+            }
+            
+            /* Schermi molto piccoli */
+            @media (max-width: 480px) {
+                .health-certificate-content {
+                    max-height: 35vh;
+                    padding: 12px;
+                }
             }
         </style>
         <?php
     }
+
 
     /**
      * Valida che il certificato sia stato accettato
