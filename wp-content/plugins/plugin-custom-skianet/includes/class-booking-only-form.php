@@ -53,7 +53,7 @@ class Booking_Code_Form_Handler {
         global $post;
         
         // Carica solo se lo shortcode è presente
-        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'booking_form_code')) {
+        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'render_booking_only_form_code')) {
             return;
         }
         

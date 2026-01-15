@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    console.log('Booking Only Form JS loaded');
+
+
     const form = document.getElementById('booking-form-code');
     if (!form) return;
-    console.log('Booking Only Form JS loaded');
     // Campi del form
     const purchaseCodeInput = document.getElementById('purchase_code');
     const locationRadios = document.querySelectorAll('input[name="location"]');
