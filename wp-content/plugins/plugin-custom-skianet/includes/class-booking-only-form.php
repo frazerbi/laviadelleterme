@@ -57,20 +57,27 @@ class Booking_Code_Form_Handler {
             return;
         }
         
-        // CSS
-        // wp_enqueue_style(
-        //     'booking-code-form-css',
-        //     plugin_dir_url(dirname(__FILE__)) . 'assets/css/booking-form.css',
-        //     array(),
-        //     '1.0.0'
-        // );
-        
-        // JavaScript
-        wp_enqueue_script(
-            'booking-code-form-js',
-            plugin_dir_url(dirname(__FILE__)) . 'assets/js/booking-only-form.js',
+        // CSS di vanilla-calendar-pro (compilato da esbuild)
+        wp_enqueue_style(
+            'vanilla-calendar-bundle',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-only-form.min.css',
             array(),
-            '1.0.0',
+            '1.1.0'
+        );
+
+        wp_enqueue_style(
+            'booking-only-form-style',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/css/booking-only-form.css',
+            array('vanilla-calendar-bundle'),
+            '1.0.0'
+        );
+
+        // Booking form script (compilato con esbuild, include vanilla-calendar-pro)
+        wp_enqueue_script(
+            'booking-only-form-script',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-only-form.min.js',
+            array(),
+            '1.1.0',
             true
         );
         
