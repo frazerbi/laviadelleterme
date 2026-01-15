@@ -15,7 +15,7 @@ class Booking_Code_Form_Handler {
     /**
      * Renderizza il form tramite shortcode
      */
-    public function render_booking_only_form_code($atts) {
+    public function render_booking_only_form_code() {
         
         // Inizia il buffer output
         ob_start();
@@ -47,6 +47,3 @@ class Booking_Code_Form_Handler {
     }
 
 }
-
-// Inizializza la classe
-new Booking_Code_Form_Handler();
