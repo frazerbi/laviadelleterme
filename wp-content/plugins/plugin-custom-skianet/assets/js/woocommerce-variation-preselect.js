@@ -42,34 +42,35 @@ function selectVariation(ticketType) {
 
         jQuery(document).ready(function($) {
             const checkForm = setInterval(function() {
-                const $select = $('[name="attribute_pa_tipologia-ingressi"]');
+            const $select = $('[name="attribute_pa_tipologia-ingressi"]');
 
-                if ($select.length === 0) {
-                    return;
+            if ($select.length === 0) {
+                return;
+            }
+
+            clearInterval(checkForm);
+
+            let valueToSelect = null;
+
+            $select.find('option').each(function() {
+                const optionValue = $(this).val();
+                const optionText = $(this).text().toLowerCase();
+
+                if (ticketType === '4h' && (optionValue.includes('mezz') || optionText.includes('giornat'))) {
+                    valueToSelect = optionValue;
+                } else if (ticketType === 'giornaliero' && (optionValue.includes('giornalier') || optionText.includes('giornalier'))) {
+                    valueToSelect = optionValue;
                 }
+            });
 
-                clearInterval(checkForm);
+            if (!valueToSelect) {
+                reject(new Error(`Nessuna opzione trovata per ticketType: ${ticketType}`));
+                return;
+            }
 
-                let valueToSelect = null;
+            $select.val(valueToSelect).trigger('change');
+            resolve(true);
 
-                $select.find('option').each(function() {
-                    const optionValue = $(this).val();
-                    const optionText = $(this).text().toLowerCase();
-
-                    if (ticketType === '4h' && (optionValue.includes('4') || optionText.includes('4'))) {
-                        valueToSelect = optionValue;
-                    } else if (ticketType === 'giornaliero' && (optionValue.includes('giornalier') || optionText.includes('giornalier'))) {
-                        valueToSelect = optionValue;
-                    }
-                });
-
-                if (!valueToSelect) {
-                    reject(new Error(`Nessuna opzione trovata per ticketType: ${ticketType}`));
-                    return;
-                }
-
-                $select.val(valueToSelect).trigger('change');
-                resolve(true);
             }, 100);
 
             setTimeout(function() {
