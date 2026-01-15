@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Campi del form
     const purchaseCodeInput = document.getElementById('purchase_code');
-    const verifyButton = document.getElementById('verify-code');
     const locationRadios = document.querySelectorAll('input[name="location"]');
     const dateField = document.getElementById('booking_date');
     const timeSlotField = document.getElementById('time_slot');
@@ -12,9 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
 
-    // Stato del codice verificato
-    let codeVerified = false;
-    let orderData = null;
+    // Dati API
+    let apiData = null;
 
     // Helper per ottenere la location selezionata
     function getSelectedLocation() {
@@ -28,125 +26,28 @@ document.addEventListener('DOMContentLoaded', function() {
         return selectedRadio ? selectedRadio.value : '';
     }
 
-    // Dati API
-    let apiData = null;
-
-    // === VERIFICA CODICE ===
-    verifyButton.addEventListener('click', handleCodeVerification);
-
+    // Trasforma il codice in maiuscolo mentre digita
     purchaseCodeInput.addEventListener('input', function(e) {
         e.target.value = e.target.value.toUpperCase();
     });
 
-    purchaseCodeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            verifyButton.click();
+    // Abilita le location quando il codice è completo (16 caratteri)
+    purchaseCodeInput.addEventListener('input', function() {
+        const code = this.value.trim();
+        const isValidLength = code.length === 16;
+        
+        locationRadios.forEach(radio => {
+            radio.disabled = !isValidLength;
+        });
+        
+        if (!isValidLength && getSelectedLocation()) {
+            // Reset se il codice viene modificato
+            locationRadios.forEach(radio => radio.checked = false);
+            dateField.value = '';
+            dateField.disabled = true;
+            disableFieldsFrom('date');
         }
     });
-
-    function handleCodeVerification() {
-        const code = purchaseCodeInput.value.trim().toUpperCase();
-        
-        if (!validateCode(code)) {
-            showMessage('error', 'Inserisci un codice valido (16 caratteri alfanumerici)');
-            return;
-        }
-        
-        verifyCode(code);
-    }
-
-    function validateCode(code) {
-        const regex = /^[A-Z0-9]{16}$/;
-        return regex.test(code);
-    }
-
-    function verifyCode(code) {
-        setButtonState('loading');
-        
-        const formData = new FormData();
-        formData.append('action', 'verify_purchase_code');
-        formData.append('code', code);
-        formData.append('nonce', bookingCodeAjax.nonce);
-        
-        fetch(bookingCodeAjax.ajaxurl, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Errore di rete');
-            }
-            return response.json();
-        })
-        .then(handleVerificationResponse)
-        .catch(handleVerificationError);
-    }
-
-    function handleVerificationResponse(data) {
-        if (data.success) {
-            showMessage('success', data.data.message);
-            setButtonState('verified');
-            purchaseCodeInput.readOnly = true;
-            codeVerified = true;
-            
-            // Salva i dati dell'ordine se presenti
-            if (data.data.order_data) {
-                orderData = data.data.order_data;
-            }
-            
-            // Abilita i campi del form
-            enableFormFields();
-            
-        } else {
-            showMessage('error', data.data.message || 'Codice non valido');
-            setButtonState('default');
-        }
-    }
-
-    function handleVerificationError(error) {
-        console.error('Errore verifica:', error);
-        showMessage('error', 'Errore di connessione. Riprova.');
-        setButtonState('default');
-    }
-
-    function setButtonState(state) {
-        switch(state) {
-            case 'loading':
-                verifyButton.disabled = true;
-                verifyButton.textContent = 'Verifica in corso...';
-                verifyButton.classList.remove('verified');
-                break;
-                
-            case 'verified':
-                verifyButton.disabled = true;
-                verifyButton.textContent = '✓ Verificato';
-                verifyButton.classList.add('verified');
-                break;
-                
-            case 'default':
-            default:
-                verifyButton.disabled = false;
-                verifyButton.textContent = 'Verifica Codice';
-                verifyButton.classList.remove('verified');
-                break;
-        }
-    }
-
-    function enableFormFields() {
-        // Abilita location
-        locationRadios.forEach(radio => {
-            radio.disabled = false;
-        });
-        
-        // Abilita gender
-        genderRadios.forEach(radio => {
-            radio.disabled = false;
-        });
-        
-        // Data rimane disabilitata finché non si seleziona una location
-        console.log('Campi abilitati - seleziona una location per continuare');
-    }
 
     // === GESTIONE PROGRESSIVA DEI CAMPI ===
     locationRadios.forEach(radio => {
@@ -194,14 +95,18 @@ document.addEventListener('DOMContentLoaded', function() {
         apiData = null;
 
         const fields = {
-            'date': [timeSlotField],
-            'time': []
+            'date': [timeSlotField, genderRadios],
+            'time': [genderRadios]
         };
 
         if (fields[from]) {
             fields[from].forEach(field => {
-                field.disabled = true;
-                field.value = '';
+                if (NodeList.prototype.isPrototypeOf(field)) {
+                    field.forEach(radio => radio.disabled = true);
+                } else {
+                    field.disabled = true;
+                    field.value = '';
+                }
             });
         }
 
@@ -209,12 +114,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function checkSubmitButton() {
+        const hasCode = purchaseCodeInput.value.trim().length === 16;
         const hasLocation = getSelectedLocation();
         const hasDate = dateField.value;
         const hasTimeSlot = timeSlotField.value;
         const hasGender = getSelectedGender();
         
-        submitBtn.disabled = !(hasLocation && hasDate && hasTimeSlot && hasGender);
+        submitBtn.disabled = !(hasCode && hasLocation && hasDate && hasTimeSlot && hasGender);
+        
+        // Abilita il campo gender quando c'è una fascia oraria
+        if (hasTimeSlot) {
+            genderRadios.forEach(radio => radio.disabled = false);
+        }
     }
 
     function showMessage(type, text) {
@@ -302,13 +213,15 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        if (!codeVerified) {
-            showMessage('error', 'Verifica prima il codice acquisto.');
-            return;
-        }
-
+        const code = purchaseCodeInput.value.trim();
         const selectedLocation = getSelectedLocation();
         const selectedGender = getSelectedGender();
+
+        // Validazione
+        if (code.length !== 16) {
+            showMessage('error', 'Il codice deve essere di 16 caratteri.');
+            return;
+        }
 
         if (!selectedLocation || !dateField.value || !timeSlotField.value || !selectedGender) {
             showMessage('error', 'Compila tutti i campi obbligatori.');
@@ -337,14 +250,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Reset form
                     form.reset();
-                    codeVerified = false;
-                    orderData = null;
-                    purchaseCodeInput.readOnly = false;
-                    setButtonState('default');
                     disableFieldsFrom('date');
                     dateField.disabled = true;
-                    
-                    // Disabilita tutti i radio
                     locationRadios.forEach(radio => radio.disabled = true);
                     genderRadios.forEach(radio => radio.disabled = true);
                 }
