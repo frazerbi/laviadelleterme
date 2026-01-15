@@ -61,11 +61,11 @@ class Booking_Checkout_Fields {
         ?>
         <div class="health-certificate-content" style="max-height: 25vh; overflow:scroll; margin-bottom: 2rem; padding: 15px; background: var(--e-global-color-29fcec7);">
 
-            <h4 style="margin-top: 0; margin-bottom: 1rem; color: #0074A0;">
+            <h5 style="margin-top: 0; margin-bottom: 1rem; font-weight: bold;">
                 <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
-            </h4>
+            </h5>
             
-            <div style="font-size: 13px; line-height: 1.7; margin-bottom: 20px; color: #333;">
+            <div>
                 <p style="margin-bottom: 15px;">
                     <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'text-domain'); ?></strong>
                 </p>
