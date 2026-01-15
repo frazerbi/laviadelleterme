@@ -6,6 +6,21 @@
 class Booking_Code_Form_Handler {
     
     /**
+     * Istanza singleton
+     */
+    private static $instance = null;
+
+    /**
+     * Ottieni l'istanza della classe
+     */
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+    
+    /**
      * Costruttore - registra hooks e shortcode
      */
     public function __construct() {
