@@ -62,7 +62,9 @@
 }
 
 .booking-form .btn-submit:hover {
-    background: #005a87;
+    background: transparent;
+    border-color: #0073aa;
+    color: #0073aa;
 }
 
 .booking-form .btn-submit:disabled {
