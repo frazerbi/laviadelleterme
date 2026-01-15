@@ -24,7 +24,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
+    color: var(--e-global-color-secondary);
 }
 
 .booking-form .required {
@@ -52,11 +52,11 @@
 .booking-form .btn-submit {
     width: 100%;
     padding: 12px;
-    background: #0073aa;
+    background: var(--e-global-color-primary);
     color: white;
     border: none;
     border-radius: 4px;
-    border: 2px solid #0073aa;
+    border: 2px solid var(--e-global-color-primary);
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s;
@@ -64,8 +64,8 @@
 
 .booking-form .btn-submit:hover {
     background: transparent;
-    border-color: #0073aa;
-    color: #0073aa;
+    border-color: var(--e-global-color-primary);
+    color: var(--e-global-color-primary);
 }
 
 .booking-form .btn-submit:disabled {
@@ -134,17 +134,17 @@
 
 .number-input-wrapper .btn-number {
     padding: 0 1rem;
-    color: #005a87;
-    border-color: #005a87;
+    color: var(--e-global-color-primary);
+    border-color: var(--e-global-color-primary);
     background-color: transparent;
-    border: 1px solid #005a87;
+    border: 1px solid var(--e-global-color-primary);
     border-radius: 4px;
     font-size: 16px;
     height: 46px;
 }
 
 .number-input-wrapper .btn-number:not(:disabled):hover {
-    background-color: #005a87;
+    background-color: var(--e-global-color-primary);
     color: #fff;
 }
 
@@ -167,7 +167,7 @@
     margin: 0;
 }
 .visualradio-item:has(.visualradio-input:checked) {
-    border-color: #0073aa;
+    border-color: var(--e-global-color-primary);
 }
 
 .visualradio-label {
@@ -175,7 +175,7 @@
 }
 
 .visualradio-item:has(.visualradio-input:checked) .visualradio-label {
-    color: #0073aa;
+    color: var(--e-global-color-primary);
 }
 
 .visualradio-thumb {
