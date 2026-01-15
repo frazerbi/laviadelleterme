@@ -1,10 +1,12 @@
+import { Calendar } from 'vanilla-calendar-pro';
+import 'vanilla-calendar-pro/styles/index.css';
+import 'vanilla-calendar-pro/styles/layout.css';
+import 'vanilla-calendar-pro/styles/themes/light.css';
+
 document.addEventListener('DOMContentLoaded', function() {
-
-    console.log('Booking Only Form JS loaded');
-
-
     const form = document.getElementById('booking-form-code');
     if (!form) return;
+
     // Campi del form
     const purchaseCodeInput = document.getElementById('purchase_code');
     const locationRadios = document.querySelectorAll('input[name="location"]');
@@ -14,8 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
 
-    // Dati API
+    // Dati API e calendario
     let apiData = null;
+    let calendar = null;
+    let availabilityData = null;
+    let calendarWrapper = null;
 
     // Helper per ottenere la location selezionata
     function getSelectedLocation() {
@@ -28,6 +33,143 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedRadio = document.querySelector('input[name="gender"]:checked');
         return selectedRadio ? selectedRadio.value : '';
     }
+
+    // Mappa le location dai valori del form ai nomi dei file JSON
+    function mapLocationToFileName(location) {
+        const locationMap = {
+            'terme-genova': 'genova',
+            'monterosa-spa': 'monterosa',
+            'terme-saint-vincent': 'saint-vincent'
+        };
+        return locationMap[location] || location;
+    }
+
+    // === CALENDARIO VANILLA ===
+    
+    // Funzione per creare/ricreare il wrapper del calendario
+    function createCalendarWrapper() {
+        // Rimuovi il wrapper esistente se presente
+        if (calendarWrapper && calendarWrapper.parentNode) {
+            calendarWrapper.parentNode.removeChild(calendarWrapper);
+        }
+
+        // Crea un nuovo wrapper
+        calendarWrapper = document.createElement('div');
+        calendarWrapper.className = 'vanilla-calendar-wrapper';
+        dateField.parentNode.insertBefore(calendarWrapper, dateField.nextSibling);
+
+        return calendarWrapper;
+    }
+
+    // Crea il wrapper iniziale
+    createCalendarWrapper();
+
+    // Funzione per recuperare il JSON delle disponibilità per location
+    async function fetchAvailabilityJSON(location) {
+        try {
+            const fileName = mapLocationToFileName(location);
+            const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
+
+            const response = await fetch(jsonPath);
+
+            if (!response.ok) {
+                console.error(`File non trovato: ${jsonPath}`);
+                showMessage('error', 'Impossibile caricare il calendario per questa location.');
+                return null;
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Errore nel recupero del JSON availability:', error);
+            showMessage('error', 'Errore nel caricamento del calendario.');
+            return null;
+        }
+    }
+
+    // Funzione per costruire l'array di date disabilitate dal JSON
+    function buildDisabledDatesArray(availabilityData) {
+        if (!availabilityData || !availabilityData.availability) {
+            return [];
+        }
+
+        // Filtra le date con availability = false e restituiscile come array
+        const disabledDates = Object.entries(availabilityData.availability)
+            .filter(([, isAvailable]) => !isAvailable)
+            .map(([date]) => date);
+
+        return disabledDates;
+    }
+
+    async function initCalendar(location) {
+        if (calendar) return;
+
+        // Range di date: oggi + 60 giorni
+        const today = new Date();
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 60);
+
+        const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
+        // Recupera i dati di disponibilità dal JSON
+        availabilityData = await fetchAvailabilityJSON(location);
+
+        // Costruisci l'array delle date disabilitate
+        const disabledDates = buildDisabledDatesArray(availabilityData);
+
+        const options = {
+            locale: 'it',
+            selectedTheme: 'light',
+            selectionDatesMode: 'single',
+            dateMin: firstDayCurrentMonth.toISOString().split('T')[0], 
+            dateMax: lastDayNextMonth.toISOString().split('T')[0], 
+            disableDates: disabledDates,
+            disableDatesPast: true,
+            selectedDates: dateField.value ? [dateField.value] : [],
+            onShow() {
+                // Assicura che il calendario sia visibile con display: block
+                calendarWrapper.style.display = 'block';
+            },
+            onClickDate(self, event) {
+                // Ottieni la data cliccata dal data attribute (formato YYYY-MM-DD)
+                const clickedDate = self.context.selectedDates[0];
+                if (clickedDate && !disabledDates.includes(clickedDate)) {
+                    dateField.value = clickedDate;
+                    // Trigger dell'evento change per il form
+                    const changeEvent = new Event('change', { bubbles: true });
+                    
+                    dateField.dispatchEvent(changeEvent);
+                    console.log('Data selezionata:', clickedDate);
+                    // Chiudi il calendario
+                    calendarWrapper.style.display = 'none';
+                } else {
+                    showMessage('error', 'Data non disponibile. Seleziona un\'altra data.');
+                    self.update(); // Reset selezione
+                }
+            },
+        };
+
+        calendar = new Calendar(calendarWrapper, options);
+        calendar.init();
+    }
+
+    // Mostra calendario al click sull'input
+    dateField.addEventListener('click', async function(e) {
+        if (!this.disabled) {
+            e.preventDefault();
+
+            if (!calendar) {
+                const selectedLocation = getSelectedLocation();
+                if (selectedLocation) {
+                    await initCalendar(selectedLocation);
+                }
+            }
+            if (calendar) {
+                calendar.show();
+            }
+        }
+    });
 
     // === GESTIONE CODICE ACQUISTO ===
     // Trasforma il codice in maiuscolo mentre digita
@@ -70,13 +212,34 @@ document.addEventListener('DOMContentLoaded', function() {
             radio.checked = false;
         });
         submitBtn.disabled = true;
+        
+        // Reset calendario
+        if (calendar) {
+            calendar.destroy();
+            calendar = null;
+            availabilityData = null;
+        }
+        
         hideMessage();
     }
 
     // === GESTIONE LOCATION ===
     locationRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
+        radio.addEventListener('change', async function() {
             if (this.checked) {
+                // Reset calendario
+                if (calendar) {
+                    calendar.destroy();
+                    calendar = null;
+                    availabilityData = null;
+                }
+                
+                // Ricrea il wrapper del calendario
+                createCalendarWrapper();
+                
+                // Inizializza nuovo calendario per la nuova location
+                await initCalendar(this.value);
+                
                 // Abilita il campo data
                 dateField.disabled = false;
                 
