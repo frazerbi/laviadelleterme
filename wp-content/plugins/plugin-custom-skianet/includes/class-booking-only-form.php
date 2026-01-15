@@ -57,21 +57,6 @@ class Booking_Code_Form_Handler {
             return;
         }
         
-        // CSS di vanilla-calendar-pro (compilato da esbuild)
-        wp_enqueue_style(
-            'vanilla-calendar-bundle',
-            plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-only-form.min.css',
-            array(),
-            '1.1.0'
-        );
-
-        wp_enqueue_style(
-            'booking-only-form-style',
-            plugin_dir_url(dirname(__FILE__)) . 'assets/css/booking-only-form.css',
-            array('vanilla-calendar-bundle'),
-            '1.0.0'
-        );
-
         // Booking form script (compilato con esbuild, include vanilla-calendar-pro)
         wp_enqueue_script(
             'booking-only-form-script',
