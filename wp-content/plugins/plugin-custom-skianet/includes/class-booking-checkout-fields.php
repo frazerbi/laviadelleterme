@@ -41,9 +41,9 @@ class Booking_Checkout_Fields {
         // Valida che sia stato accettato
         add_action('woocommerce_checkout_process', array($this, 'validate_health_certificate'));
         
-        // Salva nell'ordine
-        add_action('woocommerce_checkout_update_order_meta', array($this, 'save_health_certificate'));
-        
+        // Salva nei metadati degli order items (non dell'ordine)
+        add_action('woocommerce_checkout_create_order_line_item', array($this, 'save_health_certificate_to_item'), 10, 4);
+
         // Mostra nei dettagli ordine (admin e email)
         add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'display_health_certificate_in_admin'));
         add_action('woocommerce_order_details_after_order_table', array($this, 'display_health_certificate_in_order'));
@@ -59,34 +59,60 @@ class Booking_Checkout_Fields {
         }
 
         ?>
-        <div class="health-certificate-wrapper" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border: 2px solid #0074A0; border-radius: 5px;">
+        <div class="health-certificate-wrapper" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border: 2px solid #0074A0; border-radius: 5px;">
             <h3 style="margin-top: 0; color: #0074A0;">
-                <?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?>
+                <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
             </h3>
             
-            <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
-                <?php _e('L\'accesso alle strutture termali è consentito solo a persone in buone condizioni di salute. Sono esclusi dall\'accesso coloro che presentano:', 'text-domain'); ?>
-            </p>
+            <div style="font-size: 13px; line-height: 1.7; margin-bottom: 20px; color: #333;">
+                <p style="margin-bottom: 15px;">
+                    <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'text-domain'); ?></strong>
+                </p>
+                
+                <ol style="padding-left: 20px; margin-bottom: 15px;">
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('trovarsi in condizioni psicofisiche idonee a usufruire dei trattamenti di benessere offerti dalle Strutture compresi bagno turco, sauna, vasche idromassaggio e, in particolare:', 'text-domain'); ?>
+                        <ul style="margin-top: 8px; padding-left: 20px; list-style-type: disc;">
+                            <li style="margin-bottom: 6px;"><?php _e('di essere a conoscenza che l\'uso di sauna e bagno turco non sono idonei a coloro che hanno disturbi di pressione arteriosa e presenza di patologie a carico del sistema venoso superficiale e profondo;', 'text-domain'); ?></li>
+                            <li style="margin-bottom: 6px;"><?php _e('non accusare sintomi quali: febbre, tosse, difficoltà respiratorie;', 'text-domain'); ?></li>
+                            <li style="margin-bottom: 6px;"><?php _e('di godere di sana e robusta costituzione e di essersi sottoposto di recente a visita medica per accertare la propria idoneità fisica;', 'text-domain'); ?></li>
+                        </ul>
+                    </li>
+                    
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('dover informare correttamente il personale delle Strutture circa eventuali patologie, allergie, condizioni mediche, stati di gravidanza, terapie in corso, interventi chirurgici recenti o altre condizioni che possano costituire controindicazione, anche temporanea, ai trattamenti offerti dalle Strutture;', 'text-domain'); ?>
+                    </li>
+                    
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('essere consapevole che i trattamenti benessere hanno esclusiva finalità di benessere e rilassamento e non sostituiscono in alcun modo prestazioni mediche o terapeutiche;', 'text-domain'); ?>
+                    </li>
+                    
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('impegnarsi a comunicare tempestivamente alle Strutture qualsiasi variazione del proprio stato di salute che possa insorgere prima o durante l\'erogazione delle prestazioni dello Stabilimento;', 'text-domain'); ?>
+                    </li>
+                    
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('essere a conoscenza dell\'obbligo di indossare ciabattine durante il soggiorno nelle Strutture;', 'text-domain'); ?>
+                    </li>
+                    
+                    <li style="margin-bottom: 12px;">
+                        <?php _e('esonerare da qualsivoglia responsabilità le Strutture, i suoi dipendenti e collaboratori per eventuali danni, malesseri o conseguenze derivanti da informazioni incomplete, inesatte o omesse sul proprio stato di salute; dal mancato rispetto delle indicazioni fornite dal personale delle Strutture da condizioni personali non risultanti dalla presente dichiarazione o non conosciute.', 'text-domain'); ?>
+                    </li>
+                </ol>
+            </div>
             
-            <ul style="font-size: 13px; line-height: 1.8; margin-bottom: 15px; padding-left: 20px;">
-                <li><?php _e('Malattie infettive o contagiose in atto', 'text-domain'); ?></li>
-                <li><?php _e('Ferite aperte, lesioni cutanee o dermatiti', 'text-domain'); ?></li>
-                <li><?php _e('Disturbi cardiaci o respiratori gravi', 'text-domain'); ?></li>
-                <li><?php _e('Gravidanza in corso (consultare il medico)', 'text-domain'); ?></li>
-                <li><?php _e('Altre condizioni che potrebbero essere aggravate dall\'uso delle strutture termali', 'text-domain'); ?></li>
-            </ul>
-            
-            <div style="margin-top: 15px;">
+            <!-- Checkbox Dichiarazione -->
+            <div style="padding: 12px; background: #fff; border: 1px solid #dee2e6; border-radius: 4px;">
                 <label for="health_certificate_accepted" style="display: flex; align-items: flex-start; cursor: pointer;">
                     <input 
                         type="checkbox" 
                         name="health_certificate_accepted" 
                         id="health_certificate_accepted" 
                         value="1" 
-                        style="margin-right: 10px; margin-top: 4px; width: 18px; height: 18px; cursor: pointer;"
+                        style="margin-right: 10px; margin-top: 4px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
                     />
                     <span style="font-size: 14px; font-weight: 600; color: #333;">
-                        <?php _e('Dichiaro di essere in buone condizioni di salute e di non rientrare in nessuna delle condizioni sopra elencate. Accetto la piena responsabilità per l\'utilizzo delle strutture termali.', 'text-domain'); ?>
+                        <?php _e('Confermo di dichiarare e accettare quanto sopra.', 'text-domain'); ?>
                         <span style="color: #d9534f;">*</span>
                     </span>
                 </label>
@@ -123,15 +149,25 @@ class Booking_Checkout_Fields {
     }
 
     /**
-     * Salva l'accettazione nell'ordine
+     * Salva l'accettazione nei metadati degli order items con prenotazione
      */
-    public function save_health_certificate($order_id) {
+    public function save_health_certificate_to_item($item, $cart_item_key, $values, $order) {
+        // ✅ Salva solo per prodotti con prenotazione
+        if (!isset($values['booking_id'])) {
+            return;
+        }
+
+        // Verifica che sia stato accettato
         if (isset($_POST['health_certificate_accepted']) && $_POST['health_certificate_accepted'] == '1') {
-            update_post_meta($order_id, '_health_certificate_accepted', 'yes');
-            update_post_meta($order_id, '_health_certificate_date', current_time('mysql'));
-            update_post_meta($order_id, '_health_certificate_ip', $_SERVER['REMOTE_ADDR']);
+            // ✅ Salva nei metadati dell'item
+            $item->add_meta_data('_health_certificate_accepted', 'yes', true);
+            $item->add_meta_data('_health_certificate_date', current_time('mysql'), true);
+            $item->add_meta_data('_health_certificate_ip', $_SERVER['REMOTE_ADDR'], true);
             
-            error_log("✅ Certificato salute accettato per ordine {$order_id}");
+            // Campo visibile per l'utente (opzionale)
+            $item->add_meta_data('Certificato Salute', 'Accettato ✅', true);
+            
+            error_log("✅ Certificato salute salvato per item {$item->get_id()} - Booking: {$values['booking_id']}");
         }
     }
 
@@ -139,42 +175,80 @@ class Booking_Checkout_Fields {
      * Mostra nei dettagli ordine admin
      */
     public function display_health_certificate_in_admin($order) {
-        $accepted = get_post_meta($order->get_id(), '_health_certificate_accepted', true);
+        $has_certificate = false;
         
-        if ($accepted === 'yes') {
-            $date = get_post_meta($order->get_id(), '_health_certificate_date', true);
-            $ip = get_post_meta($order->get_id(), '_health_certificate_ip', true);
+        foreach ($order->get_items() as $item) {
+            $accepted = $item->get_meta('_health_certificate_accepted');
             
-            ?>
-            <div class="health-certificate-info" style="margin-top: 20px; padding: 10px; background: #f0f8ff; border-left: 3px solid #0074A0;">
-                <h3><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h3>
-                <p>
-                    <strong><?php _e('Accettato:', 'text-domain'); ?></strong> ✅ Sì<br>
-                    <strong><?php _e('Data:', 'text-domain'); ?></strong> <?php echo esc_html($date); ?><br>
-                    <strong><?php _e('IP:', 'text-domain'); ?></strong> <?php echo esc_html($ip); ?>
-                </p>
-            </div>
-            <?php
+            if ($accepted === 'yes') {
+                $has_certificate = true;
+                break;
+            }
         }
+        
+        if (!$has_certificate) {
+            return;
+        }
+        
+        ?>
+        <div class="health-certificate-info" style="margin-top: 20px; padding: 10px; background: #f0f8ff; border-left: 3px solid #0074A0;">
+            <h3><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h3>
+            <?php
+            foreach ($order->get_items() as $item) {
+                $accepted = $item->get_meta('_health_certificate_accepted');
+                
+                if ($accepted === 'yes') {
+                    $date = $item->get_meta('_health_certificate_date');
+                    $ip = $item->get_meta('_health_certificate_ip');
+                    $booking_id = $item->get_meta('_booking_id');
+                    
+                    ?>
+                    <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 3px;">
+                        <p style="margin: 0;">
+                            <strong><?php echo esc_html($item->get_name()); ?></strong><br>
+                            <small>
+                                <strong><?php _e('Booking ID:', 'text-domain'); ?></strong> <?php echo esc_html($booking_id); ?><br>
+                                <strong><?php _e('Accettato:', 'text-domain'); ?></strong> ✅ Sì<br>
+                                <strong><?php _e('Data:', 'text-domain'); ?></strong> <?php echo esc_html($date); ?><br>
+                                <strong><?php _e('IP:', 'text-domain'); ?></strong> <?php echo esc_html($ip); ?>
+                            </small>
+                        </p>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
+        </div>
+        <?php
     }
 
     /**
      * Mostra nei dettagli ordine cliente
      */
     public function display_health_certificate_in_order($order) {
-        $accepted = get_post_meta($order->get_id(), '_health_certificate_accepted', true);
+        $has_certificate = false;
         
-        if ($accepted === 'yes') {
-            ?>
-            <section class="health-certificate-confirmation" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
-                <h2><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h2>
-                <p style="margin: 0; color: #28a745; font-weight: 600;">
-                    ✅ <?php _e('Hai confermato di essere in buone condizioni di salute.', 'text-domain'); ?>
-                </p>
-            </section>
-            <?php
+        foreach ($order->get_items() as $item) {
+            if ($item->get_meta('_health_certificate_accepted') === 'yes') {
+                $has_certificate = true;
+                break;
+            }
         }
+        
+        if (!$has_certificate) {
+            return;
+        }
+        
+        ?>
+        <section class="health-certificate-confirmation" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+            <h2><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h2>
+            <p style="margin: 0; color: #28a745; font-weight: 600;">
+                ✅ <?php _e('Hai confermato di essere in buone condizioni di salute per i prodotti prenotati.', 'text-domain'); ?>
+            </p>
+        </section>
+        <?php
     }
+
 
     /**
      * Verifica se il carrello contiene prodotti con prenotazione
