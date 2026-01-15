@@ -45,7 +45,6 @@ class Booking_Checkout_Fields {
         add_action('woocommerce_checkout_create_order_line_item', array($this, 'save_health_certificate_to_item'), 10, 4);
 
         // Mostra nei dettagli ordine (admin e email)
-        add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'display_health_certificate_in_admin'));
         add_action('woocommerce_order_details_after_order_table', array($this, 'display_health_certificate_in_order'));
     }
 
@@ -59,9 +58,9 @@ class Booking_Checkout_Fields {
         }
 
         ?>
-        <div class="health-certificate-content" style="max-height: 25vh; overflow:scroll; margin-bottom: 2rem; padding: 15px; background: var(--e-global-color-29fcec7);">
+        <div class="health-certificate-content" style="max-height: 25vh; overflow:scroll; margin-bottom: 2rem; padding: 1.6rem; background: var(--e-global-color-29fcec7);">
 
-            <h5 style="margin-top: 0; margin-bottom: 1rem; font-weight: bold;">
+            <h5 style="margin-top: 0; margin-bottom: 1.6rem; font-weight: bold; text-transform: uppercase;">
                 <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
             </h5>
             
@@ -170,57 +169,6 @@ class Booking_Checkout_Fields {
             
             error_log("✅ Certificato salute salvato per item {$item->get_id()} - Booking: {$values['booking_id']}");
         }
-    }
-
-    /**
-     * Mostra nei dettagli ordine admin
-     */
-    public function display_health_certificate_in_admin($order) {
-        $has_certificate = false;
-        
-        foreach ($order->get_items() as $item) {
-            $accepted = $item->get_meta('_health_certificate_accepted');
-            
-            if ($accepted === 'yes') {
-                $has_certificate = true;
-                break;
-            }
-        }
-        
-        if (!$has_certificate) {
-            return;
-        }
-        
-        ?>
-        <div class="health-certificate-info" style="margin-top: 20px; padding: 10px; background: #f0f8ff; border-left: 3px solid #0074A0;">
-            <h3><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h3>
-            <?php
-            foreach ($order->get_items() as $item) {
-                $accepted = $item->get_meta('_health_certificate_accepted');
-                
-                if ($accepted === 'yes') {
-                    $date = $item->get_meta('_health_certificate_date');
-                    $ip = $item->get_meta('_health_certificate_ip');
-                    $booking_id = $item->get_meta('_booking_id');
-                    
-                    ?>
-                    <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 3px;">
-                        <p style="margin: 0;">
-                            <strong><?php echo esc_html($item->get_name()); ?></strong><br>
-                            <small>
-                                <strong><?php _e('Booking ID:', 'text-domain'); ?></strong> <?php echo esc_html($booking_id); ?><br>
-                                <strong><?php _e('Accettato:', 'text-domain'); ?></strong> ✅ Sì<br>
-                                <strong><?php _e('Data:', 'text-domain'); ?></strong> <?php echo esc_html($date); ?><br>
-                                <strong><?php _e('IP:', 'text-domain'); ?></strong> <?php echo esc_html($ip); ?>
-                            </small>
-                        </p>
-                    </div>
-                    <?php
-                }
-            }
-            ?>
-        </div>
-        <?php
     }
 
     /**
