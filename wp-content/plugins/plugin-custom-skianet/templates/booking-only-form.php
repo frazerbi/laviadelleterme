@@ -29,33 +29,20 @@ $locations = Booking_Handler::get_available_locations();
                 name="purchase_code" 
                 id="purchase_code" 
                 required 
-                placeholder="ES: SKIA-12345-ABCD"
+                placeholder="XXXXXXXXXXXXXXXX"
                 aria-label="Inserisci codice acquisto"
-                pattern="[A-Z0-9-]+"
-                style="text-transform: uppercase;"
+                pattern="[A-Z0-9]+"
+                maxlength="16"
+
             >
-            <button type="button" id="verify-code" class="btn-verify">
-                Verifica Codice
-            </button>
         </div>
 
-        <!-- Informazioni ordine (nascoste inizialmente) -->
-        <div id="order-info" class="order-info" style="display: none;">
-            <h3>Dettagli Acquisto</h3>
-            <div class="order-details">
-                <p><strong>Tipo ingresso:</strong> <span id="order-ticket-type"></span></p>
-                <p><strong>Numero ingressi:</strong> <span id="order-tickets-count"></span></p>
-                <p><strong>Ingressi Uomo:</strong> <span id="order-male"></span></p>
-                <p><strong>Ingressi Donna:</strong> <span id="order-female"></span></p>
-            </div>
-        </div>
-
-        <!-- Location -->
+                <!-- Location -->
         <div class="form-group visualradio-group">
             <legend for="location">Seleziona Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
                     <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
-                        <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required disabled>
+                        <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required>
                         <span class="visualradio-label"><?php echo esc_html($label); ?></span>
                         <figure class="visualradio-thumb">
                             <img src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__))); ?>assets/img/strutture/thumb_<?php echo esc_attr($value); ?>.jpg" alt="<?php echo esc_html($label); ?> thumb">
@@ -82,7 +69,7 @@ $locations = Booking_Handler::get_available_locations();
                 aria-label="Seleziona data prenotazione"
             >
         </div>
-
+        
         <!-- Fascia Oraria -->
         <div class="form-group">
             <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
@@ -90,6 +77,35 @@ $locations = Booking_Handler::get_available_locations();
                 <option value="">-- Seleziona una fascia oraria --</option>
                 <!-- Le opzioni vengono popolate dinamicamente da JavaScript -->
             </select>
+        </div>
+        
+        <!-- Sesso ingresso -->
+        <div class="form-group gender-group">
+            <legend>Questo codice è per: <span class="required">*</span></legend>
+            <div class="radio-options">
+                <label class="radio-option">
+                    <input 
+                        type="radio" 
+                        name="gender" 
+                        id="gender_male" 
+                        value="male" 
+                        required 
+                        disabled
+                    >
+                    <span class="radio-label">Uomo</span>
+                </label>
+                <label class="radio-option">
+                    <input 
+                        type="radio" 
+                        name="gender" 
+                        id="gender_female" 
+                        value="female" 
+                        required 
+                        disabled
+                    >
+                    <span class="radio-label">Donna</span>
+                </label>
+            </div>
         </div>
 
         <!-- Messaggio di risposta -->
@@ -103,44 +119,3 @@ $locations = Booking_Handler::get_available_locations();
         </div>
     </form>
 </div>
-
-<style>
-.booking-form-code .btn-verify {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #0073aa;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.booking-form-code .btn-verify:hover {
-    background-color: #005177;
-}
-
-.order-info {
-    background-color: #f0f0f0;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px 0;
-}
-
-.order-info h3 {
-    margin-top: 0;
-    color: #333;
-}
-
-.order-details p {
-    margin: 10px 0;
-}
-
-.order-details strong {
-    display: inline-block;
-    min-width: 150px;
-}
-
-#purchase_code {
-    text-transform: uppercase;
-}
-</style>
