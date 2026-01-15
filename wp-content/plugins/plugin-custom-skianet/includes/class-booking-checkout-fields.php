@@ -65,7 +65,7 @@ class Booking_Checkout_Fields {
                 <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
             </h5>
             
-            <div>
+            <div style="font-size: 1rem;">
                 <p style="margin-bottom: 15px;">
                     <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'text-domain'); ?></strong>
                 </p>
