@@ -116,10 +116,7 @@
                 const item = location.closest('.visualradio-item');
                 if (item) {
                     item.classList.add('disabled');
-                    console.log('Classe disabled aggiunta:', item); // ← DEBUG
-                } else {
-                    console.log('visualradio-item non trovato'); // ← DEBUG
-                }
+                } 
             });
         }
 

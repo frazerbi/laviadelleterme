@@ -42,7 +42,7 @@ $locations = Booking_Handler::get_available_locations();
         <div class="form-group visualradio-group">
             <legend for="location">Seleziona Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
-                    <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
+                    <label class="visualradio-item disabled" for="location_<?php echo esc_attr($value); ?>">
                         <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required>
                         <span class="visualradio-label"><?php echo esc_html($label); ?></span>
                         <figure class="visualradio-thumb">
