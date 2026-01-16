@@ -121,7 +121,7 @@ function init_booking_handler_plugin() {
     }
 
     if (class_exists('Booking_Only_Handler')) {
-        Booking_Only_Handler::init();
+        Booking_Only_Handler::get_instance();
     }
 }
 
