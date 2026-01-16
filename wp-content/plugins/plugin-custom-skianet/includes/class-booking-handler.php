@@ -128,6 +128,13 @@ class Booking_Handler {
             '1.0.0'
         );
 
+        wp_enqueue_style(
+            'booking-pdp-style',
+            plugin_dir_url(dirname(__FILE__)) . 'assets/css/pdp.css',
+            array(),
+            '1.0.0'
+        );
+
         // Booking form script (compilato con esbuild, include vanilla-calendar-pro)
         wp_enqueue_script(
             'booking-form-script',

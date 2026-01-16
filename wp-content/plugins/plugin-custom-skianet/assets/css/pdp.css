@@ -1,0 +1,29 @@
+.product.customDataLoaded .custom-data-ui {
+	background-color: #f3f3f3;
+	padding: 16px;
+	border-radius: 4px;
+	margin-bottom: 24px;
+}
+
+.product.customDataLoaded .custom-data-ui ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.product.customDataLoaded .variations,
+.product.customDataLoaded .quantity,
+.product.customDataLoaded .price {
+	position: absolute;
+    clip: rect(0 0 0 0);
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+}
