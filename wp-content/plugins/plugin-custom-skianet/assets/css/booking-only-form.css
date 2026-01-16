@@ -175,14 +175,12 @@
 }
 
 .gender-input:checked + .gender-label {
-    color: #0073aa;
+    color: var(--e-global-color-primary);
     font-weight: 600;
 }
 
 .gender-item:has(.gender-input:checked) {
-    border-color: #0073aa;
-    background: #f0f8ff;
-    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
+    border-color: var(--e-global-color-primary);
 }
 
 .gender-label {
