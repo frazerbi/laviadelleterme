@@ -106,7 +106,6 @@ class Booking_Only_Handler {
         $purchase_code = isset($_POST['purchase_code']) ? sanitize_text_field($_POST['purchase_code']) : '';
         $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
         $booking_date = isset($_POST['booking-only_date']) ? sanitize_text_field($_POST['booking-only_date']) : '';
-        $time_slot = isset($_POST['time_slot']) ? sanitize_text_field($_POST['time_slot']) : '';
         $gender = isset($_POST['gender']) ? sanitize_text_field($_POST['gender']) : '';
         
         // Validazione base
@@ -123,7 +122,7 @@ class Booking_Only_Handler {
         if (!Booking_Handler::is_valid_location($location)) {
             wp_send_json_error(['message' => 'Location non valida.']);
         }
-        
+
         // TODO: Qui aggiungi la tua logica specifica
         // - Verifica codice nel database
         // - Salva prenotazione
@@ -132,7 +131,7 @@ class Booking_Only_Handler {
         // Log per debug
         error_log(sprintf(
             'Booking Only - Dati ricevuti: Codice=%s, Location=%s, Data=%s, Slot=%s, Gender=%s',
-            $purchase_code, $location, $booking_date, $time_slot, $gender
+            $purchase_code, $location, $booking_date, $gender
         ));
         
         // Risposta di successo

@@ -547,7 +547,7 @@ class Booking_Handler {
      *      - ticket 4h        → p2
      *      - ticket giornaliero → p4
      */
-    private function validate_category($categorie_raw, $booking_date, $ticket_type) {
+    public function validate_category($categorie_raw, $booking_date, $ticket_type) {
 
         // --- 1. CONTROLLO PERIODO NATALIZIO ---
         if (Booking_Redirect::is_christmas_period($booking_date)) {

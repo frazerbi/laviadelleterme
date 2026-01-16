@@ -95,7 +95,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
 
         <!-- Submit -->
         <div class="form-group">
-            <button type="submit" name="submit_booking" class="btn-submit">
+            <button type="submit" name="submit_booking" class="btn-submit" disabled>
                 Prosegui con la prenotazione
             </button>
         </div>

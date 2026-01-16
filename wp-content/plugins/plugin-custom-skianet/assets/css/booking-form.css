@@ -54,9 +54,8 @@
     padding: 12px;
     background: var(--e-global-color-primary);
     color: white;
-    border: none;
     border-radius: 4px;
-    border: 2px solid var(--e-global-color-primary);
+    border: 1px solid var(--e-global-color-primary);
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s;
@@ -71,6 +70,7 @@
 .booking-form .btn-submit:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    color: #999;
 }
 
 .booking-response {
@@ -168,10 +168,6 @@
 }
 .visualradio-item:has(.visualradio-input:checked) {
     border-color: var(--e-global-color-primary);
-}
-
-.visualradio-label {
-
 }
 
 .visualradio-item:has(.visualradio-input:checked) .visualradio-label {
