@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 
 // Ottieni i dati dalla classe
 $locations = Booking_Handler::get_available_locations();
+$user_codes = Booking_Only_Handler::get_user_codes();
 
 ?>
 
@@ -37,6 +38,30 @@ $locations = Booking_Handler::get_available_locations();
                 minlength="16"
             >
         </div>
+
+        <?php if (!empty($user_codes)): ?>
+        <!-- Dropdown codici salvati -->
+        <div class="saved-codes-wrapper">
+            <label for="saved_codes" class="saved-codes-label">
+                Oppure seleziona un codice dai tuoi ordini:
+            </label>
+            <select id="saved_codes" class="saved-codes-select">
+                <option value="">-- Seleziona un codice --</option>
+                <?php foreach ($user_codes as $order_data): ?>
+                    <optgroup label="Ordine #<?php echo esc_attr($order_data['order_number']); ?> - <?php echo esc_html($order_data['order_date']); ?>">
+                        <?php foreach ($order_data['codes'] as $code_data): ?>
+                            <option value="<?php echo esc_attr($code_data['code']); ?>">
+                                <?php echo esc_html($code_data['code']); ?>
+                                <?php if (!empty($code_data['product_name'])): ?>
+                                    - <?php echo esc_html($code_data['product_name']); ?>
+                                <?php endif; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <?php endif; ?>
 
         <!-- Location -->
         <div class="form-group visualradio-group">

@@ -11,6 +11,7 @@
             if (!this.form) return;
 
             this.purchaseCode = document.getElementById('purchase_code');
+            this.savedCodes = document.getElementById('saved_codes'); 
             this.locations = document.querySelectorAll('input[name="location"]');
             this.dateInput = document.getElementById('booking-only_date');
             this.timeSlot = document.getElementById('time_slot');
@@ -27,6 +28,11 @@
             // Event listeners per abilitazione progressiva
             this.purchaseCode.addEventListener('input', () => this.checkPurchaseCode());
             
+            if (this.savedCodes) {
+                this.savedCodes.addEventListener('change', () => this.handleSavedCodeSelect());
+            }
+
+
             this.locations.forEach(location => {
                 location.addEventListener('change', () => this.checkLocation());
             });
@@ -40,6 +46,18 @@
             this.purchaseCode.addEventListener('input', (e) => {
                 e.target.value = e.target.value.toUpperCase();
             });
+        }
+
+        /**
+         * Gestisce la selezione di un codice salvato
+         */
+        handleSavedCodeSelect() {
+            const selectedCode = this.savedCodes.value;
+            
+            if (selectedCode) {
+                this.purchaseCode.value = selectedCode;
+                this.purchaseCode.dispatchEvent(new Event('input')); // Trigger validazione
+            }
         }
 
         /**

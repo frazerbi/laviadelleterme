@@ -304,3 +304,41 @@
         margin-bottom: 20px;
     }
 }
+
+/* Codici salvati */
+.saved-codes-wrapper {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.saved-codes-label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.saved-codes-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.saved-codes-select:hover {
+    border-color: #0073aa;
+}
+
+.saved-codes-select optgroup {
+    font-weight: 600;
+    font-style: normal;
+    color: #333;
+}
+
+.saved-codes-select option {
+    padding: 5px;
+}

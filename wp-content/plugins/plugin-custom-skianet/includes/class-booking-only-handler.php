@@ -37,6 +37,9 @@ class Booking_Only_Handler {
         // Registra handler AJAX
         add_action('wp_ajax_submit_booking_only_ajax', [$this, 'handle_booking_only_submission']);
         add_action('wp_ajax_nopriv_submit_booking_only_ajax', [$this, 'handle_booking_only_submission']);
+
+        add_action('wp_ajax_get_user_purchase_codes', [$this, 'get_user_purchase_codes']);
+        
     }
     
     /**
@@ -141,4 +144,92 @@ class Booking_Only_Handler {
         ]);
     }
 
+    /**
+     * Ottiene i codici acquisto dell'utente loggato
+     * 
+     * @return array Array di codici raggruppati per ordine
+     */
+    public static function get_user_codes() {
+        if (!is_user_logged_in()) {
+            return [];
+        }
+        
+        $user_id = get_current_user_id();
+        
+        // Ottieni gli ordini dell'utente
+        $orders = wc_get_orders([
+            'customer_id' => $user_id,
+            'status' => ['completed', 'processing'], // Solo ordini completati/in elaborazione
+            'limit' => -1,
+            'orderby' => 'date',
+            'order' => 'DESC'
+        ]);
+        
+        $user_codes = [];
+        
+        foreach ($orders as $order) {
+            $order_id = $order->get_id();
+            $order_number = $order->get_order_number();
+            $order_date = $order->get_date_created()->format('d/m/Y');
+            
+            // Ottieni i codici associati a questo ordine
+            $codes = self::get_codes_from_order($order);
+            
+            if (!empty($codes)) {
+                $user_codes[] = [
+                    'order_id' => $order_id,
+                    'order_number' => $order_number,
+                    'order_date' => $order_date,
+                    'codes' => $codes
+                ];
+            }
+        }
+        
+        return $user_codes;
+    }
+
+    /**
+     * Ottiene i codici da un ordine specifico
+     * 
+     * @param WC_Order $order Oggetto ordine WooCommerce
+     * @return array Array di codici
+     */
+    private static function get_codes_from_order($order) {
+        global $wpdb;
+        
+        $all_codes = [];
+        
+        // Itera su tutti gli item dell'ordine
+        foreach ($order->get_items() as $item_id => $item) {
+            $order_id = $item->get_order_id();
+            $product_id = $item->get_product_id();
+            $variation_id = $item->get_variation_id();
+            $check_id = $variation_id > 0 ? $variation_id : $product_id;
+            
+            // Query per ottenere i codici licenza
+            $query = $wpdb->prepare(
+                "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
+                WHERE order_id = %d AND product_id = %d",
+                $order_id,
+                $check_id
+            );
+            
+            $results = $wpdb->get_results($query, ARRAY_A);
+            
+            if (!empty($results)) {
+                foreach ($results as $row) {
+                    if (!empty($row['license_code1'])) {
+                        $all_codes[] = [
+                            'code' => $row['license_code1'],
+                            'product_id' => $check_id,
+                            'item_id' => $item_id,
+                            'product_name' => $item->get_name()
+                        ];
+                    }
+                }
+            }
+        }
+        
+        return $all_codes;
+    }
 }
