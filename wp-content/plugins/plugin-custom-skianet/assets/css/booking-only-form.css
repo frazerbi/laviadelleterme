@@ -32,6 +32,13 @@
     font-weight: bold;
 }
 
+/* Campi disabilitati */
+.visualradio-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
 .booking-only-form select,
 .booking-only-form input[type="date"],
 .booking-only-form input[type="number"],

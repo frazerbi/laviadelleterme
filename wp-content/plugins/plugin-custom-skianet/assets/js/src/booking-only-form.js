@@ -114,7 +114,12 @@
                 location.disabled = true;
                 location.checked = false;
                 const item = location.closest('.visualradio-item');
-                if (item) item.classList.add('disabled');
+                if (item) {
+                    item.classList.add('disabled');
+                    console.log('Classe disabled aggiunta:', item); // ← DEBUG
+                } else {
+                    console.log('visualradio-item non trovato'); // ← DEBUG
+                }
             });
         }
 
