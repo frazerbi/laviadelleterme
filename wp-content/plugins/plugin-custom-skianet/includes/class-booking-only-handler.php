@@ -30,7 +30,6 @@ class Booking_Only_Handler {
     private function init() {
         // Registra lo shortcode
         add_shortcode('booking_only_form', array($this, 'render_booking_only_form'));
-
         
         // Enqueue assets
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -77,8 +76,8 @@ class Booking_Only_Handler {
         // JavaScript del form
         wp_enqueue_script(
             'booking-only-form-script',
-            plugin_dir_url(dirname(__FILE__)) . 'assets/js/booking-only-form.js',
-            ['jquery'],
+            plugin_dir_url(dirname(__FILE__)) . 'assets/js/src/booking-only-form.js',
+            [],
             PLUGIN_SKIANET_VERSION,
             true
         );
