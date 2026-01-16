@@ -18,6 +18,8 @@
             this.response = document.getElementById('booking-only-response');
             this.submitBtn = this.form.querySelector('button[type="submit"]');
 
+            this.currentLocation = null;
+
             this.init();
         }
 
@@ -53,6 +55,7 @@
                 this.disableDate();
                 this.disableTimeSlot();
                 this.disableGender();
+                this.currentLocation = null;
             }
         }
 
@@ -60,9 +63,21 @@
          * Controlla la location selezionata
          */
         checkLocation() {
-            if (this.getSelectedLocation()) {
+            const selectedLocation = this.getSelectedLocation();
+            
+            if (selectedLocation) {
+                // Se la location è cambiata, resetta data e campi successivi
+                if (this.currentLocation !== null && this.currentLocation !== selectedLocation) {
+                    this.dateInput.value = '';
+                    this.disableTimeSlot();
+                    this.disableGender();
+                    this.clearMessage();
+                }
+                
+                this.currentLocation = selectedLocation;
                 this.enableDate();
             } else {
+                this.currentLocation = null;
                 this.disableDate();
                 this.disableTimeSlot();
                 this.disableGender();
