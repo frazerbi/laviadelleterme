@@ -142,18 +142,4 @@ class Booking_Only_Handler {
         ]);
     }
 
-    /**
-     * Ottieni le location disponibili (usa quelle di Booking_Handler)
-     */
-    public static function get_available_locations() {
-        $locations = Booking_Handler::get_available_locations();
-        
-        // Restituisci solo label e key per il template
-        $simple_locations = [];
-        foreach ($locations as $key => $data) {
-            $simple_locations[$key] = $data['label'];
-        }
-        
-        return $simple_locations;
-    }
 }
