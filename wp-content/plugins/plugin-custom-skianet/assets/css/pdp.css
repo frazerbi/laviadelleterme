@@ -1,3 +1,22 @@
+.product.customDataLoaded .secondary-info {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 16px;
+}
+
+.product.customDataLoaded .secondary-info .price {
+	font-family: serif;
+    color: inherit;
+    font-weight: 700;
+    font-size: 36px;
+}
+.product.customDataLoaded .secondary-info .note {
+	font-size: 14px;
+	color: #666;
+}
+
 .product.customDataLoaded .custom-data-ui {
 	background-color: #f3f3f3;
 	padding: 16px;
@@ -11,12 +30,12 @@
 	margin: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	font-size: 16px;
 }
 
 .product.customDataLoaded .variations,
 .product.customDataLoaded .quantity,
-.product.customDataLoaded .price {
+.product.customDataLoaded .woocommerce-variation-price {
 	position: absolute;
     clip: rect(0 0 0 0);
     width: 1px;

@@ -153,6 +153,29 @@ function setLocationImage(locationId) {
 }
 
 function buildDataUI(data) {
+    const titleWrapper = document.querySelector('.product .product_title').parentElement;
+    const titleEl = document.querySelector('.product .product_title');
+    const titleText = titleEl.textContent
+
+    const newTitle = `Prenota a <b>${data.location}</b> per il giorno <b>${data.date}</b> per ${data.guests} ospiti (${data.ticket}).`;
+    titleEl.innerHTML = newTitle;
+
+    const secondaryInfo = document.createElement('div');
+    secondaryInfo.className = 'secondary-info';
+    const priceEl = document.createElement('span');
+    priceEl.className = 'price';
+    priceEl.textContent = data.price;
+
+    const noteEl = document.createElement('span');
+    noteEl.className = 'note';
+    noteEl.textContent = titleText;
+
+    secondaryInfo.appendChild(priceEl);
+    secondaryInfo.appendChild(noteEl);
+    titleWrapper.appendChild(secondaryInfo);
+
+
+
     const container = document.createElement('div');
     container.className = 'custom-data-ui';
 
@@ -166,9 +189,10 @@ function buildDataUI(data) {
 
     container.appendChild(list);
 
-    const variationsForm = document.querySelector('.product .variations_form');
-    if (variationsForm) {
-        variationsForm.insertBefore(container, variationsForm.firstChild);
+    // append container after .woocommerce-variation-description
+    const variationDesc = document.querySelector('.woocommerce-variation-description');
+    if (variationDesc) {
+        variationDesc.parentNode.insertBefore(container, variationDesc.nextSibling);
     }
 }
 
@@ -197,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await selectVariation(ticketType);
         const priceData = await waitForVariationPrice();
-        data.price = priceData.price;
+        data.price = priceData.price + " €";
 
         const hasNullOrUndefined = Object.values(data).some(value => value === null || value === undefined);
 
