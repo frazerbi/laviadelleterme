@@ -29,7 +29,8 @@ class Booking_Only_Handler {
      */
     private static function init() {
         // Registra lo shortcode
-        add_shortcode('booking_only_form', [$this, 'render_form']);
+        add_shortcode('booking_only_form', array($this, 'render_booking_only_form'));
+
         
         // Enqueue assets
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -41,7 +42,7 @@ class Booking_Only_Handler {
      * @param array $atts Attributi dello shortcode
      * @return string HTML del form
      */
-    public static function render_form() {
+    public static function render_booking_only_form() {
         // Inizia output buffering
         ob_start();
         
