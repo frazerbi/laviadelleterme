@@ -152,8 +152,19 @@ class Booking_Handler {
      */
     public function check_availability_api() {
 
-        // Verifica nonce
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
+ 
+        if (isset($_POST['nonce'])) {
+            // Verifica nonce del form principale
+            if (wp_verify_nonce($_POST['nonce'], 'booking_form_nonce')) {
+                $nonce_valid = true;
+            }
+            // Verifica nonce del form booking only
+            if (wp_verify_nonce($_POST['nonce'], 'booking_only_form_action')) {
+                $nonce_valid = true;
+            }
+        }
+
+        if (!$nonce_valid) {
             wp_send_json_error(array('message' => 'Errore di sicurezza.'));
         }
 
