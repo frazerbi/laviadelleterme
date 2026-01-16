@@ -191,7 +191,7 @@
             this.timeSlot.innerHTML = '<option value="">Caricamento...</option>';
 
             const formData = new FormData();
-            formData.append('action', 'get_available_time_slots');
+            formData.append('action', 'check_availability_api');
             formData.append('nonce', bookingOnlyAjax.nonce);
             formData.append('location', location);
             formData.append('booking_date', date);
@@ -200,24 +200,54 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
             .then(data => {
-                if (data.success && data.data.slots.length > 0) {
-                    let options = '<option value="">-- Seleziona una fascia oraria --</option>';
-                    data.data.slots.forEach(slot => {
-                        options += `<option value="${slot.value}">${slot.label}</option>`;
+                console.log('Data received:', data);
+                
+                // Controlla che esistano gli available_slots
+                if (data.success && data.data && data.data.available_slots && data.data.available_slots.length > 0) {
+                    
+                    // Svuota il select e aggiungi l'opzione di default
+                    this.timeSlot.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+                    
+                    let hasAvailableSlots = false; // ← Dichiarato qui
+                    
+                    // Aggiungi le opzioni disponibili
+                    data.data.available_slots.forEach(slot => {
+                        if (slot.disponibilita > 0) {
+                            const option = document.createElement('option');
+                            option.value = slot.id; 
+                            option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
+                            option.dataset.time = slot.time;
+                            option.dataset.categorie = slot.categorie || '';
+                            option.dataset.disponibilita = slot.disponibilita;
+                            this.timeSlot.appendChild(option);
+                            
+                            hasAvailableSlots = true;
+                        }
                     });
-                    this.timeSlot.innerHTML = options;
-                    this.enableTimeSlot();
-                    this.clearMessage();
+                    
+                    // Abilita il campo solo se ci sono slot disponibili
+                    if (hasAvailableSlots) {
+                        this.enableTimeSlot();
+                        this.clearMessage();
+                    } else {
+                        this.timeSlot.innerHTML = '<option value="">Nessuna fascia oraria disponibile</option>';
+                        this.showMessage('Nessuna fascia oraria disponibile per questa data', 'warning');
+                    }
+                    
                 } else {
                     this.timeSlot.innerHTML = '<option value="">Nessuna fascia oraria disponibile</option>';
-                    this.showMessage('Nessuna fascia oraria disponibile', 'warning');
+                    this.showMessage('Nessuna disponibilità per questa data', 'warning');
                 }
             })
-            .catch(() => {
+            .catch(error => {
+                console.error('Errore:', error);
                 this.timeSlot.innerHTML = '<option value="">Errore caricamento</option>';
-                this.showMessage('Errore nel caricamento', 'error');
+                this.showMessage('Errore nel caricamento delle fasce orarie', 'error');
             });
         }
 
