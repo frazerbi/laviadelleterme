@@ -130,6 +130,89 @@
     width: 100%;
 }
 
+/* Gender selection - Stile riquadri senza icone */
+.gender-group {
+    margin-bottom: 20px;
+}
+
+.gender-group legend {
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: block;
+    font-size: 16px;
+}
+
+.gender-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.gender-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fff;
+    min-height: 60px;
+}
+
+.gender-item:hover:not(.disabled) {
+    pointer-events: none;
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.gender-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.gender-input:checked + .gender-label {
+    color: #0073aa;
+    font-weight: 600;
+}
+
+.gender-item:has(.gender-input:checked) {
+    border-color: #0073aa;
+    background: #f0f8ff;
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
+}
+
+.gender-label {
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Stato disabilitato */
+.gender-item.disabled {
+    pointer-events: none;
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.gender-item.disabled .gender-label {
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gender-options {
+        grid-template-columns: 1fr;
+    }
+}
+
 .number-input-wrapper input[type="number"],
 .number-input-wrapper input[type="tel"] {
     order: 1;

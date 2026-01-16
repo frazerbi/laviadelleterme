@@ -169,7 +169,11 @@
          * Abilita sesso
          */
         enableGender() {
-            this.genderInputs.forEach(input => input.disabled = false);
+            this.genderInputs.forEach(input => {
+                input.disabled = false;
+                const item = input.closest('.gender-item');
+                if (item) item.classList.remove('disabled');
+            });
         }
 
         /**
@@ -179,6 +183,8 @@
             this.genderInputs.forEach(input => {
                 input.disabled = true;
                 input.checked = false;
+                const item = input.closest('.gender-item');
+                if (item) item.classList.add('disabled');
             });
         }
 
@@ -201,12 +207,9 @@
                 body: formData
             })
             .then(response => {
-                console.log('Response status:', response.status);
                 return response.json();
             })
-            .then(data => {
-                console.log('Data received:', data);
-                
+            .then(data => {                
                 // Controlla che esistano gli available_slots
                 if (data.success && data.data && data.data.available_slots && data.data.available_slots.length > 0) {
                     

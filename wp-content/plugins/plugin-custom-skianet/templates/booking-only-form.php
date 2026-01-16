@@ -83,8 +83,8 @@ $locations = Booking_Handler::get_available_locations();
         <!-- Sesso ingresso -->
         <div class="form-group gender-group">
             <legend>Questo codice è per: <span class="required">*</span></legend>
-            <div class="radio-options">
-                <label class="radio-option">
+            <div class="gender-options">
+                <label class="gender-item disabled" for="gender_male">
                     <input 
                         type="radio" 
                         name="gender" 
@@ -92,10 +92,12 @@ $locations = Booking_Handler::get_available_locations();
                         value="male" 
                         required 
                         disabled
+                        class="gender-input"
                     >
-                    <span class="radio-label">Uomo</span>
+                    <span class="gender-label">Uomo</span>
                 </label>
-                <label class="radio-option">
+                
+                <label class="gender-item disabled" for="gender_female">
                     <input 
                         type="radio" 
                         name="gender" 
@@ -103,12 +105,12 @@ $locations = Booking_Handler::get_available_locations();
                         value="female" 
                         required 
                         disabled
+                        class="gender-input"
                     >
-                    <span class="radio-label">Donna</span>
+                    <span class="gender-label">Donna</span>
                 </label>
             </div>
         </div>
-
 
         <!-- Messaggio di risposta -->
         <div id="booking-only-response" class="booking-only-response"></div>

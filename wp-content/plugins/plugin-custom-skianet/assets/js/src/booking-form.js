@@ -415,11 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === CHIAMATA API DISPONIBILITÀ ===
     function callAvailabilityAPI(location, date) {
-        console.log('=== DEBUG loadTimeSlots ===');
-        console.log('Location:', location);
-        console.log('Date:', date);
-        console.log('Ajax URL:', bookingFormData.ajaxurl);
-        console.log('Nonce:', bookingFormData.nonce);
 
         showMessage('', 'Verifica disponibilità in corso...');
         disableFieldsFrom('ticket');
