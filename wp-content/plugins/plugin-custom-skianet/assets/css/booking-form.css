@@ -67,12 +67,6 @@
     color: var(--e-global-color-primary);
 }
 
-.booking-form .btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    color: #999;
-}
-
 .booking-response {
     margin-bottom: 20px;
     padding: 15px;
@@ -106,9 +100,11 @@
 }
 
 .booking-form .btn-submit:disabled {
-    opacity: 0.5;
     cursor: not-allowed;
     background: #ccc;
+    opacity: 0.6;
+    color: #999;
+    border-color: #ccc;
 }
 
 /* Stile per il pulsante + e - */
