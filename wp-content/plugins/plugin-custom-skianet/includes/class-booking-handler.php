@@ -172,11 +172,6 @@ class Booking_Handler {
         $location = isset($_POST['location']) ? sanitize_text_field($_POST['location']) : '';
         $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';        
 
-        // Fallback per il form booking-only
-        if (empty($booking_date) && isset($_POST['booking-only_date'])) {
-            $booking_date = sanitize_text_field($_POST['booking-only_date']);
-        }
-
         // Valida location
         if (!$this->is_valid_location($location)) {
             wp_send_json_error(array('message' => 'Location non valida.'));

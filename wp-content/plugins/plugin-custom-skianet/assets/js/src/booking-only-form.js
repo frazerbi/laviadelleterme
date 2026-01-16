@@ -194,7 +194,7 @@
             formData.append('action', 'get_available_time_slots');
             formData.append('nonce', bookingOnlyAjax.nonce);
             formData.append('location', location);
-            formData.append('date', date);
+            formData.append('booking_date', date);
 
             fetch(bookingOnlyAjax.ajax_url, {
                 method: 'POST',
