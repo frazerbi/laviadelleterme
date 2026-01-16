@@ -154,7 +154,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    border: 2px solid #ddd;
+    border: 1px solid #ddd;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;

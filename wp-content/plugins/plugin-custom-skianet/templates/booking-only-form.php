@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Ottieni i dati dalla classe
-$locations = Booking_Handler::get_available_locations();
+$locations = Booking_Only_Handler::get_available_locations();
 
 ?>
 

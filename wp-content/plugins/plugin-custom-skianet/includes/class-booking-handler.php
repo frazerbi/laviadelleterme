@@ -72,7 +72,7 @@ class Booking_Handler {
     /**
      * Ottieni il valore da criptare per una location specifica
      */
-    private function get_location_value_for_encryption($location_slug) {
+    public function get_location_value_for_encryption($location_slug) {
         return self::$locations[$location_slug]['value'] ?? '';
     }
 
@@ -505,7 +505,7 @@ class Booking_Handler {
     /**
      * Verifica se la location è valida
      */
-    private function is_valid_location($location) {
+    public function is_valid_location($location) {
         return !empty($location) && array_key_exists($location, self::$locations);
     }
 
