@@ -605,4 +605,5 @@ class Booking_Handler {
         return new WP_Error('invalid_category', 'Categorie non valide o non compatibili con il tipo di biglietto.');
     }
 
+
 }

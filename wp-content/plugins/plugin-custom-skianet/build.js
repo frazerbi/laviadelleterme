@@ -56,53 +56,20 @@ const buildOptions = {
   plugins: [postcssPlugin],
 };
 
-// Configurazione per booking-form-code.js (form con codice)
-const bookingFormCodeBuildOptions = {
-  entryPoints: ['assets/js/src/booking-only-form.js'],
-  bundle: true,
-  minify: true,
-  sourcemap: true,
-  target: ['es2017'],
-  outdir: 'assets/js/dist',
-  entryNames: '[name].min',
-  format: 'iife',
-  globalName: 'BookingFormCode',
-  platform: 'browser',
-  loader: {
-    '.css': 'css',
-  },
-  plugins: [postcssPlugin],
-};
-
 async function build() {
   try {
     if (isWatch) {
-      // Watch mode - crea context per entrambi i file
-      const ctx1 = await esbuild.context(buildOptions);
-      const ctx2 = await esbuild.context(bookingFormCodeBuildOptions);
-      
-      await Promise.all([
-        ctx1.watch(),
-        ctx2.watch()
-      ]);
-      
+      const ctx = await esbuild.context(buildOptions);
+      await ctx.watch();
       console.log('👀 Watching for changes...');
-      console.log('   - booking-form.js');
-      console.log('   - booking-form-code.js');
     } else {
-      // Build mode - compila entrambi i file
-      await Promise.all([
-        esbuild.build(buildOptions),
-        esbuild.build(bookingFormCodeBuildOptions)
-      ]);
-      
+      await esbuild.build(buildOptions);
       console.log('✅ Build completata!');
-      console.log('   - booking-form.min.js');
-      console.log('   - booking-form-code.min.js');
     }
   } catch (error) {
     console.error('❌ Build fallita:', error);
     process.exit(1);
   }
 }
+
 build();

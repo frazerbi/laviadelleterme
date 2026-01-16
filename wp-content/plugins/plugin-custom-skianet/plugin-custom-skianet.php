@@ -61,7 +61,7 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-order-status.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-email-notification.php'; 
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-nonbooking-email.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-checkout-fields.php';
-require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-only-form.php';
+
 require_once PLUGIN_SKIANET_PATH . '/vendor/fpdf/fpdf.php';
 
 
@@ -117,10 +117,6 @@ function init_booking_handler_plugin() {
 
     if (class_exists('Booking_Checkout_Fields')) {
         Booking_Checkout_Fields::get_instance();
-    }
-
-    if (class_exists('Booking_Code_Form_Handler')) {
-        Booking_Code_Form_Handler::get_instance();
     }
 }
 
