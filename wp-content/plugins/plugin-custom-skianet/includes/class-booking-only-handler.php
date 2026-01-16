@@ -27,7 +27,7 @@ class Booking_Only_Handler {
     /**
      * Inizializza lo shortcode
      */
-    private static function init() {
+    private function init() {
         // Registra lo shortcode
         add_shortcode('booking_only_form', array($this, 'render_booking_only_form'));
 
@@ -42,7 +42,7 @@ class Booking_Only_Handler {
      * @param array $atts Attributi dello shortcode
      * @return string HTML del form
      */
-    public static function render_booking_only_form() {
+    public function render_booking_only_form() {
         // Inizia output buffering
         ob_start();
         
@@ -56,7 +56,7 @@ class Booking_Only_Handler {
     /**
      * Enqueue degli assets necessari per il form
      */
-    public static function enqueue_assets() {
+    public function enqueue_assets() {
 
         // Carica solo se lo shortcode è presente nella pagina
         if (is_singular()) {
