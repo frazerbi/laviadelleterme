@@ -33,10 +33,12 @@
 }
 
 /* Campi disabilitati */
-.visualradio-item.disabled {
-    opacity: 0.5;
+.booking-only-form .visualradio-item.disabled {
     pointer-events: none;
+    background-color: #f5f5f5;
+    color: #999;
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .booking-only-form select,
