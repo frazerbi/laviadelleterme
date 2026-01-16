@@ -1,6 +1,5 @@
 /**
- * Booking Only Form - JavaScript Handler
- * Gestisce l'abilitazione progressiva dei campi del form
+ * Booking Only Form - JavaScript Handler Semplificato
  */
 
 (function() {
@@ -23,157 +22,57 @@
         }
 
         init() {
-            // Disabilita tutti i campi tranne il codice acquisto
-            this.disableAllFields();
-
-            // Event listeners
-            this.purchaseCode.addEventListener('input', () => this.handlePurchaseCodeInput());
+            // Event listeners per abilitazione progressiva
+            this.purchaseCode.addEventListener('input', () => this.checkPurchaseCode());
             
             this.locations.forEach(location => {
-                location.addEventListener('change', () => this.handleLocationChange());
+                location.addEventListener('change', () => this.checkLocation());
             });
 
-            this.dateInput.addEventListener('change', () => this.handleDateChange());
-            this.timeSlot.addEventListener('change', () => this.handleTimeSlotChange());
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        }
-
-        /**
-         * Disabilita tutti i campi tranne il codice acquisto
-         */
-        disableAllFields() {
-            this.disableLocations();
-            this.disableDate();
-            this.disableTimeSlot();
-            this.disableGender();
-            this.submitBtn.disabled = true;
-        }
-
-        /**
-         * Gestisce l'input del codice acquisto
-         */
-        handlePurchaseCodeInput() {
-            const code = this.purchaseCode.value.trim().toUpperCase();
-            this.purchaseCode.value = code; // Forza maiuscolo
+            this.dateInput.addEventListener('change', () => this.checkDate());
+            this.timeSlot.addEventListener('change', () => this.checkTimeSlot());
             
-            // Valida il formato del codice (lettere maiuscole e numeri, minimo 10 caratteri)
-            const isValidFormat = /^[A-Z0-9]{10,}$/.test(code);
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
 
-            if (isValidFormat && code.length >= 10) {
-                // Verifica il codice via AJAX
-                this.verifyPurchaseCode(code);
+            // Formatta il codice in maiuscolo mentre si digita
+            this.purchaseCode.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase();
+            });
+        }
+
+        /**
+         * Controlla il codice acquisto (solo lunghezza)
+         */
+        checkPurchaseCode() {
+            const code = this.purchaseCode.value.trim();
+            
+            if (code.length === 16) {
+                this.enableLocations();
             } else {
-                // Se il codice non è valido, disabilita tutto
                 this.disableLocations();
                 this.disableDate();
                 this.disableTimeSlot();
                 this.disableGender();
-                this.submitBtn.disabled = true;
-                this.clearMessage();
             }
         }
 
         /**
-         * Verifica il codice acquisto via AJAX
+         * Controlla la location selezionata
          */
-        verifyPurchaseCode(code) {
-            this.showMessage('Verifica del codice in corso...', 'info');
-
-            const formData = new FormData();
-            formData.append('action', 'verify_purchase_code');
-            formData.append('nonce', bookingOnlyAjax.nonce);
-            formData.append('purchase_code', code);
-
-            fetch(bookingOnlyAjax.ajax_url, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.showMessage(data.data.message, 'success');
-                    this.enableLocations();
-                } else {
-                    this.showMessage(data.data.message || 'Codice non valido', 'error');
-                    this.disableLocations();
-                }
-            })
-            .catch(() => {
-                this.showMessage('Errore di connessione. Riprova.', 'error');
-                this.disableLocations();
-            });
-        }
-
-        /**
-         * Abilita la selezione delle location
-         */
-        enableLocations() {
-            this.locations.forEach(location => {
-                location.disabled = false;
-                const visualItem = location.closest('.visualradio-item');
-                if (visualItem) {
-                    visualItem.classList.remove('disabled');
-                }
-            });
-        }
-
-        /**
-         * Disabilita la selezione delle location
-         */
-        disableLocations() {
-            this.locations.forEach(location => {
-                location.disabled = true;
-                location.checked = false;
-                const visualItem = location.closest('.visualradio-item');
-                if (visualItem) {
-                    visualItem.classList.add('disabled');
-                }
-            });
-        }
-
-        /**
-         * Gestisce il cambio di location
-         */
-        handleLocationChange() {
-            const selectedLocation = this.getSelectedLocation();
-            
-            if (selectedLocation) {
+        checkLocation() {
+            if (this.getSelectedLocation()) {
                 this.enableDate();
             } else {
                 this.disableDate();
                 this.disableTimeSlot();
                 this.disableGender();
-                this.submitBtn.disabled = true;
             }
         }
 
         /**
-         * Ottiene la location selezionata
+         * Controlla la data selezionata
          */
-        getSelectedLocation() {
-            const selected = Array.from(this.locations).find(loc => loc.checked);
-            return selected ? selected.value : null;
-        }
-
-        /**
-         * Abilita la selezione della data
-         */
-        enableDate() {
-            this.dateInput.disabled = false;
-        }
-
-        /**
-         * Disabilita la selezione della data
-         */
-        disableDate() {
-            this.dateInput.disabled = true;
-            this.dateInput.value = '';
-        }
-
-        /**
-         * Gestisce il cambio di data
-         */
-        handleDateChange() {
+        checkDate() {
             const selectedDate = this.dateInput.value;
             const selectedLocation = this.getSelectedLocation();
             
@@ -182,12 +81,92 @@
             } else {
                 this.disableTimeSlot();
                 this.disableGender();
-                this.submitBtn.disabled = true;
             }
         }
 
         /**
-         * Carica le fasce orarie disponibili via AJAX
+         * Controlla la fascia oraria selezionata
+         */
+        checkTimeSlot() {
+            if (this.timeSlot.value) {
+                this.enableGender();
+            } else {
+                this.disableGender();
+            }
+        }
+
+        /**
+         * Abilita locations
+         */
+        enableLocations() {
+            this.locations.forEach(location => {
+                location.disabled = false;
+                const item = location.closest('.visualradio-item');
+                if (item) item.classList.remove('disabled');
+            });
+        }
+
+        /**
+         * Disabilita locations
+         */
+        disableLocations() {
+            this.locations.forEach(location => {
+                location.disabled = true;
+                location.checked = false;
+                const item = location.closest('.visualradio-item');
+                if (item) item.classList.add('disabled');
+            });
+        }
+
+        /**
+         * Abilita data
+         */
+        enableDate() {
+            this.dateInput.disabled = false;
+        }
+
+        /**
+         * Disabilita data
+         */
+        disableDate() {
+            this.dateInput.disabled = true;
+            this.dateInput.value = '';
+        }
+
+        /**
+         * Abilita fascia oraria
+         */
+        enableTimeSlot() {
+            this.timeSlot.disabled = false;
+        }
+
+        /**
+         * Disabilita fascia oraria
+         */
+        disableTimeSlot() {
+            this.timeSlot.disabled = true;
+            this.timeSlot.value = '';
+        }
+
+        /**
+         * Abilita sesso
+         */
+        enableGender() {
+            this.genderInputs.forEach(input => input.disabled = false);
+        }
+
+        /**
+         * Disabilita sesso
+         */
+        disableGender() {
+            this.genderInputs.forEach(input => {
+                input.disabled = true;
+                input.checked = false;
+            });
+        }
+
+        /**
+         * Carica le fasce orarie disponibili
          */
         loadTimeSlots(location, date) {
             this.showMessage('Caricamento fasce orarie...', 'info');
@@ -207,90 +186,22 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data.slots.length > 0) {
-                    this.populateTimeSlots(data.data.slots);
+                    let options = '<option value="">-- Seleziona una fascia oraria --</option>';
+                    data.data.slots.forEach(slot => {
+                        options += `<option value="${slot.value}">${slot.label}</option>`;
+                    });
+                    this.timeSlot.innerHTML = options;
                     this.enableTimeSlot();
                     this.clearMessage();
                 } else {
                     this.timeSlot.innerHTML = '<option value="">Nessuna fascia oraria disponibile</option>';
-                    this.showMessage('Nessuna fascia oraria disponibile per questa data', 'warning');
-                    this.disableTimeSlot();
+                    this.showMessage('Nessuna fascia oraria disponibile', 'warning');
                 }
             })
             .catch(() => {
                 this.timeSlot.innerHTML = '<option value="">Errore caricamento</option>';
-                this.showMessage('Errore nel caricamento delle fasce orarie', 'error');
-                this.disableTimeSlot();
+                this.showMessage('Errore nel caricamento', 'error');
             });
-        }
-
-        /**
-         * Popola il select delle fasce orarie
-         */
-        populateTimeSlots(slots) {
-            let options = '<option value="">-- Seleziona una fascia oraria --</option>';
-            
-            slots.forEach(slot => {
-                options += `<option value="${slot.value}">${slot.label}</option>`;
-            });
-            
-            this.timeSlot.innerHTML = options;
-        }
-
-        /**
-         * Abilita la selezione della fascia oraria
-         */
-        enableTimeSlot() {
-            this.timeSlot.disabled = false;
-        }
-
-        /**
-         * Disabilita la selezione della fascia oraria
-         */
-        disableTimeSlot() {
-            this.timeSlot.disabled = true;
-            this.timeSlot.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
-        }
-
-        /**
-         * Gestisce il cambio di fascia oraria
-         */
-        handleTimeSlotChange() {
-            const selectedTimeSlot = this.timeSlot.value;
-            
-            if (selectedTimeSlot) {
-                this.enableGender();
-            } else {
-                this.disableGender();
-                this.submitBtn.disabled = true;
-            }
-        }
-
-        /**
-         * Abilita la selezione del sesso
-         */
-        enableGender() {
-            this.genderInputs.forEach(input => {
-                input.disabled = false;
-            });
-            this.submitBtn.disabled = false;
-        }
-
-        /**
-         * Disabilita la selezione del sesso
-         */
-        disableGender() {
-            this.genderInputs.forEach(input => {
-                input.disabled = true;
-                input.checked = false;
-            });
-        }
-
-        /**
-         * Ottiene il sesso selezionato
-         */
-        getSelectedGender() {
-            const selected = Array.from(this.genderInputs).find(input => input.checked);
-            return selected ? selected.value : null;
         }
 
         /**
@@ -299,16 +210,10 @@
         handleSubmit(e) {
             e.preventDefault();
 
-            // Verifica che tutti i campi siano compilati
-            if (!this.validateForm()) {
-                this.showMessage('Compila tutti i campi richiesti', 'error');
-                return;
-            }
-
             const formData = new FormData(this.form);
             this.submitBtn.disabled = true;
             this.submitBtn.textContent = 'Invio in corso...';
-            this.showMessage('Elaborazione prenotazione...', 'info');
+            this.showMessage('Elaborazione in corso...', 'info');
 
             fetch(bookingOnlyAjax.ajax_url, {
                 method: 'POST',
@@ -319,7 +224,6 @@
                 if (data.success) {
                     this.showMessage(data.data.message, 'success');
                     
-                    // Redirect se presente
                     if (data.data.redirect_url) {
                         setTimeout(() => {
                             window.location.href = data.data.redirect_url;
@@ -332,39 +236,31 @@
                 }
             })
             .catch(() => {
-                this.showMessage('Errore di connessione. Riprova.', 'error');
+                this.showMessage('Errore di connessione', 'error');
                 this.submitBtn.disabled = false;
                 this.submitBtn.textContent = 'Prosegui con la prenotazione';
             });
         }
 
         /**
-         * Valida il form
+         * Ottiene la location selezionata
          */
-        validateForm() {
-            const code = this.purchaseCode.value.trim();
-            const location = this.getSelectedLocation();
-            const date = this.dateInput.value;
-            const timeSlot = this.timeSlot.value;
-            const gender = this.getSelectedGender();
-
-            return code && location && date && timeSlot && gender;
+        getSelectedLocation() {
+            const selected = Array.from(this.locations).find(loc => loc.checked);
+            return selected ? selected.value : null;
         }
 
         /**
-         * Mostra un messaggio
+         * Mostra messaggio
          */
         showMessage(message, type = 'info') {
             this.response.className = 'booking-only-response ' + type;
             this.response.innerHTML = message;
             this.response.style.display = 'block';
-            
-            // Smooth scroll al messaggio
-            this.response.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         /**
-         * Cancella il messaggio
+         * Cancella messaggio
          */
         clearMessage() {
             this.response.style.display = 'none';
@@ -373,11 +269,9 @@
         }
     }
 
-    // Inizializza quando il DOM è pronto
+    // Inizializza
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            new BookingOnlyForm();
-        });
+        document.addEventListener('DOMContentLoaded', () => new BookingOnlyForm());
     } else {
         new BookingOnlyForm();
     }

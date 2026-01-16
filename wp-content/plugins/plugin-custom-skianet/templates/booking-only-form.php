@@ -32,9 +32,9 @@ $locations = Booking_Handler::get_available_locations();
                 required 
                 placeholder="XXXXXXXXXXXXXXXX"
                 aria-label="Inserisci codice acquisto"
-                pattern="[A-Z0-9]+"
+                pattern="[A-Z0-9]{16}"
                 maxlength="16"
-
+                minlength="16"
             >
         </div>
 
