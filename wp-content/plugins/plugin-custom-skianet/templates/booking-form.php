@@ -21,7 +21,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         
         <!-- Location -->
         <div class="form-group form-group-location visualradio-group">
-            <legend for="location">STEP  1: Seleziona la Location:</legend>
+            <legend for="location">STEP  1: Seleziona la Location <span class="required">*</span></legend>
                 <?php foreach ($locations as $value => $label): ?>
                     <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
                         <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required>
@@ -35,7 +35,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
 
         <!-- Data -->
         <div class="form-group form-group-date">
-            <label for="booking_date">STEP   2: Scegli la data desiderata:</label>
+            <label for="booking_date">STEP   2: Scegli la data desiderata <span class="required">*</span></label>
             <input 
                 type="date" 
                 name="booking_date" 
