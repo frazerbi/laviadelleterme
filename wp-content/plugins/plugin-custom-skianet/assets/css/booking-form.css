@@ -4,13 +4,17 @@
 }
 
 .booking-form .form-group {
-    margin-bottom: 1.6rem;
+    margin-bottom: 2rem;
+}
+
+.booking-form .form-group-submit {
+    margin-top: 3rem;
+    margin-bottom: 0;
 }
 
 .booking-form .form-group-row {
     display: flex;
     gap: 15px;
-    margin-bottom: 1.6rem;
 }
 
 .booking-form .form-group-half {

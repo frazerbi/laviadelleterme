@@ -76,13 +76,13 @@ $ticket_types = Booking_Handler::get_ticket_types();
             <legend class="form-group-legend">STEP   5: Numero di ingressi <span class="required">*</span></legend>
             <div class="form-group-row">
                 <div class="form-group-half">
-                    <label for="num_male">Ingressi Uomo:</label>
+                    <label for="num_male">N. Uomo:</label>
                     <input type="tel" name="num_male" id="num_male" 
                            min="0" max="20" value="0" placeholder="0" required disabled>
                 </div>
 
                 <div class="form-group-half">
-                    <label for="num_female">Ingressi Donna:</label>
+                    <label for="num_female">N. Donna:</label>
                     <input type="tel" name="num_female" id="num_female" 
                            min="0" max="20" value="0" placeholder="0" required disabled>
                 </div>
@@ -94,7 +94,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         <div id="booking-response" class="booking-response"></div>
 
         <!-- Submit -->
-        <div class="form-group">
+        <div class="form-group form-group-submit">
             <button type="submit" name="submit_booking" class="btn-submit" disabled>
                 Prosegui con la prenotazione
             </button>
