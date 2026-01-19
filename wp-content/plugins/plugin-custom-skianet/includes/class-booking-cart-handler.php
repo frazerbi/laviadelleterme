@@ -227,7 +227,7 @@ class Booking_Cart_Handler {
             
             // Mostra quantità come testo non modificabile con classe specifica
             return sprintf(
-                '<div class="quantity quantity-readonly woocommerce-quantity" style="text-align: center; display: inline-block; padding: 8px 12px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;">
+                '<div class="quantity quantity-readonly woocommerce-quantity" style="text-align: center; display: inline-block; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;">
                     <strong >%s</strong>
                     <input type="hidden" name="cart[%s][qty]" value="%s" />
                 </div>',
