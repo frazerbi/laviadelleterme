@@ -41,6 +41,19 @@
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    box-sizing: border-box; /* IMPORTANTE per Safari */
+    -webkit-appearance: none; /* Rimuove lo stile nativo Safari */
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Fix specifico per Safari */
+.booking-form input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+}
+
+.booking-form input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
 }
 
 .booking-form input[type="number"],
@@ -208,7 +221,7 @@
     
     
     .booking-form .form-group {
-        margin-bottom: 1.6rem;
+        margin-bottom: 3rem;
     }
 }
 
