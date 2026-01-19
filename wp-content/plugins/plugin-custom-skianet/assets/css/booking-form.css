@@ -4,13 +4,13 @@
 }
 
 .booking-form .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.6rem;
 }
 
 .booking-form .form-group-row {
     display: flex;
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 1.6rem;
 }
 
 .booking-form .form-group-half {
@@ -24,6 +24,7 @@
     margin-bottom: 8px;
     font-weight: 600;
     color: var(--e-global-color-secondary);
+    font-size: 1.2rem;
 }
 
 .booking-form .required {
@@ -206,8 +207,8 @@
     }
     
     
-    .booking-form .form-group-half {
-        margin-bottom: 20px;
+    .booking-form .form-group {
+        margin-bottom: 1.6rem;
     }
 }
 
@@ -218,17 +219,9 @@
         padding: 0 10px;
     }
 
-    .booking-form .form-group {
-        margin-bottom: 18px;
-    }
-
     .booking-form .form-group-row {
         flex-direction: column;
         gap: 0;
-    }
-    
-    .booking-form .form-group-half {
-        margin-bottom: 18px;
     }
 
     .booking-form .number-input-wrapper {

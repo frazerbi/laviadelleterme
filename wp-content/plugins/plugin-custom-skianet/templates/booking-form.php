@@ -21,7 +21,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         
         <!-- Location -->
         <div class="form-group form-group-location visualradio-group">
-            <legend for="location">Seleziona Location:</legend>
+            <legend for="location">Step 1: Seleziona la Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
                     <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
                         <input class="visualradio-input" type="radio" name="location" id="location_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required>
@@ -35,10 +35,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
 
         <!-- Data -->
         <div class="form-group form-group-date">
-            <label for="booking_date">
-                Data Prenotazione:
-                <span class="label-hint">Seleziona la data desiderata</span>
-            </label>
+            <label for="booking_date">Step 2: Scegli la data desiderata:</label>
             <input 
                 type="date" 
                 name="booking_date" 
@@ -54,7 +51,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
 
         <!-- Tipo di Ingresso -->
         <div class="form-group form-group-ticket-type">
-            <label for="ticket_type">Tipo di Ingresso: <span class="required">*</span></label>
+            <label for="ticket_type">Step 3: Tipo di Ingresso <span class="required">*</span></label>
             <select name="ticket_type" id="ticket_type" required disabled>
                 <option value="">-- Seleziona tipo di ingresso --</option>
                 <?php foreach ($ticket_types as $value => $label): ?>
@@ -67,7 +64,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
 
         <!-- Fascia Oraria -->
         <div class="form-group form-group-time-slot">
-            <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
+            <label for="time_slot">Step 4: A che ora ti aspettiamo? <span class="required">*</span></label>
             <select name="time_slot" id="time_slot" required disabled>
                 <option value="">-- Seleziona una fascia oraria --</option>
                 <!-- Le opzioni vengono popolate dinamicamente da JavaScript -->
@@ -75,17 +72,13 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
         
         <!-- Numero Ingressi -->
-        <div class="form-group-row form-group-number-of-entries">
-            <div class="form-group form-group-half">
-                <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
-                <input type="tel" name="num_male" id="num_male" 
-                       min="0" max="20" value="0" placeholder="0" required disabled>
-            </div>
-
-            <div class="form-group form-group-half">
-                <label for="num_female">Ingressi Donna: <span class="required">*</span></label>
+        <div class="form-group form-group-half form-group-female">
+            <label for="num_female">&nbsp;</label>
+            <div class="number-input-wrapper">
+                <button type="button" class="btn-number btn-down" disabled>−</button>
                 <input type="tel" name="num_female" id="num_female" 
-                       min="0" max="20" value="0" placeholder="0" required disabled>
+                        min="0" max="20" value="0" placeholder="Donna" required disabled>
+                <button type="button" class="btn-number btn-up" disabled>+</button>
             </div>
         </div>
 
