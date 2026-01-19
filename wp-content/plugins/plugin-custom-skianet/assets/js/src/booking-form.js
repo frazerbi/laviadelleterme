@@ -512,16 +512,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 disableFieldsFrom('date');
                 dateField.disabled = true;
 
-                // Focus sul primo radio button della location
-                const firstLocationRadio = document.querySelector('input[name="location"]');
-                if (firstLocationRadio) {
-                    firstLocationRadio.focus();
-                }
-
                 if (data.data.redirect_url) {
                     setTimeout(() => {
                         window.location.href = data.data.redirect_url;
-                    }, 1500); // Aspetta 1.5s per mostrare messaggio
+                    }, 500); // Aspetta 1.5s per mostrare messaggio
                 } else {
                     // Reset form se non c'è redirect
                     form.reset();
