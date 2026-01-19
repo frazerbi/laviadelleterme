@@ -20,7 +20,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         <?php wp_nonce_field('booking_form_action', 'booking_form_nonce'); ?>
         
         <!-- Location -->
-        <div class="form-group visualradio-group">
+        <div class="form-group form-group-location visualradio-group">
             <legend for="location">Seleziona Location:</legend>
                 <?php foreach ($locations as $value => $label): ?>
                     <label class="visualradio-item" for="location_<?php echo esc_attr($value); ?>">
@@ -34,7 +34,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
 
         <!-- Data -->
-        <div class="form-group">
+        <div class="form-group form-group-date">
             <label for="booking_date">
                 Data Prenotazione:
                 <span class="label-hint">Seleziona la data desiderata</span>
@@ -53,7 +53,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
 
         <!-- Tipo di Ingresso -->
-        <div class="form-group">
+        <div class="form-group form-group-ticket-type">
             <label for="ticket_type">Tipo di Ingresso: <span class="required">*</span></label>
             <select name="ticket_type" id="ticket_type" required disabled>
                 <option value="">-- Seleziona tipo di ingresso --</option>
@@ -66,7 +66,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
 
         <!-- Fascia Oraria -->
-        <div class="form-group">
+        <div class="form-group form-group-time-slot">
             <label for="time_slot">A che ora ti aspettiamo? <span class="required">*</span></label>
             <select name="time_slot" id="time_slot" required disabled>
                 <option value="">-- Seleziona una fascia oraria --</option>
@@ -75,7 +75,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
         
         <!-- Numero Ingressi -->
-        <div class="form-group-row">
+        <div class="form-group-row form-group-number-of-entries">
             <div class="form-group form-group-half">
                 <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
                 <input type="tel" name="num_male" id="num_male" 

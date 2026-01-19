@@ -20,7 +20,6 @@
 
 .booking-form label,
 .booking-form legend {
-    font-size: 16px;
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
@@ -41,7 +40,6 @@
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 16px;
 }
 
 .booking-form input[type="number"],
@@ -201,6 +199,12 @@
         flex-direction: column;
         gap: 0;
     }
+
+    .booking-form .form-group-number-of-entries .form-group-row {
+        flex-direction: row; /* Mantiene le due colonne */
+        gap: 12px;
+    }
+    
     
     .booking-form .form-group-half {
         margin-bottom: 20px;
@@ -227,27 +231,7 @@
         margin-bottom: 18px;
     }
 
-    .booking-form label,
-    .booking-form legend {
-        font-size: 15px;
-    }
-
-    .visualradio-item,
-    .booking-form label.visualradio-item {
-        padding: 10px;
-        gap: 10px;
-    }
-
-    .visualradio-label {
-        font-size: 15px;
-    }
-
-    .visualradio-thumb {
-        width: 80px;
-        height: 55px;
-    }
-
-    .number-input-wrapper {
+    .booking-form .number-input-wrapper {
         gap: 6px;
     }
 
@@ -263,12 +247,10 @@
     .booking-form input[type="text"],
     .booking-form input[type="tel"] {
         padding: 11px;
-        font-size: 16px; /* Mantiene 16px per evitare zoom su iOS */
     }
 
     .booking-form .btn-submit {
         padding: 13px;
-        font-size: 16px;
     }
 }
 
@@ -278,27 +260,4 @@
         padding: 0 8px;
     }
 
-    .visualradio-item,
-    .booking-form label.visualradio-item {
-        padding: 8px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .visualradio-thumb {
-        width: 100%;
-        height: 120px;
-        order: -1;
-    }
-
-    .visualradio-label {
-        width: 100%;
-        text-align: center;
-        font-size: 15px;
-    }
-
-    .number-input-wrapper .btn-number {
-        font-size: 16px;
-    }
 }
