@@ -72,13 +72,17 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
         
         <!-- Numero Ingressi -->
-        <div class="form-group form-group-half form-group-female">
-            <label for="num_female">&nbsp;</label>
-            <div class="number-input-wrapper">
-                <button type="button" class="btn-number btn-down" disabled>−</button>
+        <div class="form-group-row form-group-number-of-entries">
+            <div class="form-group form-group-half">
+                <label for="num_male">Ingressi Uomo: <span class="required">*</span></label>
+                <input type="tel" name="num_male" id="num_male" 
+                       min="0" max="20" value="0" placeholder="0" required disabled>
+            </div>
+
+            <div class="form-group form-group-half">
+                <label for="num_female">Ingressi Donna: <span class="required">*</span></label>
                 <input type="tel" name="num_female" id="num_female" 
-                        min="0" max="20" value="0" placeholder="Donna" required disabled>
-                <button type="button" class="btn-number btn-up" disabled>+</button>
+                       min="0" max="20" value="0" placeholder="0" required disabled>
             </div>
         </div>
 
