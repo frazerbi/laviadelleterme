@@ -450,15 +450,6 @@ class Booking_TermeGest_Sync {
             }
         }
 
-        // ✅ Pulisci tutti i codici da BOM e caratteri invisibili
-        $codes = array_map(array($this, 'clean_license_code'), $codes);
-        
-        // ✅ Rimuovi eventuali valori vuoti
-        $codes = array_filter($codes);
-        
-        // ✅ Re-index array (importante!)
-        $codes = array_values($codes);
-        
         error_log("Recuperati " . count($codes) . " codici per item {$item_id}");
         return $codes;
     }
