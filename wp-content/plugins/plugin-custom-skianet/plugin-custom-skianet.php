@@ -49,8 +49,8 @@ add_filter('auto_update_translation', '__return_true');
 
 require_once PLUGIN_SKIANET_PATH.'/vendor/autoload.php';
 
-require_once PLUGIN_SKIANET_PATH . 'includes/class-termegest-api.php';
-require_once PLUGIN_SKIANET_PATH . 'includes/termegest-api-functions.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-api.php';
+require_once PLUGIN_SKIANET_PATH . '/includes/termegest-api-functions.php';
 
 // Carica la classe
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-handler.php';
