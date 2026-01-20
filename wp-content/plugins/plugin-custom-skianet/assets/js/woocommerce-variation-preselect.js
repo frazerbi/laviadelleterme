@@ -153,18 +153,31 @@ function setLocationImage(locationId) {
 }
 
 function buildDataUI(data) {
+    const DATA_LABELS = {
+        'location': 'Struttura',
+        'date': 'Data',
+        'ticket': 'Tipologia',
+        'guests': 'Ospiti',
+        'unitPrice': 'Prezzo unitario',
+        'totalPrice': 'Totale',
+        'priceHtml': 'Prezzo'
+    };
+
+    console.log('Dati da mostrare nella UI:', data);
+
     const titleWrapper = document.querySelector('.product .product_title').parentElement;
     const titleEl = document.querySelector('.product .product_title');
     const titleText = titleEl.textContent
 
-    const newTitle = `Prenota a <b>${data.location}</b> per il giorno <b>${data.date}</b> per ${data.guests} ospiti (${data.ticket}).`;
+    const hostLabel = data.guests === 1 ? 'ospite' : 'ospiti';
+    const newTitle = `Prenota a <b>${data.location}</b> per il giorno <b>${data.date}</b> per ${data.guests} ${data.guests === 1 ? 'ospite' : 'ospiti'} (${data.ticket}).`;
     titleEl.innerHTML = newTitle;
 
     const secondaryInfo = document.createElement('div');
     secondaryInfo.className = 'secondary-info';
     const priceEl = document.createElement('span');
     priceEl.className = 'price';
-    priceEl.textContent = data.price;
+    priceEl.innerHTML = data.guests === 1 ? data.totalPrice + '€' : `<span>${data.totalPrice}€</span><span class="note">(${data.unitPrice}€ x ${data.guests})</span>`;
 
     const noteEl = document.createElement('span');
     noteEl.className = 'note';
@@ -181,9 +194,12 @@ function buildDataUI(data) {
 
     const list = document.createElement('ul');
 
+    const HIDDEN_KEYS = ['unitPrice', 'totalPrice'];
     for (const [key, value] of Object.entries(data)) {
+        if (HIDDEN_KEYS.includes(key)) continue;
         const listItem = document.createElement('li');
-        listItem.textContent = `${key}: ${value}`;
+        const label = DATA_LABELS[key] || key;
+        listItem.textContent = `${label}: ${value}`;
         list.appendChild(listItem);
     }
 
@@ -221,7 +237,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await selectVariation(ticketType);
         const priceData = await waitForVariationPrice();
-        data.price = priceData.price + " €";
+        const unitPrice = priceData.price;
+        const totalPrice = unitPrice * data.guests;
+        data.unitPrice = unitPrice;
+        data.totalPrice = totalPrice;
+        data.priceHtml = data.guests === 1 ? `${unitPrice}€` : `${unitPrice}€ x ${data.guests} = ${totalPrice}€`;
 
         const hasNullOrUndefined = Object.values(data).some(value => value === null || value === undefined);
 

@@ -7,10 +7,11 @@
 }
 
 .product.customDataLoaded .secondary-info .price {
-	font-family: serif;
-    color: inherit;
+	color: inherit;
     font-weight: 700;
     font-size: 36px;
+	display: flex;
+    flex-direction: column;
 }
 .product.customDataLoaded .secondary-info .note {
 	font-size: 14px;
