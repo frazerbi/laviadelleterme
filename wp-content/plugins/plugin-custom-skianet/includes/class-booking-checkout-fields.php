@@ -44,8 +44,6 @@ class Booking_Checkout_Fields {
         // Salva nei metadati degli order items (non dell'ordine)
         add_action('woocommerce_checkout_create_order_line_item', array($this, 'save_health_certificate_to_item'), 10, 4);
 
-        // Mostra nei dettagli ordine (admin e email)
-        add_action('woocommerce_order_details_after_order_table', array($this, 'display_health_certificate_in_order'));
     }
 
     /**
@@ -170,34 +168,6 @@ class Booking_Checkout_Fields {
             error_log("✅ Certificato salute salvato per item {$item->get_id()} - Booking: {$values['booking_id']}");
         }
     }
-
-    /**
-     * Mostra nei dettagli ordine cliente
-     */
-    public function display_health_certificate_in_order($order) {
-        $has_certificate = false;
-        
-        foreach ($order->get_items() as $item) {
-            if ($item->get_meta('_health_certificate_accepted') === 'yes') {
-                $has_certificate = true;
-                break;
-            }
-        }
-        
-        if (!$has_certificate) {
-            return;
-        }
-        
-        ?>
-        <section class="health-certificate-confirmation" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
-            <h2><?php _e('Dichiarazione di Buona Salute', 'text-domain'); ?></h2>
-            <p style="margin: 0; color: #28a745; font-weight: 600;">
-                ✅ <?php _e('Hai confermato di essere in buone condizioni di salute per i prodotti prenotati.', 'text-domain'); ?>
-            </p>
-        </section>
-        <?php
-    }
-
 
     /**
      * Verifica se il carrello contiene prodotti con prenotazione
