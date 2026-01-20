@@ -85,7 +85,20 @@ class Booking_TermeGest_Sync {
         
         // Recupera codici
         $codes = $this->get_license_codes_for_item($item);
-        
+
+        error_log("=== CODICI RECUPERATI PER ITEM {$item_id} ===");
+        error_log("Totale codici: " . count($codes));
+        foreach ($codes as $index => $code) {
+            error_log(sprintf(
+                "  Codice [%d]: '%s' (lunghezza: %d, hex: %s)",
+                $index + 1,
+                $code,
+                strlen($code),
+                bin2hex($code)
+            ));
+        }
+        error_log("===========================================");
+
         if (empty($codes)) {
             error_log("❌ Nessun codice trovato per booking item {$item_id}");
             $order->add_order_note("ERRORE: Nessun codice per " . $item->get_name());
