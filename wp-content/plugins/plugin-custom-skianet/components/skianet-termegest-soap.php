@@ -67,7 +67,7 @@ function skianet_termegest_get_disponibilita_by_day(int $day, int $month, int $y
             error_log("AVVISO: Risultato conversione non è array valido o vuoto");
             return [];
         }
-    
+     
         return $result;
 
     } catch (Throwable $throwable) {
