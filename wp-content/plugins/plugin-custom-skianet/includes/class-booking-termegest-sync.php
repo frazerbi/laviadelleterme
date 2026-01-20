@@ -436,6 +436,15 @@ class Booking_TermeGest_Sync {
                 $codes[] = $code_data[0]['license_code1'];
             }
         }
+
+        // ✅ Pulisci tutti i codici da BOM e caratteri invisibili
+        $codes = array_map(array($this, 'clean_license_code'), $codes);
+        
+        // ✅ Rimuovi eventuali valori vuoti
+        $codes = array_filter($codes);
+        
+        // ✅ Re-index array (importante!)
+        $codes = array_values($codes);
         
         error_log("Recuperati " . count($codes) . " codici per item {$item_id}");
         return $codes;
@@ -464,7 +473,16 @@ class Booking_TermeGest_Sync {
         $codes = array();
         foreach ($results as $row) {
             if (!empty($row->license_code1)) {
-                $codes[] = $row->license_code1;
+                $code = $row->license_code1;
+            
+                // ✅ Pulisci codice da BOM e caratteri invisibili
+                $code = str_replace("\xEF\xBB\xBF", '', $code); // BOM UTF-8
+                $code = preg_replace('/[\x00-\x1F\x7F\xA0\xAD]/u', '', $code); // Caratteri invisibili
+                $code = trim($code);
+
+                if (!empty($code)) {
+                    $codes[] = $code;
+                }
             }
         }
         

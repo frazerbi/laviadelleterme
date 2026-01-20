@@ -260,7 +260,16 @@ class Booking_Cart_Handler {
         $codes = array();
         foreach ($results as $row) {
             if (!empty($row->license_code1)) {
-                $codes[] = trim($row->license_code1);
+                $code = $row->license_code1;
+            
+                // ✅ Pulisci codice da BOM e caratteri invisibili
+                $code = str_replace("\xEF\xBB\xBF", '', $code); // BOM UTF-8
+                $code = preg_replace('/[\x00-\x1F\x7F\xA0\xAD]/u', '', $code); // Caratteri invisibili
+                $code = trim($code);
+                
+                if (!empty($code)) {
+                    $codes[] = $code;
+                }
             }
         }
         
