@@ -559,11 +559,11 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.disabled = false;
         })
         .finally(() => {
-            submitBtn.textContent = 'Prenota Ora';
+            
             if (submitBtn.disabled) {
                 setTimeout(() => {
                     submitBtn.disabled = false;
-                }, 2000);
+                }, 200);
             }
         });
     });
