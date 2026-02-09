@@ -20,17 +20,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Reset form al caricamento per evitare stato residuo dal browser back button
     form.reset();
 
-    // Gestisce il caso bfcache (back/forward cache) dove DOMContentLoaded non viene ri-eseguito
+    // Gestisce il caso back/forward navigation (bfcache o ricaricamento con form restore del browser)
     window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
+        const navEntries = performance.getEntriesByType('navigation');
+        const isBackForward = event.persisted ||
+            (navEntries.length > 0 && navEntries[0].type === 'back_forward');
+
+        if (isBackForward) {
             form.reset();
+            // Esplicitamente deseleziona i radio (form.reset può ripristinare il default HTML)
+            locationRadios.forEach(r => r.checked = false);
             if (calendar) {
                 calendar.destroy();
                 calendar = null;
                 availabilityData = null;
             }
+            createCalendarWrapper();
             dateField.disabled = true;
             disableFieldsFrom('ticket');
+            hideMessage();
         }
     });
 
