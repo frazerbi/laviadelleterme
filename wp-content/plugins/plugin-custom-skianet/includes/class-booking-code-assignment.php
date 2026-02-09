@@ -52,20 +52,6 @@ class Booking_Code_Assignment {
             return;
         }
         
-        // Verifica che l'ordine contenga prenotazioni
-        $has_booking = false;
-        foreach ($order->get_items() as $item) {
-            if ($item->get_meta('_booking_id')) {
-                $has_booking = true;
-                break;
-            }
-        }
-        
-        if (!$has_booking) {
-            error_log("Ordine {$order_id} senza prenotazioni - skip");
-            return;
-        }
-        
         // ✅ STEP 1: Assegna codici
         try {
             $codeAssign = new WC_LD_Code_Assignment();
