@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
 
+    // Reset form al caricamento per evitare stato residuo dal browser back button
+    form.reset();
+
+    // Gestisce il caso bfcache (back/forward cache) dove DOMContentLoaded non viene ri-eseguito
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            form.reset();
+            if (calendar) {
+                calendar.destroy();
+                calendar = null;
+                availabilityData = null;
+            }
+            dateField.disabled = true;
+            disableFieldsFrom('ticket');
+        }
+    });
+
     // Helper per ottenere la location selezionata
     function getSelectedLocation() {
         const selectedRadio = document.querySelector('input[name="location"]:checked');

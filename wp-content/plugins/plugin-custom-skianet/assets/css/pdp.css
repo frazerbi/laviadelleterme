@@ -34,6 +34,11 @@
 	font-size: 16px;
 }
 
+.product.loadingData .section-condizioni-vendita,
+.product.customDataLoaded .section-condizioni-vendita {
+	display: none;
+}
+
 .product.customDataLoaded .variations,
 .product.customDataLoaded .quantity,
 .product.customDataLoaded .woocommerce-variation-price {
