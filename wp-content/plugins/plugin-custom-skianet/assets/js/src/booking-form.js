@@ -262,6 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Inizializza nuovo calendario per la nuova location
                 await initCalendar(this.value);
                 dateField.disabled = false;
+                scrollToNext(dateField.closest('.form-group'));
             } else {
                 dateField.disabled = true;
                 disableFieldsFrom('ticket');
@@ -293,6 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.value = '';
         if (!this.value) {
             disableFieldsFrom('time');
+        } else {
+            scrollToNext(timeSlotField.closest('.form-group'));
         }
     });
 
@@ -334,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             disponibilitaInput.value = disponibilita;
 
+            scrollToNext(numMaleField.closest('.form-group'));
             checkSubmitButton();
         }
     });
@@ -424,6 +428,14 @@ document.addEventListener('DOMContentLoaded', function() {
         responseDiv.style.display = 'none';
     }
 
+    // Auto-scroll al campo successivo su mobile
+    function scrollToNext(element) {
+        if (window.innerWidth > 768 || !element) return;
+        setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+    }
+
     function handleNumbersInput(field) {
         const wrap = document.createElement('div');
         wrap.className = 'number-input-wrapper';
@@ -489,6 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 handleTicketTypeByCategories(apiData.available_slots);
 
                 ticketTypeField.disabled = false;
+                scrollToNext(ticketTypeField.closest('.form-group'));
             } else {
                 showMessage('error', data.data.message || 'Nessuna disponibilità per questa data.');
                 disableFieldsFrom('ticket');
@@ -550,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showMessage('success', data.data.message);
+                showMessage('success', 'Dati prenotazione completati, procedi per completare l\'acquisto.');
                 form.reset();
                 disableFieldsFrom('date');
                 dateField.disabled = true;
