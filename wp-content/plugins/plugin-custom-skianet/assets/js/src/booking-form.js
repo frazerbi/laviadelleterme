@@ -349,26 +349,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!ticketTypeField || !selectedDate) {
             return;
         }
-        
+
         const isChristmas = isChristmasPeriod(selectedDate);
         const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
-        
+
         if (giornalieroOption) {
             if (isChristmas) {
-                // ✅ PERIODO NATALIZIO - Blocca "giornaliero"
                 giornalieroOption.disabled = true;
-                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)'; 
+                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)';
 
-                // Se era selezionato, resettalo a 4h
                 if (ticketTypeField.value === 'giornaliero') {
                     ticketTypeField.value = '4h';
                 }
-                
-                //console.log('Periodo natalizio - Solo 4 ore disponibile');
             } else {
-                // ✅ PERIODO NORMALE - Abilita "giornaliero"
                 giornalieroOption.disabled = false;
                 giornalieroOption.textContent = 'Giornaliero';
+            }
+        }
+    }
+
+    /**
+     * Disabilita "giornaliero" se nessuno slot disponibile ha le categorie p3 o p4
+     * P3 = Ingresso Lun-Ven Giornaliero, P4 = Ingresso Lun-Dom Giornaliero
+     */
+    function handleTicketTypeByCategories(slots) {
+        const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
+        if (!giornalieroOption) return;
+
+        const hasGiornaliero = slots.some(slot => {
+            const categorie = (slot.categorie || '').toLowerCase().split(',');
+            return categorie.includes('p3') || categorie.includes('p4');
+        });
+
+        if (!hasGiornaliero) {
+            giornalieroOption.disabled = true;
+            giornalieroOption.textContent = 'Giornaliero (non disponibile per questa data)';
+            if (ticketTypeField.value === 'giornaliero') {
+                ticketTypeField.value = '4h';
             }
         }
     }
@@ -469,6 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 showMessage('success', data.data.message || 'Disponibilità verificata!');
                 updateTimeSlots(apiData.available_slots);
+                handleTicketTypeByCategories(apiData.available_slots);
 
                 ticketTypeField.disabled = false;
             } else {
