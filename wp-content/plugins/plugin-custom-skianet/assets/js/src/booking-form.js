@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showMessage('success', 'Dati prenotazione completati, procedi per completare l\'acquisto.');
+                showMessage('success', 'Dati prenotazione completati, verrai indirizzato per completare l\'acquisto.');
                 form.reset();
                 disableFieldsFrom('date');
                 dateField.disabled = true;
