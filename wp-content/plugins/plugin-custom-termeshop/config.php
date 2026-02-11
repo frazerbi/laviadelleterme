@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'LOGO_TERME_PATH' ) ) {
     define( 'LOGO_TERME_PATH', plugin_dir_path( __FILE__ ) . 'assets/header-la-via-delle-terme.jpg' );
 }
-
+  
 // Define the URL to the logo image file (URL for use in browser or email)
 if ( ! defined( 'LOGO_TERME_URL' ) ) {
     define( 'LOGO_TERME_URL', plugin_dir_url( __FILE__ ) . 'assets/header-la-via-delle-terme.jpg' );
