@@ -31,10 +31,10 @@ const SKIANET_ACTION_BOOKING_ADD_CART = 'skianet_booking_add_cart';
 \define('PLUGIN_SKIANET_URL', untrailingslashit(plugin_dir_url(PLUGIN_SKIANET_FILE)));
 
 if ( ! defined( 'LOGO_TERME_PATH' ) ) {
-    define( 'LOGO_TERME_PATH', WP_PLUGIN_DIR . '/plugin-custom-termeshop/assets/header-la-via-delle-terme.jpg' );
+    define( 'LOGO_TERME_PATH', PLUGIN_SKIANET_PATH . '/assets/img/header-la-via-delle-terme.jpg' );
 }
 if ( ! defined( 'LOGO_TERME_FOOTER_PATH' ) ) {
-    define( 'LOGO_TERME_FOOTER_PATH', WP_PLUGIN_DIR . '/plugin-custom-termeshop/assets/footer-coupon1.JPG' );
+    define( 'LOGO_TERME_FOOTER_PATH', PLUGIN_SKIANET_PATH . '/assets/img/footer-coupon.JPG' );
 }
 
 add_filter('auto_update_core', '__return_true');
