@@ -174,7 +174,7 @@ class Booking_Email_Notification {
             }
 
             // Costruisci email
-            $email_body = $this->build_email_body($order_details);
+            $email_body = $this->build_email_body($order_details, $order);
             
             // Invia email
             $this->send_email(
@@ -238,6 +238,12 @@ class Booking_Email_Notification {
             // Dati prenotazione
             $detail .= "<strong>Location:</strong> <span style='color: #0074A0;'>" . $booking_data['location_name'] . "</span><br>";
             $detail .= "<strong>Data:</strong> <span style='color: #0074A0;'>" . $formatted_date . "</span><br>";
+
+            // Orario
+            if (!empty($booking_data['time_slot_label'])) {
+                $detail .= "<strong>Orario:</strong> <span style='color: #0074A0;'>" . esc_html($booking_data['time_slot_label']) . "</span><br>";
+            }
+
             $detail .= "<strong>Tipo Ingresso:</strong> <span style='color: #0074A0;'>" . ($booking_data['ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero') . "</span><br>";
             
             // Ospiti
@@ -259,9 +265,19 @@ class Booking_Email_Notification {
     /**
      * Costruisce il corpo dell'email
      */
-    private function build_email_body($order_details) {
+    private function build_email_body($order_details, $order = null) {
         $order_details_text = implode("<br>", $order_details);
-        
+
+        // Saluto con nome cliente
+        $greeting = "<p>Grazie per la tua prenotazione.";
+        if ($order) {
+            $first_name = $order->get_billing_first_name();
+            $last_name = $order->get_billing_last_name();
+            if ($first_name || $last_name) {
+                $greeting = "<p>Gentile <strong>" . trim($first_name . ' ' . $last_name) . "</strong>, grazie per la tua prenotazione.";
+            }
+        }
+
         $policy_info = "<br><br><strong>Dichiarazioni e Informative:</strong><br>";
         $policy_info .= "<p>Il Sottoscritto/a <strong>DICHIARA</strong> sotto la propria responsabilità di avere preso visione delle norme comportamentali per i servizi offerti dalla struttura, a disposizione alla reception della spa, ed in particolare:</p>";
         $policy_info .= "<ul>";
@@ -274,7 +290,7 @@ class Booking_Email_Notification {
         $policy_info .= "<p>Ai sensi degli articoli 13 e 23 del DLgs. 196/03, del Regolamento EU 679/2016 e del Dlgs 101/2018 (Codice sulla protezione dei dati personali), l'interessato dichiara di essere stato adeguatamente informato ed esprime il proprio consenso all'utilizzo dei dati personali che lo riguardano, con particolare riferimento ai dati che la legge definisce come \"sensibili\", nei limiti di quanto indicato nell'informativa.</p>";
         $policy_info .= "<p>Dichiaro di avere preso visione del regolamento interno che definisce le modalità per la custodia dei valori accettandone i contenuti.</p>";
 
-        $email_body = "<p>Grazie per la tua prenotazione. Di seguito i dettagli dell'ordine:</p><br>";
+        $email_body = $greeting . " Di seguito i dettagli dell'ordine:</p><br>";
         $email_body .= $order_details_text . $policy_info;
         
         return $email_body;

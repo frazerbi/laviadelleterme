@@ -279,6 +279,13 @@
             e.preventDefault();
 
             const formData = new FormData(this.form);
+
+            // Aggiungi testo orario dalla option selezionata
+            const selectedTimeOption = this.timeSlot.options[this.timeSlot.selectedIndex];
+            if (selectedTimeOption && selectedTimeOption.dataset.time) {
+                formData.append('time_slot_label', selectedTimeOption.dataset.time);
+            }
+
             this.submitBtn.disabled = true;
             this.submitBtn.textContent = 'Invio in corso...';
             this.showMessage('Elaborazione in corso...', 'info');

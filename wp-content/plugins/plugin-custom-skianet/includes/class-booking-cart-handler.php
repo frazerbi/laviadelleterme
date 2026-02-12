@@ -77,6 +77,7 @@ class Booking_Cart_Handler {
             $cart_item_data['booking_location_name'] = $booking_data['location_name'];
             $cart_item_data['booking_date'] = $booking_data['booking_date'];
             $cart_item_data['booking_fascia_id'] = $booking_data['fascia_id'];
+            $cart_item_data['booking_time_slot_label'] = $booking_data['time_slot_label'] ?? '';
             $cart_item_data['booking_ticket_type'] = $booking_data['ticket_type'];
             $cart_item_data['booking_num_male'] = $booking_data['num_male'];
             $cart_item_data['booking_num_female'] = $booking_data['num_female'];
@@ -103,6 +104,7 @@ class Booking_Cart_Handler {
             $cart_item['booking_location_name'] = $values['booking_location_name'];
             $cart_item['booking_date'] = $values['booking_date'];
             $cart_item['booking_fascia_id'] = $values['booking_fascia_id'];
+            $cart_item['booking_time_slot_label'] = $values['booking_time_slot_label'] ?? '';
             $cart_item['booking_ticket_type'] = $values['booking_ticket_type'];
             $cart_item['booking_num_male'] = $values['booking_num_male'];
             $cart_item['booking_num_female'] = $values['booking_num_female'];
@@ -165,7 +167,11 @@ class Booking_Cart_Handler {
             $item->add_meta_data('_booking_date', $values['booking_date'], true); // Raw per API
             
             $item->add_meta_data('Fascia ID', $values['booking_fascia_id'], true);
-            $item->add_meta_data('_booking_fascia_id', $values['booking_fascia_id'], true); // ✅ Aggiungi raw
+            $item->add_meta_data('_booking_fascia_id', $values['booking_fascia_id'], true);
+            if (!empty($values['booking_time_slot_label'])) {
+                $item->add_meta_data('Orario', $values['booking_time_slot_label'], true);
+                $item->add_meta_data('_booking_time_slot_label', $values['booking_time_slot_label'], true);
+            }
 
             $item->add_meta_data('Tipo Ingresso', $values['booking_ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero', true);
             $item->add_meta_data('_booking_ticket_type', $values['booking_ticket_type'], true);
@@ -208,7 +214,8 @@ class Booking_Cart_Handler {
             'booking_id' => $item->get_meta('_booking_id'),
             'location_name' => $item->get_meta('Location'),
             'booking_date' => $item->get_meta('_booking_date'),
-            'fascia_id' => $item->get_meta('_booking_fascia_id'), // ✅ Usa il campo raw
+            'fascia_id' => $item->get_meta('_booking_fascia_id'),
+            'time_slot_label' => $item->get_meta('_booking_time_slot_label'),
             'ticket_type' => $item->get_meta('_booking_ticket_type'),
             'num_male' => (int)$item->get_meta('Ingressi Uomo'), // ✅ Cast a int
             'num_female' => (int)$item->get_meta('Ingressi Donna'), // ✅ Cast a int

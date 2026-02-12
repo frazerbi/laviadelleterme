@@ -556,6 +556,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData(form);
 
+        // Aggiungi testo orario dalla option selezionata
+        const selectedTimeOpt = timeSlotField.options[timeSlotField.selectedIndex];
+        if (selectedTimeOpt && selectedTimeOpt.dataset.time) {
+            formData.append('time_slot_label', selectedTimeOpt.dataset.time);
+        }
+
         fetch(bookingFormData.ajaxurl, {
             method: 'POST',
             body: formData

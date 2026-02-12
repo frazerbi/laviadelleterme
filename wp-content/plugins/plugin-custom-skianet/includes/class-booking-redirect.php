@@ -125,12 +125,13 @@ class Booking_Redirect {
 
         // Parametri URL
         $params = array(
-            'location'     => $booking_data['location'],
-            'date'         => $booking_data['booking_date'],
-            'num_male'     => $booking_data['num_male'],
-            'num_female'   => $booking_data['num_female'],
-            'total_guests' => $booking_data['total_guests'],
-            'ticket_type'  => $booking_data['ticket_type']
+            'location'        => $booking_data['location'],
+            'date'            => $booking_data['booking_date'],
+            'time_slot_label' => $booking_data['time_slot_label'] ?? '',
+            'num_male'        => $booking_data['num_male'],
+            'num_female'      => $booking_data['num_female'],
+            'total_guests'    => $booking_data['total_guests'],
+            'ticket_type'     => $booking_data['ticket_type']
         );
 
         $redirect_url = add_query_arg($params, $product_url);

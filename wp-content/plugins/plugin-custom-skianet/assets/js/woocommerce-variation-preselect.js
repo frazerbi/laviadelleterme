@@ -14,17 +14,24 @@ function getVars() {
     const dateParam = urlParams.get('date');
     const ticketType = urlParams.get('ticket_type');
     const totalGuests = parseInt(urlParams.get('total_guests')) || 1;
+    const timeSlotLabel = urlParams.get('time_slot_label');
 
     const niceDate = dateParam ? dateParam.split('-').reverse().join('/') : null;
     const locationLabel = LOCATION_LABELS[locationId] || null;
     const ticketTypeLabel = TICKET_TYPE_LABELS[ticketType] || null;
 
-    return {
+    const vars = {
         'location': locationLabel,
         'date': niceDate,
         'ticket': ticketTypeLabel,
         'guests': totalGuests
+    };
+
+    if (timeSlotLabel) {
+        vars.time = timeSlotLabel;
     }
+
+    return vars;
 }
 
 function selectVariation(ticketType) {
@@ -156,6 +163,7 @@ function buildDataUI(data) {
     const DATA_LABELS = {
         'location': 'Struttura',
         'date': 'Data',
+        'time': 'Orario',
         'ticket': 'Tipologia',
         'guests': 'Ospiti',
         'unitPrice': 'Prezzo unitario',
@@ -169,8 +177,8 @@ function buildDataUI(data) {
     const titleEl = document.querySelector('.product .product_title');
     const titleText = titleEl.textContent
 
-    const hostLabel = data.guests === 1 ? 'ospite' : 'ospiti';
-    const newTitle = `Prenota a <b>${data.location}</b> per il giorno <b>${data.date}</b> per ${data.guests} ${data.guests === 1 ? 'ospite' : 'ospiti'} (${data.ticket}).`;
+    const timeInfo = data.time ? ` alle ore <b>${data.time}</b>` : '';
+    const newTitle = `Prenota a <b>${data.location}</b> per il giorno <b>${data.date}</b>${timeInfo} per ${data.guests} ${data.guests === 1 ? 'ospite' : 'ospiti'} (${data.ticket}).`;
     titleEl.innerHTML = newTitle;
 
     const secondaryInfo = document.createElement('div');

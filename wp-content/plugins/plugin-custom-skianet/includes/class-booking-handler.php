@@ -232,6 +232,7 @@ class Booking_Handler {
         $booking_date = isset($_POST['booking_date']) ? sanitize_text_field($_POST['booking_date']) : '';
         $ticket_type = isset($_POST['ticket_type']) ? sanitize_text_field($_POST['ticket_type']) : '';
         $fascia_id = isset($_POST['time_slot']) ? intval($_POST['time_slot']) : 0;
+        $time_slot_label = isset($_POST['time_slot_label']) ? sanitize_text_field($_POST['time_slot_label']) : '';
         $num_male = isset($_POST['num_male']) ? intval($_POST['num_male']) : 0;
         $num_female = isset($_POST['num_female']) ? intval($_POST['num_female']) : 0;
         $categorie = isset($_POST['categorie']) ? sanitize_text_field($_POST['categorie']) : '';
@@ -269,6 +270,7 @@ class Booking_Handler {
             'location_name' => $this->get_location_value_for_encryption($location),
             'booking_date' => $validation['booking_date'],
             'fascia_id' => $validation['fascia_id'],
+            'time_slot_label' => $time_slot_label,
             'ticket_type' => $validation['ticket_type'],
             'num_male' => $validation['num_male'],
             'num_female' => $validation['num_female'],
@@ -448,6 +450,7 @@ class Booking_Handler {
             'location_name' => $data['location_name'],
             'booking_date' => $data['booking_date'],
             'fascia_id' => $data['fascia_id'],
+            'time_slot_label' => $data['time_slot_label'] ?? '',
             'ticket_type' => $data['ticket_type'],
             'num_male' => $data['num_male'],
             'num_female' => $data['num_female'],
