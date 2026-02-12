@@ -140,7 +140,7 @@ class Booking_Handler {
             'booking-form-script',
             plugin_dir_url(dirname(__FILE__)) . 'assets/js/dist/booking-form.min.js',
             array(),
-            '1.1.0',
+            '1.2.0',
             true
         );
 
