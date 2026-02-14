@@ -292,7 +292,7 @@ class Booking_Nonbooking_Email {
 
         $body_cond = "
             <p style='margin-top:60px;font-size:12px;'>Alcuni link utili: <br>
-            Prenotazione obbligatoria online al seguente link: 
+            Solo per i coupon di ingresso SPA, la prenotazione è obbligatoria al seguente link: 
             <a href='https://www.termegest.it/prenota.aspx' target='_blank' style='color:#0074A0; text-decoration:underline;'>termegest.it/prenota.aspx</a>.<br>
             Il coupon è prorogabile di 90 giorni con supplemento al link: 
             <a href='https://laviadelleterme.it/shop/proroghe/' target='_blank' style='color:#0074A0; text-decoration:underline;'>laviadelleterme.it/shop/proroghe/</a>
