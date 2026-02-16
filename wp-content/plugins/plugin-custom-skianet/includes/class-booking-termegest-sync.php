@@ -279,6 +279,8 @@ class Booking_TermeGest_Sync {
                 ? $booking_data['categorie'][0]
                 : $booking_data['categorie'];
 
+            $allInclusive = in_array(strtolower($categoria), array('p3', 'p4'), true);
+
             // Log parametri per debug
             error_log("SetPrenotazione params:");
             error_log("  idDisponibilita: " . (int)$booking_data['fascia_id']);
@@ -290,7 +292,7 @@ class Booking_TermeGest_Sync {
             error_log("  Provincia: '{$customer['state']}' (" . strlen($customer['state']) . " chars)");
             error_log("  uomodonna: " . ($is_male ? 'true' : 'false'));
             error_log("  Email: {$customer['email']} (" . strlen($customer['email']) . " chars)");
-            error_log("  AllInclusive: false");
+            error_log("  AllInclusive: " . ($allInclusive ? 'true' : 'false'));
             error_log(" Categoria: {$categoria} (" . strlen($categoria) . " chars)");
             error_log("  Protection: " . strlen($protection) . " chars");
             
@@ -305,7 +307,7 @@ class Booking_TermeGest_Sync {
                 $customer['state'],
                 $is_male,
                 $customer['email'],
-                false,
+                $allInclusive,
                 $categoria,
                 '',
                 $protection

@@ -131,7 +131,8 @@ class Booking_Redirect {
             'num_male'        => $booking_data['num_male'],
             'num_female'      => $booking_data['num_female'],
             'total_guests'    => $booking_data['total_guests'],
-            'ticket_type'     => $booking_data['ticket_type']
+            'ticket_type'     => $booking_data['ticket_type'],
+            'category'        => $category
         );
 
         $redirect_url = add_query_arg($params, $product_url);
