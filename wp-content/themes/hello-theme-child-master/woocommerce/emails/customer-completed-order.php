@@ -34,12 +34,38 @@ Riceverai un'ulteriore email con il coupon in pdf con le istruzioni per accedere
 <?php
 
 /*
+ * Filter item meta to show only selected fields in this email.
+ */
+$allowed_meta_keys = array(
+	'Location',
+	'Data Prenotazione',
+	'Orario',
+	'Tipo Ingresso',
+	'Ingressi Uomo',
+	'Ingressi Donna',
+	'Certificato Salute',
+);
+
+$completed_order_filter_item_meta = function ( $formatted_meta ) use ( $allowed_meta_keys ) {
+	$filtered = array();
+	foreach ( $formatted_meta as $meta_id => $meta ) {
+		if ( in_array( $meta->display_key, $allowed_meta_keys, true ) ) {
+			$filtered[ $meta_id ] = $meta;
+		}
+	}
+	return $filtered;
+};
+add_filter( 'woocommerce_order_item_get_formatted_meta_data', $completed_order_filter_item_meta, 10 );
+
+/*
  * @hooked WC_Emails::order_details() Shows the order details table.
  * @hooked WC_Structured_Data::generate_order_data() Generates structured data.
  * @hooked WC_Structured_Data::output_structured_data() Outputs structured data.
  * @since 2.5.0
  */
 do_action( 'woocommerce_email_order_details', $order, $sent_to_admin, $plain_text, $email );
+
+remove_filter( 'woocommerce_order_item_get_formatted_meta_data', $completed_order_filter_item_meta, 10 );
 
 /*
  * @hooked WC_Emails::order_meta() Shows order meta data.
