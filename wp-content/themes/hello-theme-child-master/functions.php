@@ -27,6 +27,8 @@ function hello_elementor_child_enqueue_scripts() {
 add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
 
 require_once  get_stylesheet_directory() . '/customize-my-account.php';
+require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB.php';
+require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB_promo.php';
 
 
 add_filter( 'wc_google_analytics_pro_do_not_track_completed_purchase', '__return_false' );
@@ -45,16 +47,6 @@ function my_hide_shipping_when_free_is_available( $rates ) {
 	return ! empty( $free ) ? $free : $rates;
 }
 add_filter( 'woocommerce_package_rates', 'my_hide_shipping_when_free_is_available', 50 );
-
-
-
-
-//shortcode controllo codici 
-require_once '/home/customer/www/laviadelleterme.it/public_html/Controllo Codici DB/controllo_codici_DB.php';
-add_shortcode('controllo_codici_prezzo_pieno', 'funzione_controllo_codici'); 
-
-require_once '/home/customer/www/laviadelleterme.it/public_html/Controllo Codici DB/controllo_codici_DB_promo.php';
-add_shortcode('controllo_codici_promo', 'funzione_controllo_codici_promo'); 
 
 //Change the 'Billing details' checkout label to 'Contact Information'
 function wc_billing_field_strings( $translated_text, $text, $domain ) {
