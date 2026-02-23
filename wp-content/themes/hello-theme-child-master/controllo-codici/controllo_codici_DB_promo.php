@@ -15,6 +15,7 @@ function funzione_controllo_codici_promo() {
         1631  => 'A6 Ingresso Lunedì - Domenica - Giornaliero',
         1616  => 'A1 Ingresso Lunedì - Venerdì - Mezza giornata',
         1617  => 'A5 Ingresso Lunedì - Venerdì - Giornaliero',
+        109182 => 'V2 Ingresso Promo Serale da 3 ore',
         21800 => 'M4 Massaggi promo',
         27378 => 'PN Ingresso Promo Lunedì - Domenica 4 Ore Per Festività Natalizie',
     ];

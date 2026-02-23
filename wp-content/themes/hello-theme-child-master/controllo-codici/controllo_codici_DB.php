@@ -19,6 +19,7 @@ function funzione_controllo_codici() {
         230   => 'P4 Ingresso Lunedì - Domenica - Giornaliero',
         225   => 'P1 Ingresso Lunedì - Venerdì - Mezza giornata',
         224   => 'P3 Ingresso Lunedì - Venerdì - Giornaliero',
+        109134 => 'V3 Ingresso Serale da 3 ore',
         98149 => 'Bonus Terme and Wellness by LVDT',
         1690  => 'M5 Massaggi',
         1243  => 'W1 Proroghe Ingressi',

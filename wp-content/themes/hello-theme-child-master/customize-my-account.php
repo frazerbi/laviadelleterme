@@ -7,7 +7,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Personalizza l'URL di registrazione
 function custom_register_url( $url ) {
-    return 'https://laviadelleterme.it/login-e-registrazione/';
+    return home_url('/login-e-registrazione/');
+    
 }
 add_filter( 'register_url', 'custom_register_url', 10, 1 );
 
@@ -15,7 +16,7 @@ add_filter( 'register_url', 'custom_register_url', 10, 1 );
 // Personalizza l'URL di login
 function custom_login_url( $url, $redirect = '', $force_reauth = false ) {
     // URL personalizzato per la pagina di login
-    $custom_url = 'https://laviadelleterme.it/login-e-registrazione/';
+    $custom_url = home_url('/login-e-registrazione/');
     
     // Aggiungi i parametri se necessario
     if ( !empty( $redirect ) ) {
