@@ -123,6 +123,15 @@ class Booking_Redirect {
 
         $product_url = get_permalink($product_id);
 
+        // Salva product_id e variation_id nella sessione per validazione
+        if (!session_id()) {
+            session_start();
+        }
+        if (isset($_SESSION['termegest_booking'])) {
+            $_SESSION['termegest_booking']['product_id']   = $product_id;
+            $_SESSION['termegest_booking']['variation_id'] = $variation_id;
+        }
+
         // Parametri URL
         $params = array(
             'location'        => $booking_data['location'],

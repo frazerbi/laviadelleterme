@@ -68,7 +68,24 @@ class Booking_Cart_Handler {
         // Recupera dati dalla sessione
         if (isset($_SESSION['termegest_booking'])) {
             $booking_data = $_SESSION['termegest_booking'];
-            
+
+            // Verifica che il prodotto aggiunto corrisponda a quello della prenotazione in sessione
+            if (isset($booking_data['product_id'])) {
+                $session_product_id   = (int) $booking_data['product_id'];
+                $session_variation_id = isset($booking_data['variation_id']) ? (int) $booking_data['variation_id'] : 0;
+                $cart_product_id      = (int) $product_id;
+                $cart_variation_id    = (int) $variation_id;
+
+                $session_id = $session_variation_id ?: $session_product_id;
+                $cart_id    = $cart_variation_id    ?: $cart_product_id;
+
+                if ($session_id !== $cart_id) {
+                    unset($_SESSION['termegest_booking']);
+                    error_log("Sessione prenotazione ignorata: prodotto in sessione ({$session_id}) diverso da quello aggiunto al carrello ({$cart_id})");
+                    return $cart_item_data;
+                }
+            }
+
             error_log('Aggiunta prenotazione al carrello: ' . print_r($booking_data, true));
             
             // Aggiungi tutti i dati della prenotazione
