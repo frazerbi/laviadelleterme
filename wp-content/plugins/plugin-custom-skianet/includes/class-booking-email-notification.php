@@ -286,7 +286,7 @@ class Booking_Email_Notification {
         $policy_info .= "<li>Dichiara di non accusare sintomi quali: febbre, tosse, difficoltà respiratorie.</li>";
         $policy_info .= "<li>Dichiara di non aver soggiornato in zone e/o Paesi con presunta trasmissione comunitaria.</li>";
         $policy_info .= "</ul>";
-        $policy_info .= "<p><strong>Politica di cancellazione:</strong> È possibile cancellare la prenotazione fino a 48 ORE prima, dopo non è più possibile ed il coupon sarà riscattato in automatico.</p>";
+        $policy_info .= "<p><strong>Politica di cancellazione:</strong> È possibile cancellare la prenotazione fino a 48 ore prima tramite il seguente link: <a href=\"https://www.termegest.it/annullapren.aspx\">https://www.termegest.it/annullapren.aspx</a>. Dopo tale termine non sarà più possibile annullarla e il coupon verrà riscattato automaticamente.</p>";
         $policy_info .= "<p>Ai sensi degli articoli 13 e 23 del DLgs. 196/03, del Regolamento EU 679/2016 e del Dlgs 101/2018 (Codice sulla protezione dei dati personali), l'interessato dichiara di essere stato adeguatamente informato ed esprime il proprio consenso all'utilizzo dei dati personali che lo riguardano, con particolare riferimento ai dati che la legge definisce come \"sensibili\", nei limiti di quanto indicato nell'informativa.</p>";
         $policy_info .= "<p>Dichiaro di avere preso visione del regolamento interno che definisce le modalità per la custodia dei valori accettandone i contenuti.</p>";
 
