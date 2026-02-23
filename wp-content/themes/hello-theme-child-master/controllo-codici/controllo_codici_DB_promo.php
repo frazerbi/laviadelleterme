@@ -20,7 +20,7 @@ function funzione_controllo_codici_promo() {
         27378 => 'PN Ingresso Promo Lunedì - Domenica 4 Ore Per Festività Natalizie',
     ];
 
-    $output = '<ul>';
+    $output = '<ul class="controllo-codici-list">';
 
     foreach ($prodotti as $product_id => $label) {
         $count = $wpdb->get_var(
@@ -29,7 +29,7 @@ function funzione_controllo_codici_promo() {
                 $product_id
             )
         );
-        $output .= '<li><strong>' . esc_html($label) . ':</strong> ' . (int)$count . '</li>';
+        $output .= '<li><strong>' . esc_html($label) . '</strong><span class="codici-count">' . (int)$count . '</span></li>';
     }
 
     $output .= '</ul>';

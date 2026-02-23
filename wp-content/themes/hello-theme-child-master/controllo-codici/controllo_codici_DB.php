@@ -37,15 +37,15 @@ function funzione_controllo_codici() {
         return '<p>Errore nella preparazione della query.</p>';
     }
 
-    $output = '<ul>';
+    $output = '<ul class="controllo-codici-list">';
 
     foreach ($prodotti as $product_id => $label) {
         $stmt->bind_param('i', $product_id);
         $stmt->execute();
         $stmt->bind_result($count);
         $stmt->fetch();
-        
-        $output .= '<li><strong>' . esc_html($label) . ':</strong> ' . (int)$count . '</li>';
+
+        $output .= '<li><strong>' . esc_html($label) . '</strong><span class="codici-count">' . (int)$count . '</span></li>';
     }
 
     $output .= '</ul>';
