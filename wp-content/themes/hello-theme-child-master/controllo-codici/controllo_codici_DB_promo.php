@@ -1,5 +1,10 @@
 <?php
 
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 function funzione_controllo_codici_promo() {
 
     global $wpdb;

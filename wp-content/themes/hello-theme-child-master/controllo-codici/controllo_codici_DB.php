@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+
 function funzione_controllo_codici() {
     
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
