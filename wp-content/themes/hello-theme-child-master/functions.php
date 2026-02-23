@@ -23,6 +23,8 @@ function hello_elementor_child_enqueue_scripts() {
 
 	wp_enqueue_script( 'custom-js', get_stylesheet_directory_uri() . '/js/script.js', array( 'jquery' ),'1.0.1',true );
 
+	wp_enqueue_style( 'controllo-codici-style', get_stylesheet_directory_uri() . '/controllo-codici/controllo-codici.css', [], '1.0.0' );
+
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
 
