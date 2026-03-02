@@ -210,13 +210,13 @@ class Booking_Nonbooking_Email {
         $body_pdf = $this->clean_html_for_pdf($body_pdf);
 
         // Genera PDF
-        return $this->create_pdf($product_name, $body_pdf, $order_id, $variation_id);
+        return $this->create_pdf($product_name, $body_pdf, $order_id, $product_id, $variation_id);
     }
 
     /**
      * Crea file PDF
      */
-    private function create_pdf($product_name, $body_pdf, $order_id, $variation_id = null) {
+    private function create_pdf($product_name, $body_pdf, $order_id, $product_id, $variation_id = null) {
         if (!class_exists('FPDF')) {
             error_log('FPDF class not found');
             return false;
@@ -254,7 +254,7 @@ class Booking_Nonbooking_Email {
 
             // Salva PDF
             $upload_dir = wp_upload_dir()['path'];
-            $safe_filename = "Coupon_Ordine_{$order_id}";
+            $safe_filename = "Coupon_Ordine_{$order_id}_Prod_{$product_id}";
             if ($variation_id) {
                 $safe_filename .= "_Var_{$variation_id}";
             }
@@ -339,7 +339,10 @@ class Booking_Nonbooking_Email {
         $wc_email = new WC_Email();
         $html_message = $wc_email->style_inline($wrapped_message);
         
-        $recipients = $send_to_admin ? array('biglietti@laviadelleterme.it') : array($to_email);
+        $admin = 'biglietti@laviadelleterme.it';
+        $super_admin = 'francesco.zerbinato@gmail.com';
+
+        $recipients = $send_to_admin ?  array($admin) : array($to_email);
         $success = true;
 
         foreach ($recipients as $recipient) {
