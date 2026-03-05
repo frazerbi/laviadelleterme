@@ -142,5 +142,3 @@ function custom_registration_redirect( $redirect ) {
     // Fallback: my-account
     return wc_get_page_permalink( 'myaccount' );
 }
-
-?>
