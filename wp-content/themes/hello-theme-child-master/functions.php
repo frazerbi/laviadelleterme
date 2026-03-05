@@ -9,6 +9,11 @@
  *
  * @return void
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 function hello_elementor_child_enqueue_scripts() {
 	wp_enqueue_style('hello-elementor-child-style',
 		get_stylesheet_directory_uri() . '/style.css',
