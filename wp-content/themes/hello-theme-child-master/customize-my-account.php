@@ -36,6 +36,11 @@ add_filter( 'login_url', 'custom_login_url', 10, 3 );
  * escludendo la pagina di recupero password
  */
 function reindirizza_utenti_non_loggati_myaccount() {
+    // Non interferire con le richieste AJAX
+    if ( wp_doing_ajax() || isset( $_GET['wc-ajax'] ) ) {
+        return;
+    }
+
     // Controlla se siamo in una pagina my-account
     if (is_page('my-account') || (strpos($_SERVER['REQUEST_URI'], '/my-account/') !== false)) {
         
