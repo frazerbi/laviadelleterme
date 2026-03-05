@@ -102,4 +102,45 @@ function custom_login_redirect( $redirect, $user ) {
     return wc_get_page_permalink( 'myaccount' );
 }
 
+add_filter( 'woocommerce_registration_redirect', 'custom_registration_redirect', 10, 1 );
+function custom_registration_redirect( $redirect ) {
+
+    // Controlla parametri redirect espliciti
+    $redirect_param = '';
+    if ( isset( $_REQUEST['redirect'] ) && !empty( $_REQUEST['redirect'] ) ) {
+        $redirect_param = wp_unslash( $_REQUEST['redirect'] );
+    } elseif ( isset( $_REQUEST['redirect_to'] ) && !empty( $_REQUEST['redirect_to'] ) ) {
+        $redirect_param = wp_unslash( $_REQUEST['redirect_to'] );
+    }
+
+    if ( !empty( $redirect_param ) ) {
+        $full_url = ( strpos( $redirect_param, 'http' ) === 0 )
+            ? esc_url_raw( $redirect_param )
+            : home_url( esc_url_raw( $redirect_param ) );
+
+        if ( strpos( $full_url, home_url() ) !== false ) {
+            return $full_url;
+        }
+    }
+
+    // Usa il referer per capire da dove proviene l'utente
+    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+
+    if ( !empty( $referer ) && strpos( $referer, home_url() ) !== false ) {
+        // Se era nel checkout, rimanda al checkout
+        if ( strpos( $referer, '/checkout' ) !== false ) {
+            return wc_get_checkout_url();
+        }
+        // Se era nella my-account o nella pagina di login/registrazione, rimanda alla my-account
+        if ( strpos( $referer, '/my-account' ) !== false || strpos( $referer, '/login-e-registrazione' ) !== false ) {
+            return wc_get_page_permalink( 'myaccount' );
+        }
+        // In tutti gli altri casi, rimanda alla pagina di provenienza
+        return $referer;
+    }
+
+    // Fallback: my-account
+    return wc_get_page_permalink( 'myaccount' );
+}
+
 ?>
