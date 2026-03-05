@@ -27,6 +27,7 @@ function hello_elementor_child_enqueue_scripts() {
 
 	if ( is_wc_endpoint_url( 'order-received' ) ) {
 		wp_enqueue_style( 'thankyou-style', get_stylesheet_directory_uri() . '/thankyou/thankyou.css', [], '1.0.0' );
+		wp_enqueue_script( 'thankyou-js', get_stylesheet_directory_uri() . '/thankyou/thankyou.js', [], '1.0.0', true );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
