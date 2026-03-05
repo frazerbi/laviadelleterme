@@ -51,8 +51,8 @@
 				addrSpan.className = 'address-customer-address';
 				addrSpan.textContent = addrLine;
 
-				address.insertBefore( addrSpan, firstP || null );
 				address.insertBefore( nameSpan, firstP || null );
+				address.insertBefore( addrSpan, firstP || null );
 			}
 		}
 

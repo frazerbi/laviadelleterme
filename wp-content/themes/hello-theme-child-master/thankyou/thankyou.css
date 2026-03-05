@@ -26,7 +26,7 @@
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 1.3em;
-	color: var(--e-global-color-secondary);
+	color: inherit
 }
 
 .woocommerce-order * {
@@ -107,7 +107,7 @@
 	display: block;
 	font-size: 0.95rem;
 	font-weight: 700;
-	color: var(--e-global-color-secondary);
+	color: inherit;
 	margin-top: 0.35rem;
 	text-transform: none;
 	letter-spacing: 0;
@@ -176,13 +176,13 @@
 .woocommerce-table--order-details .product-total .woocommerce-Price-amount {
 	font-size: 1.2rem;
 	font-weight: 700;
-	color: var(--e-global-color-secondary);
+	color: inherit
 }
 
 /* Nome prodotto */
 .woocommerce-table--order-details .product-name a {
-	font-size: 1rem;
-	font-weight: 700;
+	font-size: 1.2rem;
+	font-weight: 600;
 	color: var(--e-global-color-secondary) !important;
 	text-decoration: none !important;
 }
@@ -235,7 +235,7 @@
 	display: inline-flex;
 	align-items: center;
 	background: var(--e-global-color-29fcec7);
-	color: var(--e-global-color-text);
+	color: inherit;
 	font-size: 0.75rem;
 	font-weight: 600;
 	padding: 0.2rem 0.55rem;
@@ -261,7 +261,7 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
-	color: var(--e-global-color-text);
+	color: inherit;
 	margin-bottom: 0.5rem;
 }
 
@@ -302,14 +302,14 @@
 	display: flex;
 	align-items: center;
 	padding: 0.4rem 0.75rem !important;
-	font-family: 'Courier New', Courier, monospace;
+	font-family: inherit;
 	font-size: 0.88rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	border: none !important;
 	background: transparent;
-	font-family: inherit;
 	color: inherit !important;
+	background-color: white !important;
 }
 
 /* ============================================================
@@ -333,7 +333,7 @@
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	color: var(--e-global-color-text);
+	color: inherit;
 	margin-bottom: 0.1rem;
 }
 
@@ -341,7 +341,6 @@
 	display: flex;
 	align-items: center;
 	gap: 0.35rem;
-	background: var(--e-global-color-29fcec7);
 	border: 1px solid rgba(66, 66, 66, 0.12);
 	border-radius: 20px;
 	padding: 0.3rem 0.85rem 0.3rem 0.7rem;
@@ -349,7 +348,7 @@
 }
 
 .woocommerce-table--order-details .wc-item-meta li strong {
-	color: var(--e-global-color-text);
+	color: inherit;
 	font-weight: 500;
 	font-size: 0.78rem;
 }
@@ -357,7 +356,7 @@
 .woocommerce-table--order-details .wc-item-meta li p {
 	margin: 0 !important;
 	font-weight: 600;
-	color: var(--e-global-color-secondary);
+	color: inherit;
 }
 
 /* ============================================================
@@ -366,13 +365,13 @@
 
 .woocommerce-table--order-details tfoot {
 	display: block;
-	padding: 0 1rem;
 }
 
 .woocommerce-table--order-details tfoot tr {
 	display: flex;
 	justify-content: space-between;
 	padding: 0.4rem 0;
+	font-size: 1.2rem;
 }
 
 .woocommerce-table--order-details tfoot th,
@@ -380,8 +379,7 @@
 	border: none !important;
 	padding: 0 !important;
 	font-size: 0.9rem;
-	color: var(--e-global-color-text);
-	background: none;
+	color: inherit;
 }
 
 /* Nascondi subtotale (ridondante) */
@@ -398,9 +396,9 @@
 
 .woocommerce-table--order-details tfoot tr:last-child th,
 .woocommerce-table--order-details tfoot tr:last-child td {
-	font-size: 1.1rem;
+	font-size: 1.2rem;
 	font-weight: 700;
-	color: var(--e-global-color-secondary);
+	color: inherit;
 }
 
 /* ============================================================
@@ -416,7 +414,7 @@
 	border: none !important;
 	font-style: normal;
 	font-family: inherit;
-	color: var(--e-global-color-secondary);
+	color: inherit;
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
@@ -427,29 +425,28 @@
 	font-weight: 600;
 }
 
-/* Indirizzo: stesso layout label di telefono/email */
+/* Indirizzo: stesso layout icona di telefono/email */
 .address-customer-address {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	gap: 0.5rem;
 }
 
 .address-customer-address::before {
-	content: "Indirizzo";
-	font-size: 0.72rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--e-global-color-text);
-	white-space: nowrap;
+	content: "";
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E") no-repeat center;
+	background-size: contain;
 	flex-shrink: 0;
 }
 
-/* Phone e email: layout a riga con label a sinistra */
+/* Phone e email: layout a riga con icona a sinistra */
 .woocommerce-customer-details--phone,
 .woocommerce-customer-details--email {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	gap: 0.5rem;
 	margin: 0 !important;
 	font-size: 0.95rem;
@@ -458,19 +455,20 @@
 
 .woocommerce-customer-details--phone::before,
 .woocommerce-customer-details--email::before {
-	font-size: 0.72rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--e-global-color-text);
-	white-space: nowrap;
+	content: "";
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 	flex-shrink: 0;
 }
 
 .woocommerce-customer-details--phone::before {
-	content: "Telefono";
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/%3E%3C/svg%3E");
 }
 
 .woocommerce-customer-details--email::before {
-	content: "Email";
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='M2 7l10 7 10-7'/%3E%3C/svg%3E");
 }
