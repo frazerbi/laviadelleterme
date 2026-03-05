@@ -153,7 +153,7 @@
 	display: block;
 }
 .woocommerce-table--order-details tbody .woocommerce-table__line-item {
-	padding-top: 0;
+	padding-top: 0 !important;
 } 
 .woocommerce-table--order-details tbody tr {
 	display: flex;
