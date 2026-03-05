@@ -5,7 +5,7 @@
 
 // Cambia il titolo H1 Elementor hardcoded "Pagamento" → "Ordine ricevuto!" lato server
 add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
-	if ( $widget->get_name() === 'heading' && is_wc_endpoint_url( 'order-received' ) ) {
+	if ( $widget->get_name() === 'heading' && is_wc_endpoint_url( 'order-received' ) && is_user_logged_in() ) {
 		$content = str_replace( 'Pagamento', 'Ordine ricevuto!', $content );
 	}
 	return $content;
