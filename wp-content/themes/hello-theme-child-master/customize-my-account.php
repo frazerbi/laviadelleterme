@@ -57,27 +57,49 @@ function reindirizza_utenti_non_loggati_myaccount() {
 // Aggiungi l'azione all'hook template_redirect
 add_action('template_redirect', 'reindirizza_utenti_non_loggati_myaccount');
 
-/**
- * Reindirizza utenti già loggati dalla pagina login-e-registrazione alla pagina my-account
- */
-function reindirizza_utenti_loggati_login_page() {
+// Disabilita la richiesta di conferma email admin (causa pagine bianche su login custom)
+add_filter( 'admin_email_check_interval', '__return_false' );
 
-    // Non applicare il redirect in modalità anteprima di Elementor o nell'editor
-    if (isset($_GET['elementor-preview']) || 
-        (isset($_REQUEST['action']) && $_REQUEST['action'] == 'elementor') ||
-        is_admin()) {
-        return;
+add_filter( 'woocommerce_login_redirect', 'custom_login_redirect', 10, 2 );
+function custom_login_redirect( $redirect, $user ) {
+
+    // Controlla parametri redirect espliciti (WooCommerce usa 'redirect', WordPress usa 'redirect_to')
+    $redirect_param = '';
+    if ( isset( $_REQUEST['redirect'] ) && !empty( $_REQUEST['redirect'] ) ) {
+        $redirect_param = wp_unslash( $_REQUEST['redirect'] );
+    } elseif ( isset( $_REQUEST['redirect_to'] ) && !empty( $_REQUEST['redirect_to'] ) ) {
+        $redirect_param = wp_unslash( $_REQUEST['redirect_to'] );
     }
 
-    // Verifica se siamo nella pagina login-e-registrazione
-    if (is_page('login-e-registrazione') || $_SERVER['REQUEST_URI'] == '/login-e-registrazione/') {
-        // Verifica se l'utente è già loggato
-        if (is_user_logged_in()) {
-            // Reindirizza alla pagina my-account
-            wp_redirect(home_url('/my-account/'));
-            exit;
+    if ( !empty( $redirect_param ) ) {
+        // Gestisci sia URL assoluti che relativi dello stesso sito
+        $full_url = ( strpos( $redirect_param, 'http' ) === 0 )
+            ? esc_url_raw( $redirect_param )
+            : home_url( esc_url_raw( $redirect_param ) );
+
+        if ( strpos( $full_url, home_url() ) !== false ) {
+            return $full_url;
         }
     }
+
+    // Usa il referer per capire da dove proviene l'utente
+    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+
+    if ( !empty( $referer ) && strpos( $referer, home_url() ) !== false ) {
+        // Se era nel checkout, rimanda al checkout
+        if ( strpos( $referer, '/checkout' ) !== false ) {
+            return wc_get_checkout_url();
+        }
+        // Se era nella my-account o nella pagina di login, rimanda alla my-account
+        if ( strpos( $referer, '/my-account' ) !== false || strpos( $referer, '/login-e-registrazione' ) !== false ) {
+            return wc_get_page_permalink( 'myaccount' );
+        }
+        // In tutti gli altri casi, rimanda alla pagina di provenienza
+        return $referer;
+    }
+
+    // Fallback: my-account
+    return wc_get_page_permalink( 'myaccount' );
 }
-// Aggiungi l'azione all'hook template_redirect
-add_action('template_redirect', 'reindirizza_utenti_loggati_login_page');
+
+?>
