@@ -28,12 +28,6 @@ if ( ! defined( 'LOGO_TERME_FOOTER_PATH' ) ) {
     define( 'LOGO_TERME_FOOTER_PATH', PLUGIN_SKIANET_PATH . '/assets/img/footer-coupon.JPG' );
 }
 
-add_filter('auto_update_core', '__return_true');
-add_filter('automatic_updates_is_vcs_checkout', '__return_false', 1);
-add_filter('auto_update_plugin', '__return_true');
-add_filter('auto_update_theme', '__return_true');
-add_filter('auto_update_translation', '__return_true');
-
 require_once PLUGIN_SKIANET_PATH.'/vendor/autoload.php';
 
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-api.php';
