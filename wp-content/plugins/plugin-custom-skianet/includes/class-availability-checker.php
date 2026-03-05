@@ -154,7 +154,6 @@ class Availability_Checker {
             }
             
             // Chiama API TermeGest per il mese
-            // $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $location);
             $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
 
             // LOG: Struttura dati

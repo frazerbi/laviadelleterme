@@ -106,12 +106,24 @@ On `woocommerce_payment_complete`:
 
 ### Assets Pipeline (plugin-custom-skianet)
 
-- Source CSS: `assets/css/skianet-style.less` (LESS)
-- Source JS: `assets/js/skianet-script.js`
-- Build output: minified `.min.css` and `.min.js` with sourcemaps
+- Source CSS: `assets/css/booking-form.css`, `assets/css/booking-only-form.css`, `assets/css/pdp.css`
+- Source JS: `assets/js/src/booking-form.js`, `assets/js/src/booking-only-form.js`
+- Build output: minified `.min.css` and `.min.js` in `assets/js/dist/` with sourcemaps
 - Build tool: esbuild (`build.js`) + PostCSS with prefix-selector
-- JS dependencies: `vanilla-calendar-pro` (bundled), Select2 and FullCalendar loaded from CDN
+- JS dependencies: `vanilla-calendar-pro` (bundled via npm)
+
+### Vendor in Production
+
+The `vendor/` directory must be generated with `--no-dev` for production to exclude dev-only tools:
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (pint), `phpstan/`, `veewee/`.
 
 ### Disabled/Legacy Components
 
-Files prefixed with `__` or commented out in plugin entry points are disabled legacy code. The `__components/` directory contains old shortcode-based components replaced by the current architecture.
+- Files prefixed with `__` are disabled legacy code.
+- `__components/` directory (old shortcode-based components) has been deleted.
+- `assets/js/skianet-script.js` (old FullCalendar availability system) has been deleted.

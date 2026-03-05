@@ -37,8 +37,6 @@ class Booking_Only_Handler {
         // Registra handler AJAX
         add_action('wp_ajax_submit_booking_only_ajax', [$this, 'handle_booking_only_submission']);
         add_action('wp_ajax_nopriv_submit_booking_only_ajax', [$this, 'handle_booking_only_submission']);
-
-        add_action('wp_ajax_get_user_purchase_codes', [$this, 'get_user_purchase_codes']);
         
     }
     
