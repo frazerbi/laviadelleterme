@@ -29,6 +29,11 @@
 	color: var(--e-global-color-secondary);
 }
 
+.woocommerce-order * {
+	font-family: inherit;
+	color: inherit !important;
+}
+
 .woocommerce-thankyou-order-received  { grid-area: notice; }
 .woocommerce-order-overview           { grid-area: overview; }
 .woocommerce-order-details            { grid-area: details; }
@@ -96,6 +101,13 @@
 	display: none !important;
 }
 
+/* Mostra solo Numero ordine e Data */
+.woocommerce-order-overview__email,
+.woocommerce-order-overview__total,
+.woocommerce-order-overview__payment-method {
+	display: none !important;
+}
+
 .woocommerce-order-overview li strong {
 	display: block;
 	font-size: 0.95rem;
@@ -112,11 +124,7 @@
 
 .woocommerce-order-details__title,
 .woocommerce-column__title {
-	font-size: 0.72rem !important;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	color: var(--e-global-color-text) !important;
+	font-size: 2rem !important;
 	margin-bottom: 1rem !important;
 }
 
@@ -157,12 +165,6 @@
 	background: var(--e-global-color-31904c4d);
 	border-bottom: 1px solid rgba(66, 66, 66, 0.1);
 	margin-bottom: 0;
-}
-
-.woocommerce-table--order-details tbody td {
-	display: block;
-	border: none !important;
-	padding: 1.5rem !important;
 }
 
 .woocommerce-table--order-details .product-name {
@@ -240,20 +242,15 @@
 	overflow: hidden;
 	background: rgba(0, 116, 160, 0.06);
 }
-
+.license-codes-table tr {
+	padding: 0 !important;
+}
 .license-codes-table tr.order-gap {
 	display: none;
 }
 
 .license-codes-table th {
-	display: flex;
-	align-items: center;
-	padding: 0.4rem 0.6rem !important;
-	background: var(--e-global-color-50b7ea4);
-	color: var(--e-global-color-31904c4d);
-	font-size: 0.7rem;
-	font-weight: 700;
-	border: none !important;
+	display: none;
 }
 
 .license-codes-table td {
@@ -263,10 +260,11 @@
 	font-family: 'Courier New', Courier, monospace;
 	font-size: 0.88rem;
 	font-weight: 700;
-	color: var(--e-global-color-primary);
 	letter-spacing: 0.06em;
 	border: none !important;
 	background: transparent;
+	font-family: inherit;
+	color: inherit !important;
 }
 
 /* ============================================================
@@ -352,18 +350,59 @@
    Indirizzo di fatturazione
    ============================================================ */
 
+/* Mixin label riutilizzato via custom property */
 .woocommerce-customer-details address {
 	font-size: 0.95rem;
-	line-height: 1.8;
-	padding: 0;
-	background: none;
-	border: none;
+	line-height: 1.6;
+	padding: 0 !important;
+	background: none !important;
+	border: none !important;
 	font-style: normal;
+	font-family: inherit;
+	color: var(--e-global-color-secondary);
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+/* Label "Indirizzo" prima del testo indirizzo/nome */
+.woocommerce-customer-details address::before {
+	content: "Indirizzo";
+	display: block;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--e-global-color-text);
+	margin-bottom: -0.75rem;
+}
+
+/* Phone e email: layout a riga con label a sinistra */
+.woocommerce-customer-details--phone,
+.woocommerce-customer-details--email {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin: 0 !important;
+	font-size: 0.95rem;
 	color: var(--e-global-color-secondary);
 }
 
-.woocommerce-customer-details--phone,
-.woocommerce-customer-details--email {
-	margin: 0.25rem 0 0 !important;
+.woocommerce-customer-details--phone::before,
+.woocommerce-customer-details--email::before {
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
 	color: var(--e-global-color-text);
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.woocommerce-customer-details--phone::before {
+	content: "Telefono";
+}
+
+.woocommerce-customer-details--email::before {
+	content: "Email";
 }
