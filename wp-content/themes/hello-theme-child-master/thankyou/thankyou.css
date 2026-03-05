@@ -1,0 +1,129 @@
+/* ============================================================
+   Thank You page styles
+   ============================================================ */
+
+/* Nascondi il sottotitolo Elementor della checkout page ("Completa il pagamento...") */
+.woocommerce-order .elementor-widget-text-editor,
+.woocommerce-order ~ .elementor-widget-text-editor {
+	display: none !important;
+}
+
+/* ---- Messaggio di conferma principale ---- */
+.woocommerce-thankyou-order-received {
+	font-size: 1.4rem !important;
+	font-weight: 600;
+	text-align: center;
+	margin-bottom: 2rem !important;
+	color: #333;
+}
+
+/* ---- Order overview (numero ordine, data, email, totale, metodo) ---- */
+.woocommerce-order-overview {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: center;
+	list-style: none !important;
+	padding: 1.5rem !important;
+	margin: 0 0 2.5rem !important;
+	background: #f8f8f8;
+	border-radius: 8px;
+}
+
+.woocommerce-order-overview li {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0.75rem 1.25rem;
+	background: #fff;
+	border-radius: 6px;
+	border: 1px solid #e5e5e5;
+	min-width: 130px;
+	font-size: 0.85rem !important;
+}
+
+.woocommerce-order-overview li strong {
+	display: block;
+	font-size: 1.05rem;
+	font-weight: 700;
+	margin-top: 0.25rem;
+	color: #333;
+}
+
+/* ---- Sezione "Dettagli ordine" ---- */
+.woocommerce-order-details__title,
+.woocommerce-column__title {
+	font-size: 1.5rem !important;
+	margin-bottom: 1rem !important;
+}
+
+/* ---- Tabella prodotti ---- */
+.woocommerce-table--order-details thead th {
+	font-size: 0.9rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 0.75rem 1rem;
+	border-bottom: 2px solid #333;
+}
+
+.woocommerce-table--order-details tbody td {
+	padding: 1rem;
+	font-size: 0.95rem;
+	vertical-align: top;
+}
+
+/* Nome prodotto più leggibile */
+.woocommerce-table--order-details .product-name {
+	font-weight: 600;
+}
+
+/* ---- Codici licenza / meta prodotto ---- */
+.woocommerce-table--order-details .wc-item-meta,
+.woocommerce-table--order-details dl.variation {
+	margin-top: 0.5rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li,
+.woocommerce-table--order-details dl.variation dt,
+.woocommerce-table--order-details dl.variation dd {
+	font-size: 0.9rem;
+}
+
+/* Codici evidenziati */
+.woocommerce-table--order-details .wc-item-meta li p,
+.woocommerce-table--order-details .wc-item-meta li dd {
+	font-family: monospace;
+	font-size: 1rem;
+	font-weight: 700;
+	background: #f0f4ff;
+	border: 1px solid #c7d4ff;
+	border-radius: 4px;
+	padding: 0.2rem 0.5rem;
+	display: inline-block;
+	color: #2a4ab5;
+	letter-spacing: 0.05em;
+}
+
+/* ---- Totali ---- */
+.woocommerce-table--order-details tfoot th,
+.woocommerce-table--order-details tfoot td {
+	font-size: 1rem;
+	padding: 0.6rem 1rem;
+}
+
+.woocommerce-table--order-details tfoot tr:last-child th,
+.woocommerce-table--order-details tfoot tr:last-child td {
+	font-size: 1.2rem;
+	font-weight: 700;
+}
+
+/* ---- Indirizzo di fatturazione ---- */
+.woocommerce-customer-details address {
+	font-size: 1rem;
+	line-height: 1.7;
+	padding: 1.25rem 1.5rem;
+	background: #f8f8f8;
+	border-radius: 8px;
+	border: 1px solid #e5e5e5;
+}

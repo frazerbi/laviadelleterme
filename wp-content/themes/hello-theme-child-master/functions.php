@@ -25,9 +25,13 @@ function hello_elementor_child_enqueue_scripts() {
 
 	wp_enqueue_style( 'controllo-codici-style', get_stylesheet_directory_uri() . '/controllo-codici/controllo-codici.css', [], '1.0.0' );
 
+	if ( is_wc_endpoint_url( 'order-received' ) ) {
+		wp_enqueue_style( 'thankyou-style', get_stylesheet_directory_uri() . '/thankyou/thankyou.css', [], '1.0.0' );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
 
+require_once get_stylesheet_directory() . '/thankyou/thankyou.php';
 require_once  get_stylesheet_directory() . '/customize-my-account.php';
 require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB.php';
 require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB_promo.php';
