@@ -1,129 +1,312 @@
 /* ============================================================
-   Thank You page styles
+   Thank You page — redesign moderno
    ============================================================ */
 
-/* Nascondi il sottotitolo Elementor della checkout page ("Completa il pagamento...") */
-.woocommerce-order .elementor-widget-text-editor,
-.woocommerce-order ~ .elementor-widget-text-editor {
+/* ---- Nasconde il sottotitolo Elementor "Completa il pagamento..." ---- */
+/* (gestito anche via JS, questa è la copertura CSS) */
+.elementor-widget-woocommerce-checkout-page ~ .elementor-widget-text-editor {
 	display: none !important;
 }
 
-/* ---- Messaggio di conferma principale ---- */
+/* ============================================================
+   Messaggio di conferma
+   ============================================================ */
+
 .woocommerce-thankyou-order-received {
-	font-size: 1.4rem !important;
-	font-weight: 600;
+	font-size: 1.15rem !important;
+	font-weight: 500;
 	text-align: center;
+	color: #555;
 	margin-bottom: 2rem !important;
-	color: #333;
+	padding: 0 !important;
+	background: none !important;
+	border: none !important;
 }
 
-/* ---- Order overview (numero ordine, data, email, totale, metodo) ---- */
+/* ============================================================
+   Order overview (numero ordine, data, email, totale, metodo)
+   ============================================================ */
+
 .woocommerce-order-overview {
 	display: flex !important;
 	flex-wrap: wrap;
-	gap: 1rem;
-	justify-content: center;
+	gap: 0.75rem;
 	list-style: none !important;
-	padding: 1.5rem !important;
+	padding: 0 !important;
 	margin: 0 0 2.5rem !important;
-	background: #f8f8f8;
-	border-radius: 8px;
+	justify-content: center;
 }
 
 .woocommerce-order-overview li {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 0.75rem 1.25rem;
-	background: #fff;
-	border-radius: 6px;
-	border: 1px solid #e5e5e5;
-	min-width: 130px;
-	font-size: 0.85rem !important;
+	text-align: center;
+	padding: 1rem 1.25rem;
+	background: #f7f7f7;
+	border-radius: 10px;
+	border: 1px solid #ebebeb;
+	min-width: 120px;
+	font-size: 0.78rem;
+	color: #888;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.woocommerce-order-overview li::before {
+	display: none !important;
 }
 
 .woocommerce-order-overview li strong {
 	display: block;
-	font-size: 1.05rem;
+	font-size: 0.95rem;
 	font-weight: 700;
-	margin-top: 0.25rem;
-	color: #333;
+	color: #1a1a1a;
+	margin-top: 0.35rem;
+	text-transform: none;
+	letter-spacing: 0;
 }
 
-/* ---- Sezione "Dettagli ordine" ---- */
-.woocommerce-order-details__title,
-.woocommerce-column__title {
-	font-size: 1.5rem !important;
+/* ============================================================
+   Sezione "Dettagli ordine"
+   ============================================================ */
+
+.woocommerce-order-details__title {
+	font-size: 0.8rem !important;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: #aaa !important;
 	margin-bottom: 1rem !important;
 }
 
-/* ---- Tabella prodotti ---- */
-.woocommerce-table--order-details thead th {
-	font-size: 0.9rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 0.75rem 1rem;
-	border-bottom: 2px solid #333;
+/* ---- Trasforma la tabella in layout a card ---- */
+
+.woocommerce-table--order-details {
+	display: block !important;
+	border: none !important;
+}
+
+.woocommerce-table--order-details thead {
+	display: none !important;
+}
+
+.woocommerce-table--order-details tbody {
+	display: block;
+}
+
+.woocommerce-table--order-details tbody tr {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	background: #fff;
+	border: 1px solid #e8e8e8;
+	border-radius: 14px;
+	margin-bottom: 1rem;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+	overflow: hidden;
 }
 
 .woocommerce-table--order-details tbody td {
-	padding: 1rem;
-	font-size: 0.95rem;
-	vertical-align: top;
+	display: block;
+	border: none !important;
+	padding: 1.5rem !important;
 }
 
-/* Nome prodotto più leggibile */
+/* Colonna nome prodotto */
 .woocommerce-table--order-details .product-name {
-	font-weight: 600;
+	flex: 1;
 }
 
-/* ---- Codici licenza / meta prodotto ---- */
-.woocommerce-table--order-details .wc-item-meta,
-.woocommerce-table--order-details dl.variation {
-	margin-top: 0.5rem;
+/* Colonna prezzo */
+.woocommerce-table--order-details .product-total {
+	white-space: nowrap;
+	padding-top: 1.5rem !important;
+	padding-right: 1.5rem !important;
+	padding-left: 0 !important;
 }
 
-.woocommerce-table--order-details .wc-item-meta li,
-.woocommerce-table--order-details dl.variation dt,
-.woocommerce-table--order-details dl.variation dd {
-	font-size: 0.9rem;
-}
-
-/* Codici evidenziati */
-.woocommerce-table--order-details .wc-item-meta li p,
-.woocommerce-table--order-details .wc-item-meta li dd {
-	font-family: monospace;
-	font-size: 1rem;
+.woocommerce-table--order-details .product-total .woocommerce-Price-amount {
+	font-size: 1.25rem;
 	font-weight: 700;
-	background: #f0f4ff;
-	border: 1px solid #c7d4ff;
-	border-radius: 4px;
-	padding: 0.2rem 0.5rem;
-	display: inline-block;
-	color: #2a4ab5;
-	letter-spacing: 0.05em;
+	color: #1a1a1a;
 }
 
-/* ---- Totali ---- */
+/* Nome prodotto */
+.woocommerce-table--order-details .product-name a {
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #1a1a1a !important;
+	text-decoration: none !important;
+}
+
+/* Badge quantità */
+.woocommerce-table--order-details .product-quantity {
+	display: inline-flex;
+	align-items: center;
+	background: #efefef;
+	color: #555;
+	font-size: 0.78rem;
+	font-weight: 600;
+	padding: 0.2rem 0.55rem;
+	border-radius: 20px;
+	margin-left: 0.4rem;
+	vertical-align: middle;
+}
+
+/* ---- Codici licenza — stile ticket ---- */
+
+.license-codes-table {
+	display: block;
+	width: auto !important;
+	margin-top: 1rem;
+}
+
+.license-codes-table tbody {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.license-codes-table tr:not(.order-gap) {
+	display: inline-flex;
+	align-items: stretch;
+	border: 1.5px solid #c7d4ff;
+	border-radius: 8px;
+	overflow: hidden;
+	background: #f0f4ff;
+}
+
+.license-codes-table tr.order-gap {
+	display: none;
+}
+
+.license-codes-table th {
+	display: flex;
+	align-items: center;
+	padding: 0.4rem 0.6rem !important;
+	background: #c7d4ff;
+	color: #2a4ab5;
+	font-size: 0.7rem;
+	font-weight: 700;
+	border: none !important;
+}
+
+.license-codes-table td {
+	display: flex;
+	align-items: center;
+	padding: 0.4rem 0.75rem !important;
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 0.88rem;
+	font-weight: 700;
+	color: #2a4ab5;
+	letter-spacing: 0.06em;
+	border: none !important;
+	background: transparent;
+}
+
+/* ---- Meta prenotazione (Location, Data, Orario) — chips ---- */
+
+.woocommerce-table--order-details .wc-item-meta {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.85rem;
+	list-style: none !important;
+	padding: 0 !important;
+}
+
+.woocommerce-table--order-details .wc-item-meta li {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	background: #fafafa;
+	border: 1px solid #e5e5e5;
+	border-radius: 20px;
+	padding: 0.3rem 0.85rem 0.3rem 0.7rem;
+	font-size: 0.85rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li strong {
+	color: #999;
+	font-weight: 500;
+	font-size: 0.8rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li p {
+	margin: 0 !important;
+	font-weight: 600;
+	color: #1a1a1a;
+}
+
+/* ============================================================
+   Tfoot — riepilogo totali
+   ============================================================ */
+
+.woocommerce-table--order-details tfoot {
+	display: block;
+	padding: 0 1rem;
+}
+
+.woocommerce-table--order-details tfoot tr {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.4rem 0;
+}
+
 .woocommerce-table--order-details tfoot th,
 .woocommerce-table--order-details tfoot td {
-	font-size: 1rem;
-	padding: 0.6rem 1rem;
+	border: none !important;
+	padding: 0 !important;
+	font-size: 0.9rem;
+	color: #666;
+	background: none;
+}
+
+/* Nascondi subtotale (ridondante con il totale) */
+.woocommerce-table--order-details tfoot tr:first-child {
+	display: none !important;
+}
+
+/* Riga totale finale */
+.woocommerce-table--order-details tfoot tr:last-child {
+	margin-top: 0.5rem;
+	padding-top: 0.75rem;
+	border-top: 2px solid #1a1a1a;
 }
 
 .woocommerce-table--order-details tfoot tr:last-child th,
 .woocommerce-table--order-details tfoot tr:last-child td {
-	font-size: 1.2rem;
+	font-size: 1.15rem;
 	font-weight: 700;
+	color: #1a1a1a;
 }
 
-/* ---- Indirizzo di fatturazione ---- */
+/* ============================================================
+   Sezione "Indirizzo di fatturazione"
+   ============================================================ */
+
+.woocommerce-column__title {
+	font-size: 0.8rem !important;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: #aaa !important;
+	margin-bottom: 1rem !important;
+}
+
 .woocommerce-customer-details address {
-	font-size: 1rem;
-	line-height: 1.7;
+	font-size: 0.95rem;
+	line-height: 1.8;
 	padding: 1.25rem 1.5rem;
-	background: #f8f8f8;
-	border-radius: 8px;
-	border: 1px solid #e5e5e5;
+	background: #fafafa;
+	border-radius: 10px;
+	border: 1px solid #ebebeb;
+	font-style: normal;
+}
+
+.woocommerce-customer-details--phone,
+.woocommerce-customer-details--email {
+	margin: 0.25rem 0 0 !important;
+	color: #555;
 }
