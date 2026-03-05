@@ -121,6 +121,19 @@
 }
 
 /* ============================================================
+   Card container per order-details e customer-details
+   ============================================================ */
+
+.woocommerce-order-details,
+.woocommerce-customer-details {
+	background: var(--e-global-color-31904c4d);
+	border: 1px solid rgba(66, 66, 66, 0.12);
+	border-radius: 14px;
+	padding: 1.5rem;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 5%);
+}
+
+/* ============================================================
    Tabella prodotti — layout card
    ============================================================ */
 
@@ -142,11 +155,8 @@
 	align-items: flex-start;
 	gap: 1rem;
 	background: var(--e-global-color-31904c4d);
-	border: 1px solid rgba(66, 66, 66, 0.12);
-	border-radius: 14px;
-	margin-bottom: 1rem;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-	overflow: hidden;
+	border-bottom: 1px solid rgba(66, 66, 66, 0.1);
+	margin-bottom: 0;
 }
 
 .woocommerce-table--order-details tbody td {
@@ -202,6 +212,18 @@
 	display: block;
 	width: auto !important;
 	margin-top: 1rem;
+}
+
+/* Etichetta intro generata via CSS */
+.license-codes-table::before {
+	content: "Codici per la prenotazione:";
+	display: block;
+	font-size: 0.78rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--e-global-color-text);
+	margin-bottom: 0.5rem;
 }
 
 .license-codes-table tbody {
@@ -333,10 +355,9 @@
 .woocommerce-customer-details address {
 	font-size: 0.95rem;
 	line-height: 1.8;
-	padding: 1.25rem 1.5rem;
-	background: var(--e-global-color-29fcec7);
-	border-radius: 10px;
-	border: 1px solid rgba(66, 66, 66, 0.12);
+	padding: 0;
+	background: none;
+	border: none;
 	font-style: normal;
 	color: var(--e-global-color-secondary);
 }
