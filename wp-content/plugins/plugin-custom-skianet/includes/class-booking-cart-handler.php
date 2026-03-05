@@ -213,13 +213,22 @@ class Booking_Cart_Handler {
      * Formatta meta data per visualizzazione
      */
     public function format_order_item_meta($formatted_meta, $item) {
-        // Nascondi campi interni (quelli che iniziano con _)
+        $is_booking_item = $item->get_meta('_booking_id') !== '';
+
+        $visible_keys = ['Location', 'Data Prenotazione', 'Orario'];
+
         foreach ($formatted_meta as $key => $meta) {
+            // Nascondi sempre i campi interni (iniziano con _)
             if (strpos($meta->key, '_') === 0) {
+                unset($formatted_meta[$key]);
+                continue;
+            }
+            // Per i prodotti prenotazione mostra solo i campi selezionati
+            if ($is_booking_item && ! in_array($meta->key, $visible_keys, true)) {
                 unset($formatted_meta[$key]);
             }
         }
-        
+
         return $formatted_meta;
     }
 
