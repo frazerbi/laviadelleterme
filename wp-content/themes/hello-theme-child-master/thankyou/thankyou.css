@@ -26,7 +26,7 @@
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 1.3em;
-	color: inherit
+	color: var(--e-global-color-secondary);
 }
 
 .woocommerce-order * {
@@ -152,7 +152,9 @@
 .woocommerce-table--order-details tbody {
 	display: block;
 }
-
+.woocommerce-table--order-details tbody .woocommerce-table__line-item {
+	padding-top: 0;
+} 
 .woocommerce-table--order-details tbody tr {
 	display: flex;
 	align-items: flex-start;
@@ -422,7 +424,9 @@
 
 /* Nome cliente */
 .address-customer-name {
+	padding-top: 15px;
 	font-weight: 600;
+	font-size: 1.2rem;
 }
 
 /* Indirizzo: stesso layout icona di telefono/email */
@@ -433,7 +437,7 @@
 }
 
 .address-customer-address::before {
-	content: "";
+	content: "" !important;
 	display: inline-block;
 	width: 1rem;
 	height: 1rem;
@@ -455,7 +459,7 @@
 
 .woocommerce-customer-details--phone::before,
 .woocommerce-customer-details--email::before {
-	content: "";
+	content: "" !important;
 	display: inline-block;
 	width: 1rem;
 	height: 1rem;
