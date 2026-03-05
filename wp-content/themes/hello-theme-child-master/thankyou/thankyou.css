@@ -254,9 +254,8 @@
 	margin-top: 1rem;
 }
 
-/* Etichetta intro generata via CSS */
+/* Etichetta dinamica via JS (.is-booked / .is-pending) */
 .license-codes-table::before {
-	content: "Codici per la prenotazione:";
 	display: block;
 	font-size: 0.78rem;
 	font-weight: 600;
@@ -264,6 +263,14 @@
 	letter-spacing: 0.06em;
 	color: var(--e-global-color-text);
 	margin-bottom: 0.5rem;
+}
+
+.license-codes-table.is-booked::before {
+	content: "Codici prenotati";
+}
+
+.license-codes-table.is-pending::before {
+	content: "Codici per la prenotazione";
 }
 
 .license-codes-table tbody {
@@ -316,6 +323,18 @@
 	margin-top: 0.85rem;
 	list-style: none !important;
 	padding: 0 !important;
+}
+
+.woocommerce-table--order-details .wc-item-meta::before {
+	content: "Info prenotazione";
+	display: block;
+	width: 100%;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--e-global-color-text);
+	margin-bottom: 0.1rem;
 }
 
 .woocommerce-table--order-details .wc-item-meta li {
@@ -403,16 +422,27 @@
 	gap: 1rem;
 }
 
-/* Label "Indirizzo" prima del testo indirizzo/nome */
-.woocommerce-customer-details address::before {
+/* Nome cliente */
+.address-customer-name {
+	font-weight: 600;
+}
+
+/* Indirizzo: stesso layout label di telefono/email */
+.address-customer-address {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+}
+
+.address-customer-address::before {
 	content: "Indirizzo";
-	display: block;
 	font-size: 0.72rem;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
 	color: var(--e-global-color-text);
-	margin-bottom: -0.75rem;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 /* Phone e email: layout a riga con label a sinistra */
