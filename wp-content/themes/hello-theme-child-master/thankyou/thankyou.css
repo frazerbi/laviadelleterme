@@ -9,6 +9,40 @@
 }
 
 /* ============================================================
+   Layout due colonne: order-details | customer-details
+   ============================================================ */
+
+.woocommerce-order {
+	display: grid;
+	grid-template-columns: 3fr 2fr;
+	grid-template-areas:
+		"notice   notice"
+		"overview overview"
+		"details  customer"
+		"ld       ld";
+	gap: 0 2.5rem;
+	align-items: start;
+}
+
+.woocommerce-thankyou-order-received  { grid-area: notice; }
+.woocommerce-order-overview           { grid-area: overview; }
+.woocommerce-order-details            { grid-area: details; }
+.woocommerce-customer-details         { grid-area: customer; }
+.wc_ld_description                    { grid-area: ld; }
+
+@media ( max-width: 768px ) {
+	.woocommerce-order {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"notice"
+			"overview"
+			"details"
+			"customer"
+			"ld";
+	}
+}
+
+/* ============================================================
    Messaggio di conferma
    ============================================================ */
 
