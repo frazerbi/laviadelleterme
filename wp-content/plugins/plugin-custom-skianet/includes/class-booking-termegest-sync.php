@@ -80,11 +80,14 @@ class Booking_TermeGest_Sync {
     private function sync_booking_item($order, $item, $has_prenotazione_function) {
         $item_id = $item->get_id();
         $booking_id = $item->get_meta('_booking_id');
-        
+
         error_log("Sync BOOKING item {$item_id} - Prenotazione {$booking_id}");
-        
-        // Recupera codici
-        $codes = $this->get_license_codes_for_item($item);
+
+        // Recupera codici direttamente dal DB (usa_db_query = true).
+        // La lettura da order item meta (_license_code_ids) fallisce perché WC License
+        // Delivery scrive su wc_ld_license_codes bypassando la WP object cache,
+        // quindi l'oggetto WC_Order_Item in memoria risulta ancora vuoto nella stessa request.
+        $codes = $this->get_license_codes_for_item($item, true);
 
         error_log("=== CODICI RECUPERATI PER ITEM {$item_id} ===");
         error_log("Totale codici: " . count($codes));
