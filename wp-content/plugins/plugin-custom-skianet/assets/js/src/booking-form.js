@@ -295,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!this.value) {
             disableFieldsFrom('time');
         } else {
+            filterTimeSlotsByTicketType(this.value);
             scrollToNext(timeSlotField.closest('.form-group'));
         }
     });
@@ -373,25 +374,75 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Disabilita "giornaliero" se nessuno slot disponibile ha le categorie p3 o p4
-     * P3 = Ingresso Lun-Ven Giornaliero, P4 = Ingresso Lun-Dom Giornaliero
+     * Disabilita "giornaliero" se nessuno slot disponibile ha le categorie p3 o p4,
+     * disabilita "serale" se nessuno slot disponibile ha categoria v3 con ora >= 18.
      */
     function handleTicketTypeByCategories(slots) {
         const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
-        if (!giornalieroOption) return;
+        if (giornalieroOption) {
+            const hasGiornaliero = slots.some(slot => {
+                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+                return categorie.includes('p3') || categorie.includes('p4');
+            });
 
-        const hasGiornaliero = slots.some(slot => {
-            const categorie = (slot.categorie || '').toLowerCase().split(',');
-            return categorie.includes('p3') || categorie.includes('p4');
-        });
-
-        if (!hasGiornaliero) {
-            giornalieroOption.disabled = true;
-            giornalieroOption.textContent = 'Giornaliero (non disponibile per questa data)';
-            if (ticketTypeField.value === 'giornaliero') {
-                ticketTypeField.value = '4h';
+            if (!hasGiornaliero) {
+                giornalieroOption.disabled = true;
+                giornalieroOption.textContent = 'Giornaliero (non disponibile per questa data)';
+                if (ticketTypeField.value === 'giornaliero') {
+                    ticketTypeField.value = '4h';
+                }
+            } else {
+                giornalieroOption.disabled = false;
+                giornalieroOption.textContent = 'Giornaliero';
             }
         }
+
+        const seraleOption = ticketTypeField.querySelector('option[value="serale"]');
+        if (seraleOption) {
+            const hasSerale = slots.some(slot => {
+                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+                const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
+                return categorie.includes('v3') && hour >= 18;
+            });
+
+            if (!hasSerale) {
+                seraleOption.disabled = true;
+                seraleOption.textContent = 'Serale (non disponibile per questa data)';
+                if (ticketTypeField.value === 'serale') {
+                    ticketTypeField.value = '4h';
+                }
+            } else {
+                seraleOption.disabled = false;
+                seraleOption.textContent = 'Serale';
+            }
+        }
+    }
+
+    /**
+     * Filtra le fasce orarie in base al tipo di ingresso selezionato.
+     * Serale: solo slot con categoria v3 e ora >= 18.
+     * Altri: solo slot senza v3 (o con p1/p2/p3/p4).
+     */
+    function filterTimeSlotsByTicketType(ticketType) {
+        if (!apiData || !apiData.available_slots) return;
+
+        const allSlots = apiData.available_slots;
+        let filteredSlots;
+
+        if (ticketType === 'serale') {
+            filteredSlots = allSlots.filter(slot => {
+                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+                const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
+                return categorie.includes('v3') && hour >= 18;
+            });
+        } else {
+            filteredSlots = allSlots.filter(slot => {
+                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+                return !categorie.every(c => c === 'v3');
+            });
+        }
+
+        updateTimeSlots(filteredSlots);
     }
     function disableFieldsFrom(from) {
         apiData = null;

@@ -33,6 +33,10 @@ class Booking_Redirect {
         'pm' => array(
             'product_id'   => 27370,
             'variation_id' => null
+        ),
+        'v3' => array(
+            'product_id'   => 109134,
+            'variation_id' => null
         )
     );
 

@@ -190,7 +190,8 @@ class Booking_Cart_Handler {
                 $item->add_meta_data('_booking_time_slot_label', $values['booking_time_slot_label'], true);
             }
 
-            $item->add_meta_data('Tipo Ingresso', $values['booking_ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero', true);
+            $ticket_labels = array('4h' => '4 Ore', 'giornaliero' => 'Giornaliero', 'serale' => 'Serale');
+            $item->add_meta_data('Tipo Ingresso', $ticket_labels[$values['booking_ticket_type']] ?? $values['booking_ticket_type'], true);
             $item->add_meta_data('_booking_ticket_type', $values['booking_ticket_type'], true);
             
             if ($values['booking_num_male'] > 0) {

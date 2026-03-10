@@ -33,7 +33,8 @@ class Booking_Handler {
      */
     private static $ticket_types = array(
         '4h' => '4 Ore',
-        'giornaliero' => 'Giornaliero'
+        'giornaliero' => 'Giornaliero',
+        'serale' => 'Serale'
     );
     
     /**
@@ -559,24 +560,32 @@ class Booking_Handler {
      */
     public function validate_category($categorie_raw, $booking_date, $ticket_type) {
 
-        // --- 1. CONTROLLO PERIODO NATALIZIO ---
-        if (Booking_Redirect::is_christmas_period($booking_date)) {
-            return array('pm');
-        }
-
-        // --- 2. NORMALIZZA E FILTRA CATEGORIE ---
-        // Converti la stringa in array (es: "p1,p3,p4")
+        // --- 1. NORMALIZZA E FILTRA CATEGORIE ---
+        // Converti la stringa in array (es: "p1,p3,p4" o "v3")
         $categorie = array_map('trim', explode(',', $categorie_raw));
 
         // Categorie riconosciute
-        $allowed = array('p1', 'p2', 'p3', 'p4');
+        $allowed = array('p1', 'p2', 'p3', 'p4', 'v3');
         $categorie = array_intersect($categorie, $allowed);
+
+        // --- 2. GESTIONE SERALE (V3) ---
+        if ($ticket_type === 'serale') {
+            if (in_array('v3', $categorie, true)) {
+                return array('v3');
+            }
+            return new WP_Error('invalid_category', 'Categoria V3 non disponibile per il biglietto serale.');
+        }
 
         if (empty($categorie)) {
             return new WP_Error('invalid_category', 'Nessuna categoria valida trovata.');
         }
 
-        // --- 3. CONTROLLA PRIMA p1 / p3 ---
+        // --- 3. CONTROLLO PERIODO NATALIZIO ---
+        if (Booking_Redirect::is_christmas_period($booking_date)) {
+            return array('pm');
+        }
+
+        // --- 4. CONTROLLA PRIMA p1 / p3 ---
         $has_p1 = in_array('p1', $categorie, true);
         $has_p3 = in_array('p3', $categorie, true);
 

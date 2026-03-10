@@ -213,7 +213,8 @@ class Booking_Email_Notification {
                 $detail .= "<strong>Orario:</strong> <span style='color: #0074A0;'>" . esc_html($booking_data['time_slot_label']) . "</span><br>";
             }
 
-            $detail .= "<strong>Tipo Ingresso:</strong> <span style='color: #0074A0;'>" . ($booking_data['ticket_type'] === '4h' ? '4 Ore' : 'Giornaliero') . "</span><br>";
+            $ticket_labels = array('4h' => '4 Ore', 'giornaliero' => 'Giornaliero', 'serale' => 'Serale');
+            $detail .= "<strong>Tipo Ingresso:</strong> <span style='color: #0074A0;'>" . ($ticket_labels[$booking_data['ticket_type']] ?? $booking_data['ticket_type']) . "</span><br>";
             
             // Ospiti
             if ($booking_data['num_male'] > 0) {
