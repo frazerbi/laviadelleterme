@@ -430,11 +430,14 @@ document.addEventListener('DOMContentLoaded', function() {
         let filteredSlots;
 
         if (ticketType === 'serale') {
+            console.log('Tutti gli slot disponibili:', allSlots);
             filteredSlots = allSlots.filter(slot => {
                 const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
                 const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
+                console.log(`Slot ${slot.time} - categorie: ${slot.categorie} - hour: ${hour} - v3: ${categorie.includes('v3')} - >=18: ${hour >= 18}`);
                 return categorie.includes('v3') && hour >= 18;
             });
+            console.log('Slot filtrati serale:', filteredSlots);
         } else {
             filteredSlots = allSlots.filter(slot => {
                 const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
@@ -515,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 field.value = currentValue - 1;
                 field.dispatchEvent(new Event('input'));
             }
-        });
+        }); 
     }
 
     // === CHIAMATA API DISPONIBILITÀ ===
