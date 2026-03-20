@@ -117,8 +117,17 @@ class Booking_Nonbooking_Email {
         }
 
         $order_id = $order->get_id();
-        
+
         error_log("Processing coupon email for order {$order_id}");
+
+        // Raccoglie i codici dei prodotti con prenotazione per escluderli dal PDF non-booked
+        $booked_codes = array();
+        foreach ($order->get_items() as $item) {
+            if ($item->get_meta('_booking_id')) {
+                $codes = Booking_Cart_Handler::get_item_license_codes($order_id, $item->get_product_id(), $item->get_variation_id());
+                $booked_codes = array_merge($booked_codes, $codes);
+            }
+        }
 
         // Genera PDF per ogni prodotto senza prenotazione
         $attachment_paths = array();
@@ -134,7 +143,7 @@ class Booking_Nonbooking_Email {
             $nonbooking_items[] = $item;
 
             // Genera PDF per questo prodotto
-            $pdf_path = $this->generate_coupon_pdf($order, $item);
+            $pdf_path = $this->generate_coupon_pdf($order, $item, $booked_codes);
             
             if ($pdf_path) {
                 $attachment_paths[] = $pdf_path;
@@ -167,15 +176,18 @@ class Booking_Nonbooking_Email {
     /**
      * Genera PDF coupon per un prodotto
      */
-    private function generate_coupon_pdf($order, $item) {
+    private function generate_coupon_pdf($order, $item, $excluded_codes = array()) {
         $order_id = $order->get_id();
         $product_id = $item->get_product_id();
         $variation_id = $item->get_variation_id();
         $product_name = $item->get_name();
-        
-        // Recupera codici licenza        
+
+        // Recupera codici licenza ed esclude quelli dei prodotti booked
         $codes = Booking_Cart_Handler::get_item_license_codes($order_id, $product_id, $variation_id);
-    
+        if (!empty($excluded_codes)) {
+            $codes = array_values(array_diff($codes, $excluded_codes));
+        }
+
         if (empty($codes)) {
             error_log("No license codes found for product {$product_name}");
             return false;
