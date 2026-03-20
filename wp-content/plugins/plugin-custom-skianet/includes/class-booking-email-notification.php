@@ -204,7 +204,7 @@ class Booking_Email_Notification {
             $detail = "<div style='margin-bottom: 15px; padding: 10px; border-left: 3px solid #0074A0;'>";
             $detail .= "<strong>Prodotto:</strong> <span style='color: #0074A0;'>" . $this->get_mapped_product_name($item->get_name()) . "</span><br>";
             $detail .= "<strong>Quantità Coupon:</strong> <span style='color: #0074A0;'>" . $item->get_quantity() . "</span><br>";
-            $detail .= "<strong>Totale:</strong> <span style='color: #0074A0;'>€" . $item->get_total() . "</span><br>";
+            $detail .= "<strong>Totale:</strong> <span style='color: #0074A0;'>€" . number_format((float) $item->get_total(), 2, ',', '.') . "</span><br>";
 
             // Codici
             if (!empty($codes)) {
