@@ -293,8 +293,11 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.disabled = !this.value;
         timeSlotField.value = '';
         const seraleNote = document.getElementById('serale-note');
+        console.log('[serale-note] ticketType changed to:', this.value, '| element found:', !!seraleNote);
         if (seraleNote) {
-            seraleNote.style.display = (this.value && ticketTypeField.value === 'serale') ? '' : 'none';
+            const shouldShow = !!(this.value && ticketTypeField.value === 'serale');
+            console.log('[serale-note] shouldShow:', shouldShow, '| current display:', seraleNote.style.display);
+            seraleNote.style.display = shouldShow ? '' : 'none';
         }
 
         if (!this.value) {
