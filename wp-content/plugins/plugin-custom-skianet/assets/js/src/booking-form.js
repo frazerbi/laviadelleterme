@@ -292,6 +292,10 @@ document.addEventListener('DOMContentLoaded', function() {
     ticketTypeField.addEventListener('change', function() {
         timeSlotField.disabled = !this.value;
         timeSlotField.value = '';
+        const seraleNote = document.getElementById('serale-note');
+        if (seraleNote) {
+            seraleNote.style.display = this.value === 'serale' ? '' : 'none';
+        }
         if (!this.value) {
             disableFieldsFrom('time');
         } else {

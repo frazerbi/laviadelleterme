@@ -60,6 +60,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
                     </option>
                 <?php endforeach; ?>
             </select>
+            <p id="serale-note" class="booking-note" style="display:none;">L'ingresso serale comprende le ultime 3 ore della giornata.</p>
         </div>
 
         <!-- Fascia Oraria -->
