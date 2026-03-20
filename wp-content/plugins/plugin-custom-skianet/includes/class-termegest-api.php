@@ -9,7 +9,6 @@ if (!defined('ABSPATH')) {
 }
 
 use TermeGest\Type\AnyXML;
-use TermeGest\Type\TermeGestLogger;
 use TermeGestGetReserv\TermeGestGetReservClientFactory;
 use TermeGestGetReserv\Type\GetDisponibilita;
 use TermeGestGetReserv\Type\GetDisponibilitaGiornoFascia;
@@ -37,11 +36,6 @@ class TermeGest_API {
     private $client_set_info = null;
     
     /**
-     * Logger TermeGest
-     */
-    private $logger = null;
-
-    /**
      * WSDL URLs
      */
     private const WSDL_GET_RESERV = 'https://www.termegest.it/getReserv.asmx?WSDL';
@@ -62,7 +56,6 @@ class TermeGest_API {
      * Costruttore privato
      */
     private function __construct() {
-        $this->logger = TermeGestLogger::getInstance();
     }
 
     /**
@@ -136,8 +129,6 @@ class TermeGest_API {
 
         } catch (Throwable $throwable) {
             error_log("Exception get_disponibilita_by_day: " . $throwable->getMessage());
-            $this->logger->send('Error getDisponibilitaGiornoFascia: ' . $throwable->getMessage());
-            $this->logger->flushLog();
             return [];
         }
     }
@@ -159,8 +150,6 @@ class TermeGest_API {
 
             return (new AnyXML($response->getGetDisponibilitaResult()?->getAny()))->convertXmlToPhpObject();
         } catch (Throwable $throwable) {
-            $this->logger->send('Error getDisponibilita: ' . $throwable->getMessage());
-            $this->logger->flushLog();
             return [];
         }
     }
@@ -182,8 +171,6 @@ class TermeGest_API {
 
             return (new AnyXML($response->getGetFasciaResult()?->getAny()))->convertXmlToPhpObject();
         } catch (Exception $exception) {
-            $this->logger->send('Error getFascia: ' . $exception->getMessage());
-            $this->logger->flushLog();
             return [];
         }
     }
@@ -219,8 +206,6 @@ class TermeGest_API {
         } catch (Exception $exception) {
             $errorMessage = "Error getDisponibilitaById (ID: {$id}, Location: {$location}, Categoria: {$categoria}): " . $exception->getMessage();
             error_log($errorMessage);
-            $this->logger->send($errorMessage);
-            $this->logger->flushLog();
             return 0;
         }
     }
@@ -271,14 +256,6 @@ class TermeGest_API {
                 'message' => $response->getErrMsg()
             ];
         } catch (Exception $exception) {
-            $str = 'Error setPrenotazione: ' . $exception->getMessage();
-            $str .= PHP_EOL;
-            ob_start();
-            var_dump($parameters);
-            $str .= ob_get_clean();
-            $this->logger->send($str);
-            $this->logger->flushLog();
-
             return ['status' => false, 'message' => $exception->getMessage()];
         }
     }
@@ -314,14 +291,6 @@ class TermeGest_API {
 
             return $response->getSetVendutoResult();
         } catch (Exception $exception) {
-            $str = 'Error setVenduto: ' . $exception->getMessage();
-            $str .= PHP_EOL;
-            ob_start();
-            var_dump($parameters);
-            $str .= ob_get_clean();
-            $this->logger->send($str);
-            $this->logger->flushLog();
-
             return $exception->getMessage();
         }
     }
