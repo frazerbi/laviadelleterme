@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Campi del form
     const locationRadios = document.querySelectorAll('input[name="location"]');
     const dateField = document.getElementById('booking_date');
-    const ticketTypeField = document.getElementById('ticket_type');
+    const ticketTypeRadios = document.querySelectorAll('input[name="ticket_type"]');
+    const ticketTypeGroup = document.querySelector('.form-group-ticket-type');
     const timeSlotField = document.getElementById('time_slot');
     const numMaleField = document.getElementById('num_male');
     const numFemaleField = document.getElementById('num_female');
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             form.reset();
             // Esplicitamente deseleziona i radio (form.reset può ripristinare il default HTML)
             locationRadios.forEach(r => r.checked = false);
+            resetTicketType();
             if (calendar) {
                 calendar.destroy();
                 calendar = null;
@@ -46,6 +48,47 @@ document.addEventListener('DOMContentLoaded', function() {
     function getSelectedLocation() {
         const selectedRadio = document.querySelector('input[name="location"]:checked');
         return selectedRadio ? selectedRadio.value : '';
+    }
+
+    // Helper per ticket type radio buttons
+    function getTicketTypeValue() {
+        const checked = document.querySelector('input[name="ticket_type"]:checked');
+        return checked ? checked.value : '';
+    }
+
+    function resetTicketType() {
+        ticketTypeRadios.forEach(r => { r.checked = false; });
+    }
+
+    function setTicketTypeDisabled(disabled) {
+        ticketTypeRadios.forEach(r => {
+            if (!disabled && r.closest('.visualradio-card')?.classList.contains('ticket-option-disabled')) {
+                return; // mantieni disabilitate le opzioni individualmente non disponibili
+            }
+            r.disabled = disabled;
+        });
+        ticketTypeGroup.classList.toggle('is-disabled', disabled);
+    }
+
+    function setTicketTypeOptionState(value, disabled, label) {
+        const radio = document.querySelector(`input[name="ticket_type"][value="${value}"]`);
+        if (!radio) return;
+        const card = radio.closest('.visualradio-card');
+        if (!card) return;
+        const labelEl = card.querySelector('.visualradio-card-label');
+
+        radio.disabled = disabled || ticketTypeGroup.classList.contains('is-disabled');
+        card.classList.toggle('ticket-option-disabled', disabled);
+        if (labelEl && label !== undefined) labelEl.textContent = label;
+
+        if (disabled && radio.checked) {
+            radio.checked = false;
+            const radio4h = document.querySelector('input[name="ticket_type"][value="4h"]');
+            if (radio4h && !radio4h.disabled) {
+                radio4h.checked = true;
+                radio4h.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
     }
 
     // Array delle date natalizie dal backend
@@ -231,10 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
     locationRadios.forEach(radio => {
         radio.addEventListener('change', async function() {
             // Reset campi successivi quando cambia la location
-            // Reset campi successivi quando cambia la location
             dateField.value = '';
-            ticketTypeField.value = '';
-            ticketTypeField.selectedIndex = 0;
+            resetTicketType();
             timeSlotField.value = '';
             timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
             numMaleField.value = '0';
@@ -266,8 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     dateField.addEventListener('change', function() {
         // Reset campi successivi quando cambia la data
-        ticketTypeField.value = '';
-        ticketTypeField.selectedIndex = 0;
+        resetTicketType();
         timeSlotField.value = '';
         timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
 
@@ -282,21 +322,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    ticketTypeField.addEventListener('change', function() {
-        timeSlotField.disabled = !this.value;
-        timeSlotField.value = '';
-        const seraleNote = document.getElementById('serale-note');
-        if (seraleNote) {
-            const shouldShow = !!(this.value && ticketTypeField.value === 'serale');
-            seraleNote.style.display = shouldShow ? '' : 'none';
-        }
+    ticketTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const value = this.value;
+            timeSlotField.disabled = !value;
+            timeSlotField.value = '';
+            const seraleNote = document.getElementById('serale-note');
+            if (seraleNote) {
+                seraleNote.style.display = (value === 'serale') ? '' : 'none';
+            }
 
-        if (!this.value) {
-            disableFieldsFrom('time');
-        } else {
-            filterTimeSlotsByTicketType(this.value);
-            scrollToNext(timeSlotField.closest('.form-group'));
-        }
+            if (!value) {
+                disableFieldsFrom('time');
+            } else {
+                filterTimeSlotsByTicketType(value);
+                scrollToNext(timeSlotField.closest('.form-group'));
+            }
+        });
     });
 
     timeSlotField.addEventListener('change', function() {
@@ -348,25 +390,13 @@ document.addEventListener('DOMContentLoaded', function() {
      * Gestisci visibilità opzione "giornaliero" in base alla data
      */
     function handleTicketTypeOptions(selectedDate) {
-        if (!ticketTypeField || !selectedDate) {
-            return;
-        }
+        if (!selectedDate) return;
 
         const isChristmas = isChristmasPeriod(selectedDate);
-        const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
-
-        if (giornalieroOption) {
-            if (isChristmas) {
-                giornalieroOption.disabled = true;
-                giornalieroOption.textContent = 'Giornaliero (non disponibile nel periodo natalizio)';
-
-                if (ticketTypeField.value === 'giornaliero') {
-                    ticketTypeField.value = '4h';
-                }
-            } else {
-                giornalieroOption.disabled = false;
-                giornalieroOption.textContent = 'Giornaliero';
-            }
+        if (isChristmas) {
+            setTicketTypeOptionState('giornaliero', true, 'Giornaliero (non disponibile nel periodo natalizio)');
+        } else {
+            setTicketTypeOptionState('giornaliero', false, 'Giornaliero');
         }
     }
 
@@ -375,43 +405,25 @@ document.addEventListener('DOMContentLoaded', function() {
      * disabilita "serale" se nessuno slot disponibile ha categoria v3 con ora >= 18.
      */
     function handleTicketTypeByCategories(slots) {
-        const giornalieroOption = ticketTypeField.querySelector('option[value="giornaliero"]');
-        if (giornalieroOption) {
-            const hasGiornaliero = slots.some(slot => {
-                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
-                return categorie.includes('p3') || categorie.includes('p4');
-            });
-
-            if (!hasGiornaliero) {
-                giornalieroOption.disabled = true;
-                giornalieroOption.textContent = 'Giornaliero (non disponibile per questa data)';
-                if (ticketTypeField.value === 'giornaliero') {
-                    ticketTypeField.value = '4h';
-                }
-            } else {
-                giornalieroOption.disabled = false;
-                giornalieroOption.textContent = 'Giornaliero';
-            }
+        const hasGiornaliero = slots.some(slot => {
+            const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+            return categorie.includes('p3') || categorie.includes('p4');
+        });
+        if (!hasGiornaliero) {
+            setTicketTypeOptionState('giornaliero', true, 'Giornaliero (non disponibile per questa data)');
+        } else {
+            setTicketTypeOptionState('giornaliero', false, 'Giornaliero');
         }
 
-        const seraleOption = ticketTypeField.querySelector('option[value="serale"]');
-        if (seraleOption) {
-            const hasSerale = slots.some(slot => {
-                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
-                const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
-                return categorie.includes('v3') && hour >= 18;
-            });
-
-            if (!hasSerale) {
-                seraleOption.disabled = true;
-                seraleOption.textContent = 'Serale (non disponibile per questa data)';
-                if (ticketTypeField.value === 'serale') {
-                    ticketTypeField.value = '4h';
-                }
-            } else {
-                seraleOption.disabled = false;
-                seraleOption.textContent = 'Serale';
-            }
+        const hasSerale = slots.some(slot => {
+            const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+            const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
+            return categorie.includes('v3') && hour >= 18;
+        });
+        if (!hasSerale) {
+            setTicketTypeOptionState('serale', true, 'Serale (non disponibile per questa data)');
+        } else {
+            setTicketTypeOptionState('serale', false, 'Serale');
         }
     }
 
@@ -444,8 +456,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function disableFieldsFrom(from) {
         apiData = null;
 
+        if (from === 'date') {
+            setTicketTypeDisabled(true);
+            resetTicketType();
+        }
+
         const fields = {
-            'date': [ticketTypeField, timeSlotField, numMaleField, numFemaleField],
+            'date': [timeSlotField, numMaleField, numFemaleField],
             'ticket': [timeSlotField, numMaleField, numFemaleField],
             'time': [numMaleField, numFemaleField]
         };
@@ -548,8 +565,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateTimeSlots(apiData.available_slots);
                 handleTicketTypeByCategories(apiData.available_slots);
 
-                ticketTypeField.disabled = false;
-                scrollToNext(ticketTypeField.closest('.form-group'));
+                setTicketTypeDisabled(false);
+                scrollToNext(ticketTypeGroup);
             } else {
                 showMessage('error', data.data.message || 'Nessuna disponibilità per questa data.');
                 disableFieldsFrom('ticket');

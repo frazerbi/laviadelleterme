@@ -220,6 +220,78 @@
     opacity: 0;
 }
 
+/* Ticket type grid cards */
+.ticket-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.visualradio-card,
+.booking-form label.visualradio-card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    aspect-ratio: 3 / 4;
+    background-size: cover;
+    background-position: center;
+    background-color: #e0e0e0;
+    transition: border-color 0.2s;
+}
+
+.visualradio-card:has(.visualradio-input:checked) {
+    border-color: var(--e-global-color-primary);
+    box-shadow: 0 0 0 1px var(--e-global-color-primary);
+}
+
+.visualradio-card-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+    color: #fff;
+    text-align: center;
+    padding: 24px 8px 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+.visualradio-card:has(.visualradio-input:checked) .visualradio-card-label {
+    background: linear-gradient(transparent, var(--e-global-color-primary));
+}
+
+/* Gruppo ticket disabilitato (step non ancora raggiunto) */
+.form-group-ticket-type.is-disabled .visualradio-card {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Singola opzione non disponibile (giornaliero/serale) */
+.visualradio-card.ticket-option-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .ticket-type-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .visualradio-card-label {
+        font-size: 0.8rem;
+        padding: 16px 4px 6px;
+    }
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {

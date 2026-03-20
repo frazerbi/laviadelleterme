@@ -50,16 +50,24 @@ $ticket_types = Booking_Handler::get_ticket_types();
         </div>
 
         <!-- Tipo di Ingresso -->
-        <div class="form-group form-group-ticket-type">
-            <label for="ticket_type">STEP    3: Tipo di Ingresso <span class="required">*</span></label>
-            <select name="ticket_type" id="ticket_type" required disabled>
-                <option value="">-- Seleziona tipo di ingresso --</option>
+        <?php
+        $ticket_type_images = array(
+            '4h'          => 'mezza-giornata',
+            'giornaliero' => 'giornaliero',
+            'serale'      => 'serale',
+        );
+        ?>
+        <div class="form-group form-group-ticket-type is-disabled">
+            <legend class="form-group-legend">STEP    3: Tipo di Ingresso <span class="required">*</span></legend>
+            <div class="ticket-type-grid">
                 <?php foreach ($ticket_types as $value => $label): ?>
-                    <option value="<?php echo esc_attr($value); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
+                    <?php $img_slug = isset($ticket_type_images[$value]) ? $ticket_type_images[$value] : $value; ?>
+                    <label class="visualradio-card" for="ticket_type_<?php echo esc_attr($value); ?>" style="background-image: url('<?php echo esc_url(plugin_dir_url(dirname(__FILE__))); ?>assets/img/ticket-types/<?php echo esc_attr($img_slug); ?>.jpg')">
+                        <input class="visualradio-input" type="radio" name="ticket_type" id="ticket_type_<?php echo esc_attr($value); ?>" value="<?php echo esc_attr($value); ?>" required disabled>
+                        <span class="visualradio-card-label"><?php echo esc_html($label); ?></span>
+                    </label>
                 <?php endforeach; ?>
-            </select>
+            </div>
         </div>
 
         <!-- Fascia Oraria -->
