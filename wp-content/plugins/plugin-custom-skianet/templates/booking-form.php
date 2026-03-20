@@ -60,7 +60,6 @@ $ticket_types = Booking_Handler::get_ticket_types();
                     </option>
                 <?php endforeach; ?>
             </select>
-            <p id="serale-note" class="booking-note" style="display:none;">L'ingresso serale comprende le ultime 3 ore della giornata.</p>
         </div>
 
         <!-- Fascia Oraria -->
@@ -70,6 +69,7 @@ $ticket_types = Booking_Handler::get_ticket_types();
                 <option value="">-- Seleziona una fascia oraria --</option>
                 <!-- Le opzioni vengono popolate dinamicamente da JavaScript -->
             </select>
+            <p id="serale-note" class="booking-note" style="display:none;">L'ingresso serale comprende le ultime 3 ore della giornata.</p>
         </div>
         
         <!-- Numero Ingressi -->

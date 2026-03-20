@@ -35,7 +35,7 @@ class Booking_Redirect {
             'variation_id' => null
         ),
         'v3' => array(
-            'product_id'   => 109134,
+            'product_id'   => 93933, //staging ID
             'variation_id' => null
         )
     );

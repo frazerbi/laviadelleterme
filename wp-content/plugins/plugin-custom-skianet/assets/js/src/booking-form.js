@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.value = '';
         const seraleNote = document.getElementById('serale-note');
         if (seraleNote) {
-            seraleNote.style.display = this.value === 'serale' ? '' : 'none';
+            seraleNote.style.display = 'none';
         }
         if (!this.value) {
             disableFieldsFrom('time');
@@ -305,6 +305,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     timeSlotField.addEventListener('change', function() {
+        const seraleNote = document.getElementById('serale-note');
+        if (seraleNote) {
+            seraleNote.style.display = (this.value && ticketTypeField.value === 'serale') ? '' : 'none';
+        }
         const isEnabled = !!this.value;
         numMaleField.disabled = !isEnabled;
         numFemaleField.disabled = !isEnabled;
