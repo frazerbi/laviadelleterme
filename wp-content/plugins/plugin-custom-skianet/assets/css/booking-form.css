@@ -83,6 +83,16 @@
     color: var(--e-global-color-primary);
 }
 
+.booking-note {
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding: 15px;
+    border-radius: 4px;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
 .booking-response {
     margin-bottom: 20px;
     padding: 15px;

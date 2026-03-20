@@ -129,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const data = await response.json();
-        //console.log(`JSON caricato per ${location}:`, data);
         return data;
     } catch (error) {
         console.error('Errore nel recupero del JSON availability:', error);
@@ -163,11 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 
-        /*console.log('Calendario range:', {
-            min: firstDayCurrentMonth.toISOString().split('T')[0],
-            max: lastDayNextMonth.toISOString().split('T')[0]
-        });*/
-
         // Recupera i dati di disponibilità dal JSON
         availabilityData = await fetchAvailabilityJSON(location);
 
@@ -198,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const changeEvent = new Event('change', { bubbles: true });
                     
                     dateField.dispatchEvent(changeEvent);
-                    console.log('Data selezionata:', clickedDate);
+
                     // Chiudi il calendario - il metodo hide non funziona con questa configurazione
                     calendarWrapper.style.display = 'none';
                 } else {
@@ -210,8 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         calendar = new Calendar(calendarWrapper, options);
         calendar.init();
-        //console.log('Calendario inizializzato per location:', location);
-        //console.log(calendar);
+
     }
 
     // Mostra calendario al click sull'input
@@ -293,10 +286,8 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlotField.disabled = !this.value;
         timeSlotField.value = '';
         const seraleNote = document.getElementById('serale-note');
-        console.log('[serale-note] ticketType changed to:', this.value, '| element found:', !!seraleNote);
         if (seraleNote) {
             const shouldShow = !!(this.value && ticketTypeField.value === 'serale');
-            console.log('[serale-note] shouldShow:', shouldShow, '| current display:', seraleNote.style.display);
             seraleNote.style.display = shouldShow ? '' : 'none';
         }
 
@@ -322,9 +313,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedOption = this.options[this.selectedIndex];
             const categorie = selectedOption.dataset.categorie || '';
             const disponibilita = selectedOption.dataset.disponibilita || '0';
-
-            //console.log('Categorie selezionate:', categorie);
-            //console.log('Disponibilità fascia:', disponibilita);
         
             // Aggiungi campo hidden
             let categorieInput = document.getElementById('selected_categorie');
@@ -439,14 +427,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let filteredSlots;
 
         if (ticketType === 'serale') {
-            console.log('Tutti gli slot disponibili:', allSlots);
             filteredSlots = allSlots.filter(slot => {
                 const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
                 const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
-                console.log(`Slot ${slot.time} - categorie: ${slot.categorie} - hour: ${hour} - v3: ${categorie.includes('v3')} - >=18: ${hour >= 18}`);
                 return categorie.includes('v3') && hour >= 18;
             });
-            console.log('Slot filtrati serale:', filteredSlots);
         } else {
             filteredSlots = allSlots.filter(slot => {
                 const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
@@ -571,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Errore API:', error);
             showMessage('error', 'Errore di connessione durante la verifica disponibilità.');
             disableFieldsFrom('ticket');
         });
@@ -587,7 +571,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         slots.forEach(slot => {
             if (slot.disponibilita > 0) {
-                //console.log('Slot ID:', slot.id, 'Time:', slot.time, 'Categorie:', slot.categorie); 
                 const option = document.createElement('option');
                 option.value = slot.id; 
                 option.textContent = `${slot.time} - ${slot.disponibilita} posti disponibili`;
