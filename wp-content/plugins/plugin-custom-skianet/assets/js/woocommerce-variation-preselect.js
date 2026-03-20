@@ -172,8 +172,6 @@ function buildDataUI(data) {
         'priceHtml': 'Prezzo'
     };
 
-    console.log('Dati da mostrare nella UI:', data);
-
     const titleWrapper = document.querySelector('.product .product_title').parentElement;
     const titleEl = document.querySelector('.product .product_title');
     const titleText = titleEl.textContent
@@ -220,10 +218,15 @@ function buildDataUI(data) {
         elPriceWidget.style.display = 'none';
     }
 
-    // append container after .woocommerce-variation-description
+    // append container after .woocommerce-variation-description, or fallback to add-to-cart form
     const variationDesc = document.querySelector('.woocommerce-variation-description');
     if (variationDesc) {
         variationDesc.parentNode.insertBefore(container, variationDesc.nextSibling);
+    } else {
+        const cartForm = document.querySelector('.product form.cart');
+        if (cartForm) {
+            cartForm.parentNode.insertBefore(container, cartForm);
+        }
     }
 }
 
