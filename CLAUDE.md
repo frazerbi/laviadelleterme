@@ -125,8 +125,9 @@ The booking form JS fetches these local JSON files to disable unavailable dates 
 
 - Source CSS: `assets/css/booking-form.css`, `assets/css/booking-only-form.css`, `assets/css/pdp.css`
 - Source JS: `assets/js/src/booking-form.js`, `assets/js/src/booking-only-form.js`
-- Build output: minified `.min.css` and `.min.js` in `assets/js/dist/` with sourcemaps
+- Build output: `assets/js/dist/booking-form.min.js` + `booking-form.min.css` with sourcemaps
 - Build tool: esbuild (`build.js`) + PostCSS with prefix-selector; `vanilla-calendar-pro` is bundled at build time
+- `booking-only-form.js` is a hand-written IIFE served directly — it is **not** processed by esbuild
 
 ### Vendor in Production
 
