@@ -202,7 +202,7 @@ class Booking_Email_Notification {
             
             // Costruisci dettaglio
             $detail = "<div style='margin-bottom: 15px; padding: 10px; border-left: 3px solid #0074A0;'>";
-            $detail .= "<strong>Prodotto:</strong> <span style='color: #0074A0;'>" . $item->get_name() . "</span><br>";
+            $detail .= "<strong>Prodotto:</strong> <span style='color: #0074A0;'>" . $this->get_mapped_product_name($item->get_name()) . "</span><br>";
             $detail .= "<strong>Quantità Coupon:</strong> <span style='color: #0074A0;'>" . $item->get_quantity() . "</span><br>";
             $detail .= "<strong>Totale:</strong> <span style='color: #0074A0;'>€" . $item->get_total() . "</span><br>";
 
@@ -242,6 +242,39 @@ class Booking_Email_Notification {
     }
 
     /**
+     * Mappa il nome del prodotto in un nome leggibile per l'email
+     */
+    private function get_mapped_product_name($name) {
+        $lower = mb_strtolower($name);
+
+        $has_vene   = str_contains($lower, 'vene');
+        $has_dome   = str_contains($lower, 'dome');
+        $has_mezza  = str_contains($lower, 'mezza');
+        $has_giorna = str_contains($lower, 'giorna');
+
+        if (str_contains($lower, 'sera')) {
+            return 'Coupon per l\'ingresso di 3 ore serale da Lunedì a Domenica';
+        }
+        if (str_contains($lower, 'natal')) {
+            return 'Coupon per l\'ingresso di 4 ore natalizio da Lunedì a Domenica';
+        }
+        if ($has_vene && $has_mezza) {
+            return 'Coupon per l\'ingresso di 4 ore da Lunedì a Venerdì';
+        }
+        if ($has_vene && $has_giorna) {
+            return 'Coupon per l\'ingresso giornaliero da Lunedì a Venerdì';
+        }
+        if ($has_dome && $has_mezza) {
+            return 'Coupon per l\'ingresso di 4 ore da Lunedì a Domenica';
+        }
+        if ($has_dome && $has_giorna) {
+            return 'Coupon per l\'ingresso giornaliero da Lunedì a Domenica';
+        }
+
+        return $name;
+    }
+
+    /**
      * Costruisce il corpo dell'email
      */
     private function build_email_body($order_details, $order = null) {
@@ -271,7 +304,7 @@ class Booking_Email_Notification {
         $policy_info .= "<p><strong>Privacy</strong><br>";
         $policy_info .= "Ai sensi degli articoli 13 e 23 del DLgs. 196/03, del Regolamento EU 679/2016 e del Dlgs 101/2018 (Codice sulla protezione dei dati personali), l'interessato dichiara di essere stato adeguatamente informato ed esprime il proprio consenso all'utilizzo dei dati personali che lo riguardano, con particolare riferimento ai dati che la legge definisce come \"sensibili\", nei limiti di quanto indicato nell'informativa.</p>";
 
-        $email_body = $greeting . " Ecco i dettagli del tuo Coupon:</p><br>";
+        $email_body = $greeting . "<br>Ecco i dettagli del tuo Coupon:</p><br>";
         $email_body .= $order_details_text . $policy_info;
         
         return $email_body;
