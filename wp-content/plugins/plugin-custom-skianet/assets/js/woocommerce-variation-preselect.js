@@ -1,7 +1,8 @@
 function getVars() {
     const TICKET_TYPE_LABELS = {
         '4h': '4 ore',
-        'giornaliero': 'Giornaliero'
+        'giornaliero': 'Giornaliero',
+        'serale': 'Serale'
     };
     const LOCATION_LABELS = {
         'terme-saint-vincent': 'Terme di Saint-Vincent',
@@ -243,9 +244,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        await selectVariation(ticketType);
-        const priceData = await waitForVariationPrice();
-        const unitPrice = priceData.price;
+        let unitPrice;
+
+        if (ticketType === 'serale') {
+            // Prodotto semplice: leggi il prezzo direttamente dal DOM
+            const priceEl = document.querySelector('.product .price .amount');
+            if (!priceEl) throw new Error('Elemento prezzo non trovato nel DOM');
+            unitPrice = parseFloat(priceEl.textContent.replace(',', '.').replace(/[^\d.]/g, ''));
+        } else {
+            await selectVariation(ticketType);
+            const priceData = await waitForVariationPrice();
+            unitPrice = priceData.price;
+        }
+
         const totalPrice = unitPrice * data.guests;
         data.unitPrice = unitPrice;
         data.totalPrice = totalPrice;
