@@ -214,6 +214,12 @@ function buildDataUI(data) {
 
     container.appendChild(list);
 
+    // Nasconde il widget prezzo di Elementor per evitare duplicati
+    const elPriceWidget = document.querySelector('.elementor-widget-woocommerce-product-price');
+    if (elPriceWidget) {
+        elPriceWidget.style.display = 'none';
+    }
+
     // append container after .woocommerce-variation-description
     const variationDesc = document.querySelector('.woocommerce-variation-description');
     if (variationDesc) {
