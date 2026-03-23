@@ -7,7 +7,7 @@ declare(strict_types=1);
  * Description: Custom Skianet code for TermeGest.
  * Text Domain: skianet-custom
  * Domain Path: /languages
- * Version: 1.0
+ * Version: 2.0
  */
 
 if (! \defined('ABSPATH')) {
@@ -15,7 +15,7 @@ if (! \defined('ABSPATH')) {
 }
 
 const PLUGIN_SKIANET_FILE = __FILE__;
-const PLUGIN_SKIANET_VERSION = '1.2.19';
+const PLUGIN_SKIANET_VERSION = '2.0.0';
 const PLUGIN_SKIANET_TEXT_DOMAIN = 'skianet-custom';
 
 \define('PLUGIN_SKIANET_PATH', untrailingslashit(plugin_dir_path(PLUGIN_SKIANET_FILE)));
