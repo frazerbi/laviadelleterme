@@ -297,10 +297,12 @@ class Booking_Email_Notification {
         $policy_info .= "<li>godere di sana e robusta costituzione e di essersi sottoposto di recente a visita medica per accertare la propria idoneità fisica ed esonera pertanto la struttura da qualsiasi responsabilità.</li>";
         $policy_info .= "</ul>";
         $policy_info .= "<p><strong>Cambio della Struttura prenotata</strong><br>";
-        $policy_info .= "L'acquisto del Coupon le dà diritto di modificare la scelta della Struttura qui prenotata con un'altra delle nostre due strutture che trova nella nostra Home page fino a 48 ore precedenti alla data della prenotazione, salvo disponibilità. Dopo non sarà possibile modificare la scelta della Struttura.</p>";
+        $policy_info .= "L'acquisto del Coupon le dà diritto di modificare la scelta della Struttura qui prenotata con un'altra delle nostre due strutture che trova nella nostra Home page fino a 48 ore precedenti alla data della prenotazione, salvo disponibilità. Dopo non sarà possibile modificare la scelta della Struttura.<br><br>";
+        $policy_info .= "Per modificare la prenotazione accedi al link: <a href=\"https://www.termegest.it/prenota.aspx\">https://www.termegest.it/prenota.aspx</a> inserendo il proprio codice.</p>";
         $policy_info .= "<p><strong>Cancellazione e modifica della Prenotazione</strong><br>";
-        $policy_info .= "La sua prenotazione è cancellabile, o modificabile, fino a 48 ore precedenti alla data della prenotazione. Dopo non sarà possibile modificarla.<br>";
-        $policy_info .= "Per cancellare la prenotazione accedi al link: <a href=\"https://www.termegest.it/annullapren.aspx\">https://www.termegest.it/annullapren.aspx</a></p>";
+        $policy_info .= "La sua prenotazione è cancellabile, o modificabile, fino a 48 ore precedenti alla data della prenotazione. Dopo non sarà possibile modificarla.<br><br>";
+        $policy_info .= "Per cancellare la prenotazione accedi al link: <a href=\"https://www.termegest.it/annullapren.aspx\">https://www.termegest.it/annullapren.aspx</a><br><br>";
+        $policy_info .= "Per modificare la prenotazione accedi al link: <a href=\"https://www.termegest.it/prenota.aspx\">https://www.termegest.it/prenota.aspx</a> inserendo il proprio codice.</p>";
         $policy_info .= "<p><strong>Privacy</strong><br>";
         $policy_info .= "Ai sensi degli articoli 13 e 23 del DLgs. 196/03, del Regolamento EU 679/2016 e del Dlgs 101/2018 (Codice sulla protezione dei dati personali), l'interessato dichiara di essere stato adeguatamente informato ed esprime il proprio consenso all'utilizzo dei dati personali che lo riguardano, con particolare riferimento ai dati che la legge definisce come \"sensibili\", nei limiti di quanto indicato nell'informativa.</p>";
 

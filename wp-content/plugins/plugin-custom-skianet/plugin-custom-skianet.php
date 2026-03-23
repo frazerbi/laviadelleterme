@@ -5,9 +5,12 @@ declare(strict_types=1);
 /*
  * Plugin Name: Custom Skianet Plugin
  * Description: Custom Skianet code for TermeGest.
+ * Author: Francesco Zerbinato
+ * Version: 2.0
+ * Requires at least: 6.0
+ * Requires PHP: 8.1
  * Text Domain: skianet-custom
  * Domain Path: /languages
- * Version: 2.0
  */
 
 if (! \defined('ABSPATH')) {
