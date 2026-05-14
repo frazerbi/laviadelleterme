@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (thumb) {
             const badge = document.createElement('span');
             badge.className = 'location-closed-badge';
-            badge.textContent = 'Chiusa';
+            badge.textContent = 'Chiusura stagionale';
             thumb.appendChild(badge);
         }
     }
