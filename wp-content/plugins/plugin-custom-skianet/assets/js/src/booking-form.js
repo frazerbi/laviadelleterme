@@ -122,6 +122,9 @@ document.addEventListener('DOMContentLoaded', function() {
     handleNumbersInput(numFemaleField);
     verifyNumberFieldsState();
 
+    // Pre-controlla le location chiuse stagionalmente
+    preCheckLocationsAvailability();
+
     // enable/ disable + / - buttons based on number input disabled check
     function verifyNumberFieldsState() {
         [numMaleField, numFemaleField].forEach(field => {
@@ -157,28 +160,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funzione per recuperare il JSON delle disponibilità per location
-    async function fetchAvailabilityJSON(location) {
-    try {
-        const fileName = mapLocationToFileName(location);
-        const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
+    async function fetchAvailabilityJSON(location, silent = false) {
+        try {
+            const fileName = mapLocationToFileName(location);
+            const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
 
-        const response = await fetch(jsonPath);
+            const response = await fetch(jsonPath);
 
-        if (!response.ok) {
-            console.error(`File non trovato: ${jsonPath}`);
-            // ✅ Mostra messaggio all'utente
-            showMessage('error', 'Impossibile caricare il calendario per questa location.');
+            if (!response.ok) {
+                console.error(`File non trovato: ${jsonPath}`);
+                if (!silent) showMessage('error', 'Impossibile caricare il calendario per questa location.');
+                return null;
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Errore nel recupero del JSON availability:', error);
+            if (!silent) showMessage('error', 'Errore nel caricamento del calendario.');
             return null;
         }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Errore nel recupero del JSON availability:', error);
-        showMessage('error', 'Errore nel caricamento del calendario.');
-        return null;
     }
-}
+
+    function isLocationClosed(data) {
+        if (!data || !data.availability) return false;
+        const values = Object.values(data.availability);
+        return values.length > 0 && values.every(v => v === false);
+    }
+
+    function markLocationAsClosed(radio) {
+        const item = radio.closest('.visualradio-item');
+        if (!item || item.classList.contains('location-closed')) return;
+        item.classList.add('location-closed');
+        radio.disabled = true;
+        const thumb = item.querySelector('.visualradio-thumb');
+        if (thumb) {
+            const badge = document.createElement('span');
+            badge.className = 'location-closed-badge';
+            badge.textContent = 'Chiusa';
+            thumb.appendChild(badge);
+        }
+    }
+
+    async function preCheckLocationsAvailability() {
+        await Promise.all(Array.from(locationRadios).map(async radio => {
+            const data = await fetchAvailabilityJSON(radio.value, true);
+            if (data && isLocationClosed(data)) {
+                markLocationAsClosed(radio);
+            }
+        }));
+    }
 
     // Funzione per costruire l'array di date disabilitate dal JSON
     function buildDisabledDatesArray(availabilityData) {
@@ -207,6 +238,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Recupera i dati di disponibilità dal JSON
         availabilityData = await fetchAvailabilityJSON(location);
+
+        if (isLocationClosed(availabilityData)) {
+            const closedRadio = document.querySelector(`input[name="location"][value="${location}"]`);
+            if (closedRadio) markLocationAsClosed(closedRadio);
+            dateField.disabled = true;
+            showMessage('error', 'Questa struttura è temporaneamente chiusa.');
+            return;
+        }
 
         // Costruisci l'array delle date disabilitate
         const disabledDates = buildDisabledDatesArray(availabilityData);
