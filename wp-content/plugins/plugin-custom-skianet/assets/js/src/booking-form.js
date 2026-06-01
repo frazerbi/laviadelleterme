@@ -246,11 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
     async function initCalendar(location) {
         if (calendar) return;
 
-        // Range di date: oggi + 60 giorni
+        // Range: primo giorno del mese corrente → ultimo giorno del mese successivo
         const today = new Date();
-        const maxDate = new Date();
-        maxDate.setDate(maxDate.getDate() + 60);
-
         const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
         const dateMinStr = formatLocalDate(firstDayCurrentMonth);

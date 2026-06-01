@@ -112,6 +112,13 @@ The booking form JS fetches these local JSON files to disable unavailable dates 
 
 **Month calculation**: Always use `new DateTime('first day of next month')` — never `new DateTime('+1 month')`. On months with 31 days (e.g. May 31), `+1 month` overflows to day 31 of June → rolls to July 1, skipping June entirely.
 
+**Timezone**: Always pass `wp_timezone()` when constructing `DateTime` objects in the cron. PHP's `date()` uses the server timezone (likely UTC); the site is Europe/Rome (UTC+2). At end-of-month the two can disagree and produce the wrong month. Pattern:
+```php
+$wp_timezone = wp_timezone();
+$current_date = new DateTime('first day of this month', $wp_timezone);
+$next_date    = new DateTime('first day of next month', $wp_timezone);
+```
+
 **Category mapping** in `check_location_availability()`:
 - December / January → `pm`
 - All other months → `p2`
@@ -121,9 +128,22 @@ The booking form JS fetches these local JSON files to disable unavailable dates 
 wp cron event run termegest_check_availability --path=/home/customer/www/laviadelleterme.it/public_html
 ```
 
+**After month turn**: re-run the cron manually so the JSON covers the correct current+next months. A stale JSON from the previous month leaves the new "next month" missing from the file.
+
 ### Booking Form JavaScript
 
 `assets/js/src/booking-form.js` is bundled as an IIFE with `globalName: 'BookingForm'`. It implements progressive field enablement: Location → Date → Ticket Type → Time Slot → Quantity. Availability is checked in two stages: (1) local JSON files for disabled dates, (2) AJAX to `wp_ajax_check_availability_api` for slot-level data. All CSS is scoped to `.skianet-booking-wrapper` via PostCSS prefix-selector at build time.
+
+**Calendar range requirement**: The calendar must always show the full current month + full next month (first day of current month → last day of next month). Do not use a fixed-days window (e.g. "today + 60 days") — it would cut off the end of next month or expose a partial third month. This range is computed as:
+```javascript
+const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+const lastDayNextMonth     = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+```
+The PHP cron mirrors this: it generates availability data for exactly the same two months.
+
+**Disabled dates — whitelist logic**: `buildDisabledDatesArray` iterates the full calendar range (dateMin→dateMax) and disables any date where `availability[dateStr]` is falsy (missing OR false). Do not use blacklist logic (filtering only explicit `false` entries) — dates absent from the JSON would appear enabled even if never checked by the cron.
+
+**Local date formatting**: Never use `new Date(...).toISOString().split('T')[0]` to produce `dateMin`/`dateMax` strings. `toISOString()` converts to UTC, shifting the date by one day for Europe/Rome (UTC+2) at midnight. Use `formatLocalDate(d)` which reads `getFullYear/getMonth/getDate` directly.
 
 ### Theme
 
