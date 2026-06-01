@@ -211,16 +211,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }));
     }
 
-    // Funzione per costruire l'array di date disabilitate dal JSON
-    function buildDisabledDatesArray(availabilityData) {
+    function formatLocalDate(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    // Costruisce le date disabilitate: disabilita tutto ciò che non è esplicitamente true nel JSON,
+    // incluse le date fuori dal range del JSON (trattate come non disponibili)
+    function buildDisabledDatesArray(availabilityData, dateMin, dateMax) {
         if (!availabilityData || !availabilityData.availability) {
             return [];
         }
 
-        // Filtra le date con availability = false e restituiscile come array
-        const disabledDates = Object.entries(availabilityData.availability)
-            .filter(([, isAvailable]) => !isAvailable)
-            .map(([date]) => date);
+        const availability = availabilityData.availability;
+        const disabledDates = [];
+
+        // Itera tutte le date nel range del calendario, non solo quelle nel JSON
+        const current = new Date(dateMin + 'T12:00:00');
+        const end = new Date(dateMax + 'T12:00:00');
+
+        while (current <= end) {
+            const dateStr = formatLocalDate(current);
+            if (!availability[dateStr]) {
+                disabledDates.push(dateStr);
+            }
+            current.setDate(current.getDate() + 1);
+        }
 
         return disabledDates;
     }
@@ -235,6 +253,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        const dateMinStr = formatLocalDate(firstDayCurrentMonth);
+        const dateMaxStr = formatLocalDate(lastDayNextMonth);
 
         // Recupera i dati di disponibilità dal JSON
         availabilityData = await fetchAvailabilityJSON(location);
@@ -248,14 +268,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Costruisci l'array delle date disabilitate
-        const disabledDates = buildDisabledDatesArray(availabilityData);
+        const disabledDates = buildDisabledDatesArray(availabilityData, dateMinStr, dateMaxStr);
 
         const options = {
             locale: 'it',
             selectedTheme: 'light',
             selectionDatesMode: 'single',
-            dateMin: firstDayCurrentMonth.toISOString().split('T')[0], 
-            dateMax: lastDayNextMonth.toISOString().split('T')[0], 
+            dateMin: dateMinStr,
+            dateMax: dateMaxStr,
             disableDates: disabledDates,
             disableDatesPast: true,
             selectedDates: dateField.value ? [dateField.value] : [],

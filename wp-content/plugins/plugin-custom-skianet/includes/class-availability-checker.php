@@ -234,13 +234,20 @@ class Availability_Checker {
      * Ottieni i mesi da controllare
      */
     private function get_months_to_check() {
-        $current_month = (int) date('n');
-        $current_year = (int) date('Y');
-        
-        $next_date = new DateTime('+1 month');
+        $wp_timezone = wp_timezone();
+
+        $current_date = new DateTime('first day of this month', $wp_timezone);
+        $current_month = (int) $current_date->format('n');
+        $current_year = (int) $current_date->format('Y');
+
+        error_log("get_months_to_check: current={$current_month}/{$current_year}, wp_timezone=" . $wp_timezone->getName());
+
+        $next_date = new DateTime('first day of next month', $wp_timezone);
         $next_month = (int) $next_date->format('n');
         $next_year = (int) $next_date->format('Y');
-        
+
+        error_log("get_months_to_check: next={$next_month}/{$next_year}");
+
         return array(
             array('month' => $current_month, 'year' => $current_year),
             array('month' => $next_month, 'year' => $next_year)

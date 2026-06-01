@@ -110,6 +110,17 @@ The `termegest_check_availability` daily cron populates JSON files at `assets/da
 ```
 The booking form JS fetches these local JSON files to disable unavailable dates before making any AJAX calls.
 
+**Month calculation**: Always use `new DateTime('first day of next month')` — never `new DateTime('+1 month')`. On months with 31 days (e.g. May 31), `+1 month` overflows to day 31 of June → rolls to July 1, skipping June entirely.
+
+**Category mapping** in `check_location_availability()`:
+- December / January → `pm`
+- All other months → `p2`
+
+**Triggering manually** (for debug/test):
+```bash
+wp cron event run termegest_check_availability --path=/home/customer/www/laviadelleterme.it/public_html
+```
+
 ### Booking Form JavaScript
 
 `assets/js/src/booking-form.js` is bundled as an IIFE with `globalName: 'BookingForm'`. It implements progressive field enablement: Location → Date → Ticket Type → Time Slot → Quantity. Availability is checked in two stages: (1) local JSON files for disabled dates, (2) AJAX to `wp_ajax_check_availability_api` for slot-level data. All CSS is scoped to `.skianet-booking-wrapper` via PostCSS prefix-selector at build time.

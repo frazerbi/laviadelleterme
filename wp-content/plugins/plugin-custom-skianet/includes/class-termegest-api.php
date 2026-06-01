@@ -148,8 +148,18 @@ class TermeGest_API {
                 new GetDisponibilita($year, $month, $categoria, $location)
             );
 
-            return (new AnyXML($response->getGetDisponibilitaResult()?->getAny()))->convertXmlToPhpObject();
+            $any = $response->getGetDisponibilitaResult()?->getAny();
+
+            if ($any === null) {
+                error_log("get_disponibilita: getAny() ha ritornato NULL per {$year}-{$month}, cat={$categoria}");
+                return [];
+            }
+
+            error_log("get_disponibilita raw XML ({$year}-{$month}, cat={$categoria}): " . substr($any, 0, 500));
+
+            return (new AnyXML($any))->convertXmlToPhpObject();
         } catch (Throwable $throwable) {
+            error_log("ERRORE get_disponibilita ({$year}-{$month}, cat={$categoria}): " . $throwable->getMessage());
             return [];
         }
     }
