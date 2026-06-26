@@ -9,7 +9,7 @@
  * nothing. Runs at wp_footer priority 5, before print_tracking_calls (prio 10).
  *
  * Events covered:
- *   - view_item      → woocommerce_before_single_product never fires on
+ *   - view_item      → woocommerce_after_single_product_summary never fires on
  *                       Elementor single-product templates.
  *   - view_item_list → woocommerce_product_loop_end never fires when Elementor
  *                       renders the shop/archive with its own product widgets

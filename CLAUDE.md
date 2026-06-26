@@ -151,6 +151,28 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 - `style.css` — Custom WooCommerce and site-wide CSS overrides
 - `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes
 - `woocommerce/emails/` — Custom WooCommerce email templates (prefixed with `__` = disabled/legacy)
+- `ga4-elementor-compat.php` — GA4 event fallbacks for Elementor pages (see below)
+
+### GA4 / Elementor Compatibility
+
+`wp-content/themes/hello-theme-child-master/ga4-elementor-compat.php` (included from `functions.php`) provides fallbacks for GA4 events that rely on WooCommerce template hooks. Elementor Pro replaces the WC PHP template via `template_include`, so those hooks never fire on Elementor-built pages.
+
+**Pattern**: hook `wp_footer` at priority 5 (before `print_tracking_calls` at priority 10), guard with `did_action('<wc_hook>') > 0` to avoid double-tracking on standard WC pages, then call `$event->track()` manually.
+
+**Events with fallbacks:**
+
+| Event | WC hook that breaks on Elementor | Guard |
+|---|---|---|
+| `view_item` | `woocommerce_after_single_product_summary` | `did_action('woocommerce_after_single_product_summary') > 0` |
+| `view_item_list` | `woocommerce_product_loop_end` | `did_action('woocommerce_product_loop_end') > 0` |
+
+`view_item_list` fallback reads products from `$wp_query->posts` — WordPress populates this regardless of Elementor.
+
+**`select_item` cannot be fixed** — it injects click listeners on `.products .post-{id} a` (WC loop DOM); Elementor product widgets use a different DOM structure.
+
+**Safe events (no fallback needed):** `view_cart`, `begin_checkout`, `add_*_info`, `view_account`, `view_order`, `view_sign_up` fire inside WC shortcodes Elementor embeds unchanged. All data/action events (`login`, `add_to_cart`, `purchase`, `refund`, etc.) have no template dependency.
+
+**Note on `View_Item_Event.php`**: the hook was changed from `woocommerce_before_single_product` to `woocommerce_after_single_product_summary`. Both are inside the standard WC template and both are equally bypassed by Elementor; the compat guard uses the same hook the event now listens on.
 
 ### Assets Pipeline (plugin-custom-skianet)
 
