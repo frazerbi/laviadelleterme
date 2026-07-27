@@ -65,6 +65,19 @@ add_action('template_redirect', 'laviadelleterme_reindirizza_utenti_non_loggati_
 // Disabilita la richiesta di conferma email admin (causa pagine bianche su login custom)
 add_filter( 'admin_email_check_interval', '__return_false' );
 
+/**
+ * Verifica che un URL punti davvero al dominio del sito (confronto host, non substring:
+ * "https://evil.tld/?x=" + home_url() supererebbe un semplice strpos()).
+ */
+function laviadelleterme_is_local_url( $url ) {
+    if ( empty( $url ) ) {
+        return false;
+    }
+    $url_host  = wp_parse_url( $url, PHP_URL_HOST );
+    $site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+    return $url_host && $site_host && strtolower( $url_host ) === strtolower( $site_host );
+}
+
 add_filter( 'woocommerce_login_redirect', 'laviadelleterme_custom_login_redirect', 10, 2 );
 function laviadelleterme_custom_login_redirect( $redirect, $user ) {
 
@@ -82,15 +95,15 @@ function laviadelleterme_custom_login_redirect( $redirect, $user ) {
             ? esc_url_raw( $redirect_param )
             : home_url( esc_url_raw( $redirect_param ) );
 
-        if ( strpos( $full_url, home_url() ) !== false ) {
+        if ( laviadelleterme_is_local_url( $full_url ) ) {
             return $full_url;
         }
     }
 
     // Usa il referer per capire da dove proviene l'utente
-    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
-    if ( !empty( $referer ) && strpos( $referer, home_url() ) !== false ) {
+    if ( laviadelleterme_is_local_url( $referer ) ) {
         // Se era nel checkout, rimanda al checkout
         if ( strpos( $referer, '/checkout' ) !== false ) {
             return wc_get_checkout_url();
@@ -123,15 +136,15 @@ function laviadelleterme_custom_registration_redirect( $redirect ) {
             ? esc_url_raw( $redirect_param )
             : home_url( esc_url_raw( $redirect_param ) );
 
-        if ( strpos( $full_url, home_url() ) !== false ) {
+        if ( laviadelleterme_is_local_url( $full_url ) ) {
             return $full_url;
         }
     }
 
     // Usa il referer per capire da dove proviene l'utente
-    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : '';
+    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
-    if ( !empty( $referer ) && strpos( $referer, home_url() ) !== false ) {
+    if ( laviadelleterme_is_local_url( $referer ) ) {
         // Se era nel checkout, rimanda al checkout
         if ( strpos( $referer, '/checkout' ) !== false ) {
             return wc_get_checkout_url();
