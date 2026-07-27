@@ -174,6 +174,29 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 
 **Note on `View_Item_Event.php`**: the hook was changed from `woocommerce_before_single_product` to `woocommerce_after_single_product_summary`. Both are inside the standard WC template and both are equally bypassed by Elementor; the compat guard uses the same hook the event now listens on.
 
+### Thank You Page & Order-Pay Payment Status
+
+`wp-content/themes/hello-theme-child-master/thankyou/thankyou.php` and `order-pay/order-pay.php` (both required from `functions.php`) make the order-received and order-pay pages reflect the order's **actual** payment status instead of always looking successful.
+
+**Why this matters**: `_booking_id` order item meta (see `Booking_Cart_Handler::add_booking_data_to_order_items`) is written at checkout time — before any payment happens — so its mere presence can't be used to mean "booking confirmed". Likewise the Elementor heading widget on the thank-you page has hardcoded text ("Pagamento") that used to be replaced with "Ordine ricevuto!" unconditionally.
+
+**`laviadelleterme_thankyou_order_is_confirmed( $order )`** (defined in `thankyou.php`) is the single source of truth: `true` only for order status `processing`, `completed`, `booked`, `not-booked`. `booked`/`not-booked` are reached only by passing through `completed` first (see `Booking_Order_Status`), so plain `$order->is_paid()` is not enough — those two statuses aren't in WC's default paid-statuses list.
+
+Driven by that helper, `thankyou.php` conditionally:
+- Rewrites the Elementor H1 to "Ordine ricevuto!" (confirmed) vs "Ordine in attesa di pagamento" (not confirmed).
+- Overrides `woocommerce_thankyou_order_received_text` (the generic WC notice) when not confirmed.
+- Shows a per-item badge: green "Prenotazione confermata", amber "Usa i codici per completare la prenotazione" (non-booking item, confirmed order), or red "In attesa di pagamento" (order not confirmed, checked first — takes priority over the `_booking_id` check).
+- Adds a body class `thankyou-awaiting-payment` (via `body_class` filter) when not confirmed — used in `thankyou.css` to hide the Mollie gateway's own (English, unstyled) "payment status" instructions box only in that case.
+- Outputs a "Completa il pagamento" CTA box (`woocommerce_thankyou` hook) linking to `$order->get_checkout_payment_url()`, gated on `$order->needs_payment()` so it doesn't show for e.g. on-hold/BACS orders that don't need customer action.
+
+`order-pay/order-pay.php` handles the retry-payment page itself: hooks `template_redirect` at **priority 20**, i.e. after `WC_Form_Handler::pay_action()` (priority 10) has run. If the payment attempt succeeds, `pay_action()` already redirected + `exit`ed before priority 20 runs. If code still reaches priority 20, the POST (`woocommerce_pay=1`) didn't lead anywhere, so a `wc_add_notice(..., 'notice')` explains that a previous payment attempt may still be pending. This was written after discovering (via the Mollie plugin's own debug log — enable it in WooCommerce → Settings → Payments → Mollie) that Mollie blocks creating a new payment for an order while a previous one is still "active and non-cancellable" for that order, and does so **silently** (no WC error notice, no JS error, plain 200 response) — the fix is intentionally gateway-agnostic rather than parsing Mollie's internals.
+
+**Checkout styling**: `checkout/checkout.css` (required/enqueued from `functions.php` on `is_checkout()`) styles generic WooCommerce checkout markup — the notices wrapper, the `#payment` payment-methods list (Mollie gateways: card, Satispay, Bancomat Pay), and the terms/place-order area. It's a separate file from `order-pay.php`/`order-pay.css` on purpose: this markup and its styling apply to **both** the normal `/checkout/` page and the `/checkout/order-pay/…` retry page (same WC template), whereas `order-pay/` holds logic/styling specific to the retry-payment scenario only. Note: `is_checkout_pay_page()` was tried first for a narrower, order-pay-only enqueue but the `<link>` tag never appeared in the rendered page on this Elementor setup — root cause not fully diagnosed (suspect the enqueue callback ran against a build of `functions.php` on the server that predated the change, since deploys here can be manual FTP uploads — see "Manual uploads" below); switching to the broader, well-established `is_checkout()` conditional resolved it.
+
+**Payment method list markup gotcha**: each `<li class="wc_payment_method">` (rendered via WC's standard `woocommerce_payment_methods_list` markup — gateway-agnostic) contains `<input type="radio">`, `<label>`, and — for gateways with inline fields like a credit card element — a `.payment_box` div, all as **siblings**, not nested inside the label. Styling the `<li>` as `display: flex; align-items: center; flex-wrap: wrap` with the radio `flex-shrink: 0`, the label `flex: 1 1 auto`, and `.payment_box { flex: 1 0 100%; }` (forcing it onto its own full-width row) is required — without `flex-wrap: wrap` + the `.payment_box` flex-basis, it renders inline after the label instead of below it. Content **inside** hosted payment-field iframes (Mollie Components, Stripe Elements/UPE) is cross-origin and not stylable via this repo's CSS at all — that requires changing the `styles`/appearance params the gateway's own JS passes when creating those components.
+
+**Staging vs. production use different payment gateways**: staging2 (`staging2.laviadelleterme.it`) is configured with the **Mollie** WooCommerce plugin for card / Satispay / Bancomat Pay (`mollie_wc_gateway_*` classes, `.mollie-instructions`, `.mollie-component*` markup — see the Mollie-specific notes above). Production (`laviadelleterme.it`) instead uses **Stripe** (UPE, `payment_method_stripe`, `.wc-stripe-upe-element`) for cards and a separate **`woo-satispay`** plugin (`payment_method_satispay`, plain `<img>` with no class) for Satispay — entirely different plugins/markup, not just a config toggle within Mollie. `checkout/checkout.css` selectors were kept as generic as possible (targeting core WC classes, not gateway-specific ones) so the base layout works on both; the icon-sizing rule in particular was deliberately changed from a Mollie-only class match (`img.mollie-gateway-icon`) to a plain `label img` selector so it also covers `woo-satispay`'s unclassed logo. Gateway-specific styling (Mollie Components field labels, Stripe UPE fieldset/checkbox) still needs to be verified/built separately per environment — don't assume a Mollie-specific fix or debug finding (e.g. the order-pay "blocked retry" behavior) applies on production, which doesn't run Mollie at all.
+
 ### Assets Pipeline (plugin-custom-skianet)
 
 - Source CSS: `assets/css/booking-form.css`, `assets/css/booking-only-form.css`, `assets/css/pdp.css`
@@ -195,6 +218,8 @@ Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (
 ### Deployment
 
 GitHub Actions (`.github/workflows/deploy.yml`) deploys automatically to `staging2.laviadelleterme.it` on every push to `main`, via rsync over SSH (port 18765). Requires `SSH_KEY` secret in GitHub Actions.
+
+**Manual uploads**: the user also sometimes uploads changed files directly to staging via FTP/SFTP (e.g. Cyberduck) instead of going through git push. This means staging's actual state can diverge from — or be ahead of — what's committed in this repo. Don't assume "not committed" means "not live on staging"; when debugging a live behavior discrepancy, ask whether the relevant files were deployed (git push or manual upload) rather than assuming git history reflects staging.
 
 ### Disabled/Legacy Components
 

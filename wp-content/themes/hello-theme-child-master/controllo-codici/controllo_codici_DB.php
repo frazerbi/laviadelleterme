@@ -5,13 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-function funzione_controllo_codici() {
-    
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+function laviadelleterme_controllo_codici() {
 
-    if ($conn->connect_error) {
-        return '<p>Errore di connessione al database.</p>';
-    }
+    global $wpdb;
 
     $prodotti = [
         1677  => 'P5 Hotel + Ingresso alle Terme (Valido per 2 persone) - Mezza giornata',
@@ -36,29 +32,22 @@ function funzione_controllo_codici() {
         29044 => 'Hotel De La Ville 3 Notti + 2 Ingressi Terme + Veglione Di Capodanno',
     ];
 
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM `wp_wc_ld_license_codes` WHERE order_id = 0 AND product_id = ?");
-    
-    if (!$stmt) {
-        return '<p>Errore nella preparazione della query.</p>';
-    }
-
     $output = '<ul class="controllo-codici-list">';
 
     foreach ($prodotti as $product_id => $label) {
-        $stmt->bind_param('i', $product_id);
-        $stmt->execute();
-        $stmt->bind_result($count);
-        $stmt->fetch();
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$wpdb->prefix}wc_ld_license_codes` WHERE order_id = 0 AND product_id = %d",
+                $product_id
+            )
+        );
 
         $output .= '<li><strong>' . esc_html($label) . '</strong><span class="codici-count">' . (int)$count . '</span></li>';
     }
 
     $output .= '</ul>';
 
-    $stmt->close();
-    $conn->close();
-
     return $output;
 }
 
-add_shortcode('controllo_codici_prezzo_pieno', 'funzione_controllo_codici');
+add_shortcode('controllo_codici_prezzo_pieno', 'laviadelleterme_controllo_codici');

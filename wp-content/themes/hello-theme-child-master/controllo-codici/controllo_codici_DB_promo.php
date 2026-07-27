@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-function funzione_controllo_codici_promo() {
+function laviadelleterme_controllo_codici_promo() {
 
     global $wpdb;
 
@@ -42,4 +42,4 @@ function funzione_controllo_codici_promo() {
     return $output;
 }
 
-add_shortcode('controllo_codici_promo', 'funzione_controllo_codici_promo');
+add_shortcode('controllo_codici_promo', 'laviadelleterme_controllo_codici_promo');

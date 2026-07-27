@@ -8,6 +8,11 @@
 	display: none !important;
 }
 
+/* ---- Nasconde il box istruzioni del plugin Mollie, solo se l'ordine è in attesa di pagamento ---- */
+body.thankyou-awaiting-payment .mollie-instructions {
+	display: none !important;
+}
+
 /* ============================================================
    Layout due colonne: order-details | customer-details
    ============================================================ */
@@ -231,6 +236,39 @@
 
 .thankyou-booking-status--pending .thankyou-booking-status__dot {
 	background: #dc7800;
+}
+
+/* In attesa di pagamento — rosso */
+.thankyou-booking-status--awaiting {
+	background: rgba(200, 30, 30, 0.08);
+	border: 1px solid rgba(200, 30, 30, 0.25);
+	color: #a51616;
+}
+
+.thankyou-booking-status--awaiting .thankyou-booking-status__dot {
+	background: #c81e1e;
+}
+
+/* ---- Box completamento pagamento ---- */
+
+.thankyou-complete-payment {
+	grid-column: 1 / -1;
+	margin: 0 0 2rem;
+	padding: 1.25rem 1.5rem;
+	border-radius: 14px;
+	background: rgba(200, 30, 30, 0.06);
+	border: 1px solid rgba(200, 30, 30, 0.25);
+	text-align: center;
+}
+
+.thankyou-complete-payment__text {
+	margin: 0 0 1rem !important;
+	color: #a51616 !important;
+	font-weight: 500;
+}
+
+.thankyou-complete-payment__button {
+	display: inline-block;
 }
 
 /* Badge quantità */

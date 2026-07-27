@@ -6,15 +6,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 // Personalizza l'URL di registrazione
-function custom_register_url( $url ) {
+function laviadelleterme_custom_register_url( $url ) {
     return home_url('/login-e-registrazione/');
     
 }
-add_filter( 'register_url', 'custom_register_url', 10, 1 );
+add_filter( 'register_url', 'laviadelleterme_custom_register_url', 10, 1 );
 
 
 // Personalizza l'URL di login
-function custom_login_url( $url, $redirect = '', $force_reauth = false ) {
+function laviadelleterme_custom_login_url( $url, $redirect = '', $force_reauth = false ) {
     // URL personalizzato per la pagina di login
     $custom_url = home_url('/login-e-registrazione/');
     
@@ -29,13 +29,13 @@ function custom_login_url( $url, $redirect = '', $force_reauth = false ) {
     
     return $custom_url;
 }
-add_filter( 'login_url', 'custom_login_url', 10, 3 );
+add_filter( 'login_url', 'laviadelleterme_custom_login_url', 10, 3 );
 
 /**
  * Reindirizza utenti non loggati dalla pagina my-account alla pagina di login
  * escludendo la pagina di recupero password
  */
-function reindirizza_utenti_non_loggati_myaccount() {
+function laviadelleterme_reindirizza_utenti_non_loggati_myaccount() {
     // Non interferire con le richieste AJAX
     if ( wp_doing_ajax() || isset( $_GET['wc-ajax'] ) ) {
         return;
@@ -60,13 +60,13 @@ function reindirizza_utenti_non_loggati_myaccount() {
     }
 }
 // Aggiungi l'azione all'hook template_redirect
-add_action('template_redirect', 'reindirizza_utenti_non_loggati_myaccount');
+add_action('template_redirect', 'laviadelleterme_reindirizza_utenti_non_loggati_myaccount');
 
 // Disabilita la richiesta di conferma email admin (causa pagine bianche su login custom)
 add_filter( 'admin_email_check_interval', '__return_false' );
 
-add_filter( 'woocommerce_login_redirect', 'custom_login_redirect', 10, 2 );
-function custom_login_redirect( $redirect, $user ) {
+add_filter( 'woocommerce_login_redirect', 'laviadelleterme_custom_login_redirect', 10, 2 );
+function laviadelleterme_custom_login_redirect( $redirect, $user ) {
 
     // Controlla parametri redirect espliciti (WooCommerce usa 'redirect', WordPress usa 'redirect_to')
     $redirect_param = '';
@@ -107,8 +107,8 @@ function custom_login_redirect( $redirect, $user ) {
     return wc_get_page_permalink( 'myaccount' );
 }
 
-add_filter( 'woocommerce_registration_redirect', 'custom_registration_redirect', 10, 1 );
-function custom_registration_redirect( $redirect ) {
+add_filter( 'woocommerce_registration_redirect', 'laviadelleterme_custom_registration_redirect', 10, 1 );
+function laviadelleterme_custom_registration_redirect( $redirect ) {
 
     // Controlla parametri redirect espliciti
     $redirect_param = '';
