@@ -148,10 +148,25 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 ### Theme
 
 `wp-content/themes/hello-theme-child-master/` — Child theme of Hello Elementor:
-- `style.css` — Custom WooCommerce and site-wide CSS overrides
+- `style.css` — Custom WooCommerce and site-wide CSS overrides (main stylesheet; must stay at theme root, WP requirement)
+- `assets/css/`, `assets/js/` — global, non-feature-specific assets (currently `mobile-menu-style.css`, `script.js`)
+- `checkout/`, `order-pay/`, `thankyou/`, `my-account/`, `controllo-codici/` — one folder per feature module, each bundling its own PHP + CSS/JS, required individually from `functions.php`
 - `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes
 - `woocommerce/emails/` — Custom WooCommerce email templates (prefixed with `__` = disabled/legacy)
 - `ga4-elementor-compat.php` — GA4 event fallbacks for Elementor pages (see below)
+- `performance-optimization.php` — disables Gutenberg, emoji scripts, oEmbed, XML-RPC, comments (all post types, including products — no WC product reviews in use), throttles Heartbeat, limits post revisions to 3, strips self-pings. Required from `functions.php`; do **not** re-add a `?ver` query-string-stripping filter here — it was removed because it silently defeated the theme's asset cache-busting (see below).
+
+**Why this structure**: the theme has no single template-heavy surface to override, just a handful of independent WooCommerce page customizations — grouping each by feature (rather than the classic WP `inc/`-by-type convention) makes it obvious what touches what, and mirrors `plugin-custom-skianet`'s one-class-per-responsibility pattern.
+
+**`woocommerce/` is reserved — do not add feature folders there.** WooCommerce resolves theme template overrides by exact path (e.g. `woocommerce/checkout/thankyou.php` is the real order-received template, `woocommerce/checkout/form-pay.php` the real order-pay template, `woocommerce/myaccount/*.php` the real My Account templates — note: no hyphen). This theme's own `checkout/`, `order-pay/`, `my-account/` folders live at theme root specifically to avoid colliding with those reserved paths; a file placed at, say, `woocommerce/checkout/thankyou.php` would silently replace WooCommerce's real template with whatever this repo put there (these modules contain only hooked PHP, not full markup), breaking the page. Only actual template overrides belong under `woocommerce/`.
+
+**Global function naming**: loose (non-class) functions in the theme are prefixed `laviadelleterme_` to avoid collisions in the global namespace (WordPress/plugins share one global function table).
+
+**Asset versioning**: `functions.php` enqueues every theme asset with a single version — `wp_get_theme()->get( 'Version' )`, i.e. the `Version:` header in `style.css`. Bump that header whenever a theme CSS/JS file changes, otherwise browsers keep serving the cached copy after a deploy (relevant since deploys here are sometimes manual FTP, not just `git push` — see "Manual uploads" below).
+
+**`controllo-codici/`**: two public shortcodes (`controllo_codici_prezzo_pieno`, `controllo_codici_promo`) that query `{$wpdb->prefix}wc_ld_license_codes` and print remaining unassigned license-code counts per product. No capability check — anyone viewing a page containing the shortcode sees these counts; access control depends entirely on the page(s) hosting them being otherwise restricted.
+
+**`my-account/my-account.php`**: custom login/registration URLs and post-login/registration redirect logic. Redirect targets (explicit `redirect`/`redirect_to` params and the `Referer` fallback) are validated via `laviadelleterme_is_local_url()`, which compares hosts with `wp_parse_url(...,  PHP_URL_HOST)` — do not go back to a plain `strpos($url, home_url())` substring check, it's bypassable (`https://evil.tld/?x=` + `home_url()` passes it) and was an open-redirect vector here until fixed.
 
 ### GA4 / Elementor Compatibility
 
@@ -219,7 +234,7 @@ Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (
 
 GitHub Actions (`.github/workflows/deploy.yml`) deploys automatically to `staging2.laviadelleterme.it` on every push to `main`, via rsync over SSH (port 18765). Requires `SSH_KEY` secret in GitHub Actions.
 
-**Manual uploads**: the user also sometimes uploads changed files directly to staging via FTP/SFTP (e.g. Cyberduck) instead of going through git push. This means staging's actual state can diverge from — or be ahead of — what's committed in this repo. Don't assume "not committed" means "not live on staging"; when debugging a live behavior discrepancy, ask whether the relevant files were deployed (git push or manual upload) rather than assuming git history reflects staging.
+**Manual uploads**: the user also sometimes uploads changed files directly to staging **or production** via FTP/SFTP (e.g. Cyberduck) instead of going through git push — production (`laviadelleterme.it`) has no CI deploy at all, so it is *only* ever updated this way. This means both environments' actual state can diverge from — or be ahead of — what's committed in this repo (e.g. `performance-optimization.php` existed on production before it was committed here). Don't assume "not committed" means "not live"; when debugging a live behavior discrepancy, ask whether the relevant files were deployed (git push or manual upload, and to which environment) rather than assuming git history reflects either environment.
 
 ### Disabled/Legacy Components
 

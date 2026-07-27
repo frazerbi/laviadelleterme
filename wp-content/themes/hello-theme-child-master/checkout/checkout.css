@@ -96,6 +96,7 @@ body.woocommerce-checkout #payment .payment_box {
 	margin: 0 !important;
 	font-family: "Muli", Sans-serif;
 	font-size: 0.9rem;
+	border-radius: 12px;
 }
 
 body.woocommerce-checkout #payment .payment_box::before {
