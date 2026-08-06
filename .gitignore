@@ -8,6 +8,9 @@ package-lock.json
 */dist/
 **/plugin-custom-skianet/assets/data/
 woocommerce-google-analytics-pro/
+woo-satispay/
+woocommerce-gateway-stripe/
+mollie-payments-for-woocommerce/
 
 # ignore node dependency directories
 */node_modules/
