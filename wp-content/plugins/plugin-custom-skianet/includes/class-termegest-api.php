@@ -59,6 +59,28 @@ class TermeGest_API {
     }
 
     /**
+     * Esegue una chiamata SOAP ritentando solo sugli errori cURL che falliscono
+     * prima che la richiesta parta (DNS/connessione) - mai su un timeout, per
+     * evitare di rieseguire un'operazione che potrebbe già essere arrivata al server.
+     */
+    private function call_with_retry(callable $call, int $max_attempts = 3) {
+        $attempt = 0;
+        do {
+            $attempt++;
+            try {
+                return $call();
+            } catch (Exception $exception) {
+                $is_pre_send_curl_error = (bool) preg_match('/cURL error (5|6|7):/', $exception->getMessage());
+                if (!$is_pre_send_curl_error || $attempt >= $max_attempts) {
+                    throw $exception;
+                }
+                error_log("⚠️ TermeGest: connessione fallita (tentativo {$attempt}/{$max_attempts}), retry: " . $exception->getMessage());
+                sleep(1);
+            }
+        } while ($attempt < $max_attempts);
+    }
+
+    /**
      * Ottieni client GetReserv (cached per performance)
      */
     private function get_reserv_client() {
@@ -257,9 +279,9 @@ class TermeGest_API {
         ];
 
         try {
-            $response = $this->get_reserv_client()->setPrenotazione(
+            $response = $this->call_with_retry(fn () => $this->get_reserv_client()->setPrenotazione(
                 new SetPrenotazione(...array_values($parameters))
-            );
+            ));
 
             return [
                 'status' => $response->getSetPrenotazioneResult(), 
@@ -289,7 +311,7 @@ class TermeGest_API {
         ];
 
         try {
-            $response = $this->get_set_info_client()->setVenduto(
+            $response = $this->call_with_retry(fn () => $this->get_set_info_client()->setVenduto(
                 new SetVenduto(
                     $parameters['codice'],
                     $parameters['prezzo'],
@@ -297,7 +319,7 @@ class TermeGest_API {
                     $parameters['email'],
                     $parameters['security']
                 )
-            );
+            ));
 
             return $response->getSetVendutoResult();
         } catch (Exception $exception) {

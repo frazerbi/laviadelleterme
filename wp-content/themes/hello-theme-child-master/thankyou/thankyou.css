@@ -8,8 +8,8 @@
 	display: none !important;
 }
 
-/* ---- Nasconde il box istruzioni del plugin Mollie, solo se l'ordine è in attesa di pagamento ---- */
-body.thankyou-awaiting-payment .mollie-instructions {
+/* ---- Nasconde il box istruzioni del plugin Mollie (inglese, non stilizzato) ---- */
+.mollie-instructions {
 	display: none !important;
 }
 
