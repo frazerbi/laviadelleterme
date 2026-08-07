@@ -137,6 +137,10 @@ class Booking_Checkout_Fields {
             .health-certificate-wrapper label:hover span {
                 color: #0074A0;
             }
+            .health-certificate-content.health-cert-error {
+                border: 2px solid #d9534f;
+                box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.2);
+            }
         </style>
         <?php
     }
@@ -207,6 +211,33 @@ class Booking_Checkout_Fields {
                 fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: formData });
             }
 
+            // Evidenzia il box e scrolla ad esso quando manca l'accettazione della dichiarazione
+            function highlightHealthCertBox() {
+                var certBox = document.querySelector('.health-certificate-content');
+                if (!certBox) return;
+
+                certBox.classList.add('health-cert-error');
+                certBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            function clearHealthCertHighlight() {
+                var certBox = document.querySelector('.health-certificate-content');
+                if (certBox) certBox.classList.remove('health-cert-error');
+            }
+
+            function bindCheckoutErrorHandler() {
+                if (typeof window.jQuery === 'undefined') return;
+
+                window.jQuery(document.body).on('checkout_error', function() {
+                    var notices = document.querySelector('.woocommerce-NoticeGroup-checkout, .woocommerce-notices-wrapper, .woocommerce-error');
+                    var noticeText = notices ? notices.textContent : '';
+
+                    if (noticeText.indexOf('dichiarazione di buona salute') !== -1) {
+                        highlightHealthCertBox();
+                    }
+                });
+            }
+
             function init() {
                 var checkbox = document.getElementById('health_certificate_accepted');
                 if (!checkbox) return;
@@ -217,6 +248,9 @@ class Booking_Checkout_Fields {
                 checkbox.addEventListener('change', function() {
                     toggleExpressPayments(this.checked);
                     saveToSession(this.checked);
+                    if (this.checked) {
+                        clearHealthCertHighlight();
+                    }
                 });
 
                 // Osserva DOM per express buttons caricati dopo (lazy loaded)
@@ -227,6 +261,8 @@ class Booking_Checkout_Fields {
                 });
                 var paymentArea = document.getElementById('payment') || document.body;
                 observer.observe(paymentArea, { childList: true, subtree: true });
+
+                bindCheckoutErrorHandler();
             }
 
             if (document.readyState === 'loading') {
