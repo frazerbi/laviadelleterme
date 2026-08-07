@@ -94,3 +94,83 @@ add_action( 'woocommerce_thankyou', function ( $order_id ) {
 		. '<a href="' . esc_url( $order->get_checkout_payment_url() ) . '" class="button thankyou-complete-payment__button">Completa il pagamento</a>'
 		. '</div>';
 } );
+
+// Endpoint AJAX per il polling di stato (vedi sotto): usato solo dalla thank-you page quando
+// l'ordine risulta ancora "in attesa" ma necessita di pagamento. La order key va validata come
+// fa il webhook di Mollie stesso ($order->key_is_valid()), altrimenti chiunque potrebbe
+// interrogare lo stato di un ordine arbitrario passando solo un order_id.
+add_action( 'wp_ajax_laviadelleterme_check_order_confirmed', 'laviadelleterme_ajax_check_order_confirmed' );
+add_action( 'wp_ajax_nopriv_laviadelleterme_check_order_confirmed', 'laviadelleterme_ajax_check_order_confirmed' );
+function laviadelleterme_ajax_check_order_confirmed() {
+	check_ajax_referer( 'laviadelleterme_order_status', 'nonce' );
+
+	$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
+	$key      = isset( $_POST['key'] ) ? wc_clean( wp_unslash( $_POST['key'] ) ) : '';
+	$order    = $order_id ? wc_get_order( $order_id ) : false;
+
+	if ( ! $order || ! $order->key_is_valid( $key ) ) {
+		wp_send_json_error( null, 403 );
+	}
+
+	wp_send_json_success( array( 'confirmed' => laviadelleterme_thankyou_order_is_confirmed( $order ) ) );
+}
+
+// Polling automatico dello stato ordine, SOLO quando l'ordine è ancora "in attesa" ma richiede
+// pagamento (stessa condizione del box "Completa il pagamento" sopra). Copre la race condition
+// per cui il browser torna sulla thank-you page da Mollie prima che il webhook asincrono di
+// Mollie (separato dal redirect del browser, vedi MollieOrderService::onWebhookAction) abbia
+// aggiornato lo stato dell'ordine: se nel frattempo l'ordine viene confermato, la pagina si
+// ricarica da sola. Nessun impatto per gli ordini già confermati (nessuno script stampato) né
+// per chi resta davvero in attesa a lungo (es. bonifico): il polling si ferma da solo dopo ~30s.
+add_action( 'woocommerce_thankyou', function ( $order_id ) {
+	$order = wc_get_order( $order_id );
+
+	if ( ! $order || laviadelleterme_thankyou_order_is_confirmed( $order ) || ! $order->needs_payment() ) {
+		return;
+	}
+
+	$data = array(
+		'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+		'orderId'  => $order->get_id(),
+		'orderKey' => $order->get_order_key(),
+		'nonce'    => wp_create_nonce( 'laviadelleterme_order_status' ),
+	);
+	?>
+	<script>
+	( function ( cfg ) {
+		var attempts    = 0;
+		var maxAttempts = 12; // ~30s totali (intervallo 2.5s), poi si ferma senza refresh
+
+		function poll() {
+			attempts++;
+
+			var body = new URLSearchParams( {
+				action:   'laviadelleterme_check_order_confirmed',
+				order_id: cfg.orderId,
+				key:      cfg.orderKey,
+				nonce:    cfg.nonce
+			} );
+
+			fetch( cfg.ajaxUrl, { method: 'POST', body: body } )
+				.then( function ( res ) { return res.json(); } )
+				.then( function ( data ) {
+					if ( data && data.success && data.data && data.data.confirmed ) {
+						window.location.reload();
+						return;
+					}
+					if ( attempts < maxAttempts ) {
+						setTimeout( poll, 2500 );
+					}
+				} )
+				.catch( function () {
+					if ( attempts < maxAttempts ) {
+						setTimeout( poll, 2500 );
+					}
+				} );
+		}
+
+		setTimeout( poll, 2500 );
+	} )( <?php echo wp_json_encode( $data ); ?> );
+	</script>
+	<?php
+}, 20 );
