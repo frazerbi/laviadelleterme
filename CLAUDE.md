@@ -75,7 +75,7 @@ All classes follow the singleton pattern with `get_instance()` and are initializ
 
 ### SOAP API Integration (TermeGest)
 
-Requires PHP `ext-soap`. The plugin communicates with two SOAP endpoints:
+Requires PHP `ext-soap`. The plugin communicates with two SOAP endpoints: 
 - `https://www.termegest.it/getReserv.asmx` — get availability and reservations
 - `https://www.termegest.it/setinfo.asmx` — set sold items and bookings
 
