@@ -189,11 +189,7 @@ class Booking_Email_Notification {
             $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
         
             // ✅ Usa metodo condiviso
-            $codes = Booking_Cart_Handler::get_item_license_codes(
-                $order->get_id(), 
-                $item->get_product_id(), 
-                $item->get_variation_id()
-            );
+            $codes = Booking_Cart_Handler::get_item_license_codes($item);
         
 
             // Formatta data

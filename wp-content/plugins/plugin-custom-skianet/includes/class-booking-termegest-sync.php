@@ -435,7 +435,8 @@ class Booking_TermeGest_Sync {
      */
     private function get_license_codes_for_item($item, $use_db_query = false) {
         if ($use_db_query) {
-            return $this->get_codes_from_db($item);
+            // ✅ Usa metodo condiviso (già scoped al singolo order item, non solo al prodotto)
+            return Booking_Cart_Handler::get_item_license_codes($item);
         }
         
         $item_id = $item->get_id();
@@ -459,42 +460,4 @@ class Booking_TermeGest_Sync {
         return $codes;
     }
 
-    /**
-     * Recupera codici dal database direttamente
-     */
-    private function get_codes_from_db($item) {
-        global $wpdb;
-        
-        $order_id = $item->get_order_id();
-        $product_id = $item->get_product_id();
-        $variation_id = $item->get_variation_id();
-        $check_id = $variation_id > 0 ? $variation_id : $product_id;
-        
-        $query = $wpdb->prepare(
-            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
-            WHERE order_id = %d AND product_id = %d",
-            $order_id,
-            $check_id
-        );
-        
-        $results = $wpdb->get_results($query);
-        
-        $codes = array();
-        foreach ($results as $row) {
-            if (!empty($row->license_code1)) {
-                $code = $row->license_code1;
-            
-                // ✅ Pulisci codice da BOM e caratteri invisibili
-                $code = str_replace("\xEF\xBB\xBF", '', $code); // BOM UTF-8
-                $code = preg_replace('/[\x00-\x1F\x7F\xA0\xAD]/u', '', $code); // Caratteri invisibili
-                $code = trim($code);
-
-                if (!empty($code)) {
-                    $codes[] = $code;
-                }
-            }
-        }
-        
-        return $codes;
-    }
 }

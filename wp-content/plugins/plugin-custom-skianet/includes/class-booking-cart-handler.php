@@ -274,39 +274,67 @@ class Booking_Cart_Handler {
         return $product_quantity;
     }
     
-    /** 
-     * Recupera codici licenza per un item (metodo statico per uso condiviso)
+    /**
+     * Recupera i codici licenza spettanti a uno specifico order item (metodo statico per uso condiviso).
+     *
+     * wc_ld_license_codes associa i codici a order_id+product_id, senza distinguere
+     * l'order item: se un ordine contiene più item dello stesso prodotto (es. stessa
+     * tipologia di ingresso ma date/orari diversi), la query restituirebbe a ciascun
+     * item TUTTI i codici del prodotto nell'ordine. Per evitare la duplicazione,
+     * dividiamo la lista completa in base alla quantità cumulativa degli item con lo
+     * stesso prodotto che precedono quello richiesto (stesso ordine di iterazione di
+     * $order->get_items() usato da WC License Delivery per assegnare i codici).
      */
-    public static function get_item_license_codes($order_id, $product_id, $variation_id) {
+    public static function get_item_license_codes($item) {
         global $wpdb;
-        
-        $check_id = $variation_id > 0 ? $variation_id : $product_id;
+
+        $order_id     = $item->get_order_id();
+        $product_id   = $item->get_product_id();
+        $variation_id = $item->get_variation_id();
+        $check_id     = $variation_id > 0 ? $variation_id : $product_id;
 
         $query = $wpdb->prepare(
-            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
+            "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes
             WHERE order_id = %d AND product_id = %d",
             $order_id,
             $check_id
         );
-        
+
         $results = $wpdb->get_results($query);
-        
-        $codes = array();
+
+        $all_codes = array();
         foreach ($results as $row) {
             if (!empty($row->license_code1)) {
                 $code = $row->license_code1;
-            
+
                 // ✅ Pulisci codice da BOM e caratteri invisibili
                 $code = str_replace("\xEF\xBB\xBF", '', $code); // BOM UTF-8
                 $code = preg_replace('/[\x00-\x1F\x7F\xA0\xAD]/u', '', $code); // Caratteri invisibili
                 $code = trim($code);
-                
+
                 if (!empty($code)) {
-                    $codes[] = $code;
+                    $all_codes[] = $code;
                 }
             }
         }
-        
-        return $codes;
+
+        $order = $item->get_order();
+        if (!$order) {
+            return $all_codes;
+        }
+
+        $offset = 0;
+        foreach ($order->get_items() as $sibling) {
+            if ($sibling->get_id() === $item->get_id()) {
+                break;
+            }
+
+            $sibling_check_id = $sibling->get_variation_id() > 0 ? $sibling->get_variation_id() : $sibling->get_product_id();
+            if ($sibling_check_id === $check_id) {
+                $offset += (int) $sibling->get_quantity();
+            }
+        }
+
+        return array_slice($all_codes, $offset, (int) $item->get_quantity());
     }
 }

@@ -124,7 +124,7 @@ class Booking_Nonbooking_Email {
         $booked_codes = array();
         foreach ($order->get_items() as $item) {
             if ($item->get_meta('_booking_id')) {
-                $codes = Booking_Cart_Handler::get_item_license_codes($order_id, $item->get_product_id(), $item->get_variation_id());
+                $codes = Booking_Cart_Handler::get_item_license_codes($item);
                 $booked_codes = array_merge($booked_codes, $codes);
             }
         }
@@ -183,7 +183,7 @@ class Booking_Nonbooking_Email {
         $product_name = $item->get_name();
 
         // Recupera codici licenza ed esclude quelli dei prodotti booked
-        $codes = Booking_Cart_Handler::get_item_license_codes($order_id, $product_id, $variation_id);
+        $codes = Booking_Cart_Handler::get_item_license_codes($item);
         if (!empty($excluded_codes)) {
             $codes = array_values(array_diff($codes, $excluded_codes));
         }
