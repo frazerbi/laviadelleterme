@@ -176,11 +176,31 @@ body.woocommerce-checkout #place_order {
    Wallet / express checkout (Apple Pay, Google Pay, Link)
    ============================================================ */
 
+/* I bottoni wallet sono figli diretti del container: in colonna da
+   mobile, affiancati da tablet in su. `flex: 1 1 0` + `min-width: 0`
+   li rende di larghezza uguale a prescindere da quanti ne stampa
+   Stripe (Apple Pay / Google Pay / Link, variabili per device). */
 body.woocommerce-checkout #wc-stripe-express-checkout-element {
 	margin: 0 0 0.5rem !important;
 	display: flex;
 	flex-direction: column;
 	gap: 0.6rem;
+}
+
+body.woocommerce-checkout #wc-stripe-express-checkout-element > * {
+	min-width: 0;
+}
+
+@media (min-width: 768px) {
+
+	body.woocommerce-checkout #wc-stripe-express-checkout-element {
+		flex-direction: row;
+		align-items: stretch;
+	}
+
+	body.woocommerce-checkout #wc-stripe-express-checkout-element > * {
+		flex: 1 1 0;
+	}
 }
 
 body.woocommerce-checkout #wc-stripe-express-checkout-button-separator {
