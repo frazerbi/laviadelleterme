@@ -23,7 +23,18 @@ add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
 		return $content;
 	}
 
-	if ( 'heading' !== $widget->get_name() || ! is_wc_endpoint_url( 'order-received' ) ) {
+	if ( ! is_wc_endpoint_url( 'order-received' ) ) {
+		return $content;
+	}
+
+	// Sottotitolo hardcoded del widget Elementor ("Completa il pagamento…"): sulla
+	// order-received non ha senso. Rimosso qui e non più via CSS/JS: il display:none
+	// lato client lo faceva comparire per un istante prima di sparire.
+	if ( 'text-editor' === $widget->get_name() ) {
+		return false !== strpos( $content, 'Completa il pagamento' ) ? '' : $content;
+	}
+
+	if ( 'heading' !== $widget->get_name() ) {
 		return $content;
 	}
 
@@ -133,20 +144,6 @@ add_action( 'woocommerce_order_item_meta_end', function( $item_id, $item, $order
 	}
 }, 10, 4 );
 
-// Box con link per completare il pagamento, se l'ordine lo richiede ancora
-add_action( 'woocommerce_thankyou', function ( $order_id ) {
-	$order = wc_get_order( $order_id );
-
-	if ( ! $order || laviadelleterme_thankyou_order_is_confirmed( $order ) || ! $order->needs_payment() ) {
-		return;
-	}
-
-	echo '<div class="thankyou-complete-payment">'
-		. '<p class="thankyou-complete-payment__text">Il pagamento non è ancora andato a buon fine. Completa il pagamento per confermare l\'ordine.</p>'
-		. '<a href="' . esc_url( $order->get_checkout_payment_url() ) . '" class="button thankyou-complete-payment__button">Completa il pagamento</a>'
-		. '</div>';
-} );
-
 // Endpoint AJAX per il polling di stato (vedi sotto): usato solo dalla thank-you page quando
 // l'ordine risulta ancora "in attesa" ma necessita di pagamento. La order key va validata come
 // fa il webhook del gateway stesso ($order->key_is_valid()), altrimenti chiunque potrebbe
@@ -167,20 +164,25 @@ function laviadelleterme_ajax_check_order_confirmed() {
 	wp_send_json_success( array( 'confirmed' => laviadelleterme_thankyou_order_is_confirmed( $order ) ) );
 }
 
-// Polling automatico dello stato ordine, SOLO quando l'ordine è ancora "in attesa" ma richiede
-// pagamento (stessa condizione del box "Completa il pagamento" sopra). Copre la race condition
+// Box "Completa il pagamento" + polling automatico dello stato ordine, SOLO quando l'ordine
+// è ancora "in attesa" ma richiede davvero un'azione (niente per gli ordini già confermati né
+// per quelli che non necessitano pagamento, es. bonifico). Il polling copre la race condition
 // per cui il browser torna sulla thank-you page prima che il webhook asincrono del gateway
 // (richiesta separata dal redirect del browser) abbia aggiornato lo stato dell'ordine:
 // diagnosticata su Mollie ma vale per qualsiasi gateway asincrono, Stripe e Satispay inclusi.
-// Se nel frattempo l'ordine viene confermato, la pagina si
-// ricarica da sola. Nessun impatto per gli ordini già confermati (nessuno script stampato) né
-// per chi resta davvero in attesa a lungo (es. bonifico): il polling si ferma da solo dopo ~30s.
+// Se nel frattempo l'ordine viene confermato la pagina si ricarica da sola; per chi resta
+// davvero in attesa a lungo (es. bonifico) il polling si ferma da solo dopo ~30s.
 add_action( 'woocommerce_thankyou', function ( $order_id ) {
 	$order = wc_get_order( $order_id );
 
 	if ( ! $order || laviadelleterme_thankyou_order_is_confirmed( $order ) || ! $order->needs_payment() ) {
 		return;
 	}
+
+	echo '<div class="thankyou-complete-payment">'
+		. '<p class="thankyou-complete-payment__text">Il pagamento non è ancora andato a buon fine. Completa il pagamento per confermare l\'ordine.</p>'
+		. '<a href="' . esc_url( $order->get_checkout_payment_url() ) . '" class="button thankyou-complete-payment__button">Completa il pagamento</a>'
+		. '</div>';
 
 	$data = array(
 		'ajaxUrl'  => admin_url( 'admin-ajax.php' ),

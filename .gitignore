@@ -25,6 +25,7 @@ mollie-payments-for-woocommerce/
 ftp-kr.json
 
 # ignore 💩 files
+.DS_Store
 .DS_store
 .htaccess
 license.txt

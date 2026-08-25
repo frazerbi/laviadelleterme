@@ -3,11 +3,6 @@
    Usa le variabili globali Elementor del sito
    ============================================================ */
 
-/* ---- Nasconde il sottotitolo Elementor "Completa il pagamento..." ---- */
-.elementor-widget-woocommerce-checkout-page ~ .elementor-widget-text-editor {
-	display: none !important;
-}
-
 /* ============================================================
    Layout due colonne: order-details | customer-details
    ============================================================ */

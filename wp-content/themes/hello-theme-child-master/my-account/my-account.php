@@ -97,8 +97,20 @@ function laviadelleterme_is_local_url( $url ) {
     return $url_host && $site_host && strtolower( $url_host ) === strtolower( $site_host );
 }
 
-add_filter( 'woocommerce_login_redirect', 'laviadelleterme_custom_login_redirect', 10, 2 );
-function laviadelleterme_custom_login_redirect( $redirect, $user ) {
+/**
+ * Destinazione dopo login o registrazione. Logica unica per i due filtri, che prima
+ * avevano due copie identiche della stessa funzione.
+ *
+ * Ordine di preferenza:
+ *  1. parametro esplicito ('redirect' per WooCommerce, 'redirect_to' per WordPress),
+ *  2. pagina di provenienza (Referer), con scorciatoie per checkout e area account,
+ *  3. fallback sulla my-account.
+ *
+ * Ogni URL passa da laviadelleterme_is_local_url(): niente redirect fuori dal dominio.
+ *
+ * @return string URL di destinazione.
+ */
+function laviadelleterme_destinazione_dopo_accesso() {
 
     // Controlla parametri redirect espliciti (WooCommerce usa 'redirect', WordPress usa 'redirect_to')
     $redirect_param = '';
@@ -127,7 +139,7 @@ function laviadelleterme_custom_login_redirect( $redirect, $user ) {
         if ( strpos( $referer, '/checkout' ) !== false ) {
             return wc_get_checkout_url();
         }
-        // Se era nella my-account o nella pagina di login, rimanda alla my-account
+        // Se era nella my-account o nella pagina di login/registrazione, rimanda alla my-account
         if ( strpos( $referer, '/my-account' ) !== false || strpos( $referer, '/login-e-registrazione' ) !== false ) {
             return wc_get_page_permalink( 'myaccount' );
         }
@@ -139,43 +151,12 @@ function laviadelleterme_custom_login_redirect( $redirect, $user ) {
     return wc_get_page_permalink( 'myaccount' );
 }
 
+add_filter( 'woocommerce_login_redirect', 'laviadelleterme_custom_login_redirect', 10, 2 );
+function laviadelleterme_custom_login_redirect( $redirect, $user ) {
+    return laviadelleterme_destinazione_dopo_accesso();
+}
+
 add_filter( 'woocommerce_registration_redirect', 'laviadelleterme_custom_registration_redirect', 10, 1 );
 function laviadelleterme_custom_registration_redirect( $redirect ) {
-
-    // Controlla parametri redirect espliciti
-    $redirect_param = '';
-    if ( isset( $_REQUEST['redirect'] ) && !empty( $_REQUEST['redirect'] ) ) {
-        $redirect_param = wp_unslash( $_REQUEST['redirect'] );
-    } elseif ( isset( $_REQUEST['redirect_to'] ) && !empty( $_REQUEST['redirect_to'] ) ) {
-        $redirect_param = wp_unslash( $_REQUEST['redirect_to'] );
-    }
-
-    if ( !empty( $redirect_param ) ) {
-        $full_url = ( strpos( $redirect_param, 'http' ) === 0 )
-            ? esc_url_raw( $redirect_param )
-            : home_url( esc_url_raw( $redirect_param ) );
-
-        if ( laviadelleterme_is_local_url( $full_url ) ) {
-            return $full_url;
-        }
-    }
-
-    // Usa il referer per capire da dove proviene l'utente
-    $referer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
-
-    if ( laviadelleterme_is_local_url( $referer ) ) {
-        // Se era nel checkout, rimanda al checkout
-        if ( strpos( $referer, '/checkout' ) !== false ) {
-            return wc_get_checkout_url();
-        }
-        // Se era nella my-account o nella pagina di login/registrazione, rimanda alla my-account
-        if ( strpos( $referer, '/my-account' ) !== false || strpos( $referer, '/login-e-registrazione' ) !== false ) {
-            return wc_get_page_permalink( 'myaccount' );
-        }
-        // In tutti gli altri casi, rimanda alla pagina di provenienza
-        return $referer;
-    }
-
-    // Fallback: my-account
-    return wc_get_page_permalink( 'myaccount' );
+    return laviadelleterme_destinazione_dopo_accesso();
 }

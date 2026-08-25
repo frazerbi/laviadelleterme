@@ -1,148 +1,122 @@
-document.addEventListener("DOMContentLoaded", function() {
-  if (window.location.pathname === "/promozioni-speciali/") {
-    let link = document.querySelector(".page-id-10925 #pwbox-10925");
-    let link_1 = document.querySelector(".page-id-10925 .ppw-password-input.ppw-pcp-pf-password-input");
+document.addEventListener( 'DOMContentLoaded', function () {
 
-    if (link) {
-      link.setAttribute("type", "text");
-    }
-    if (link_1) {
-      link_1.setAttribute("type", "text");
-    }
+	/* ------------------------------------------------------------------
+	 * Pagine protette da password (plugin PPWP)
+	 * Il campo viene mostrato in chiaro di proposito: la password è unica e
+	 * condivisa, non è un dato personale. L'input viene normalizzato in
+	 * minuscolo perché su mobile la prima lettera parte maiuscola.
+	 * ------------------------------------------------------------------ */
 
-    function normalizeInput(event) {
-      event.target.value = event.target.value.toLowerCase().trim();
-    }
+	function preparaCampoPassword( selettore ) {
+		var campo = document.querySelector( selettore );
 
-    if (link) {
-      link.addEventListener("input", normalizeInput);
-    }
-    if (link_1) {
-      link_1.addEventListener("input", normalizeInput);
-    }
-  }
-});
+		if ( ! campo ) {
+			return;
+		}
 
+		campo.setAttribute( 'type', 'text' );
+		campo.addEventListener( 'input', function ( event ) {
+			event.target.value = event.target.value.toLowerCase().trim();
+		} );
+	}
 
-if(window.location.pathname == '/associazione-albergatori-della-valle-daosta/') {
-  let passField = document.querySelector('.page-id-1326 input.ppw-password-input.ppw-pcp-pf-password-input');
-  
-  if (typeof passField === 'object' && passField !== null ) {
-    passField.setAttribute('type','text');
-  }
+	var campiPassword = {
+		'/promozioni-speciali/': [
+			'.page-id-10925 #pwbox-10925',
+			'.page-id-10925 .ppw-password-input.ppw-pcp-pf-password-input'
+		],
+		'/associazione-albergatori-della-valle-daosta/': [
+			'.page-id-1326 input.ppw-password-input.ppw-pcp-pf-password-input'
+		]
+	};
 
-  jQuery('.page-id-1326 input.ppw-password-input.ppw-pcp-pf-password-input').on('input', function(evt) {
-      jQuery(this).val(function(_, val) {
-        return val.toLowerCase().trim();
-      });
-    });
-}
+	( campiPassword[ window.location.pathname ] || [] ).forEach( preparaCampoPassword );
 
 
-document.addEventListener('DOMContentLoaded', function () {
-  const menuToggle = document.querySelector('.icon-menu-mobile-toggle');
-  const menuToggleSticky = document.querySelector('.icon-menu-mobile-toggle-sticky');
-  const offCanvasContainers = document.querySelectorAll('[id^="off-canvas-"]');
-  
-  // Variabile globale per tracciare lo stato del menu
-  let isMenuOpen = false;
+	/* ------------------------------------------------------------------
+	 * Icona hamburger: resta sincronizzata con lo stato del menu off-canvas.
+	 * L'apertura e la chiusura le gestisce Elementor, qui si aggiorna solo
+	 * la classe .open sull'icona, senza toccare l'evento.
+	 * ------------------------------------------------------------------ */
 
-  // Verifica lo stato iniziale del menu basato su aria-hidden
-  function checkInitialState() {
-    if (offCanvasContainers && offCanvasContainers.length > 0) {
-      // Controlliamo il primo elemento (o puoi scegliere una logica diversa)
-      isMenuOpen = offCanvasContainers[0].getAttribute('aria-hidden') === 'false';
-      updateMenuState(isMenuOpen);
-    }
-  }
+	var toggles = [
+		document.querySelector( '.icon-menu-mobile-toggle' ),
+		document.querySelector( '.icon-menu-mobile-toggle-sticky' )
+	].filter( Boolean );
 
-  function updateMenuState(isOpen) {
-    isMenuOpen = isOpen;
-    
-    // Aggiorna entrambi i toggle in base allo stato
-    if (menuToggle) {
-      if (isOpen) {
-        menuToggle.classList.add('open');
-      } else {
-        menuToggle.classList.remove('open');
-      }
-    }
-    
-    if (menuToggleSticky) {
-      if (isOpen) {
-        menuToggleSticky.classList.add('open');
-      } else {
-        menuToggleSticky.classList.remove('open');
-      }
-    }
-  }
+	var offCanvasContainers = document.querySelectorAll( '[id^="off-canvas-"]' );
+	var isMenuOpen = false;
 
-  // IMPORTANTE: NON blocchiamo l'evento predefinito o la sua propagazione
-  // Lasciamo che Elementor gestisca l'apertura/chiusura del menu
+	function aggiornaIconaMenu( isOpen ) {
+		isMenuOpen = isOpen;
 
-  // Aggiunge eventi click per entrambi i toggle
-  if (menuToggle && offCanvasContainers.length > 0) {
-    menuToggle.addEventListener('click', () => {
-      // Qui NON usiamo event.preventDefault() o event.stopPropagation()
-      // Aggiorniamo solo lo stato visivo dell'icona dopo un breve ritardo
-      setTimeout(() => {
-        checkInitialState();
-      }, 100);
-    });
-  }
-  
-  if (menuToggleSticky && offCanvasContainers.length > 0) {
-    menuToggleSticky.addEventListener('click', () => {
-      // Qui NON usiamo event.preventDefault() o event.stopPropagation()
-      // Aggiorniamo solo lo stato visivo dell'icona dopo un breve ritardo
-      setTimeout(() => {
-        checkInitialState();
-      }, 100);
-    });
-  }
-  
-  // Osserva cambiamenti nell'attributo aria-hidden
-  if (offCanvasContainers.length > 0 && 'MutationObserver' in window) {
-    // Per ogni contenitore off-canvas, aggiungi un observer
-    offCanvasContainers.forEach(container => {
-      const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-          if (mutation.type === 'attributes' && 
-              (mutation.attributeName === 'aria-hidden' || mutation.attributeName === 'class')) {
-            // Controlla se lo stato è cambiato
-            const newState = container.getAttribute('aria-hidden') === 'false';
-            
-            // Aggiorna lo stato solo se è diverso da quello attuale
-            if (newState !== isMenuOpen) {
-              updateMenuState(newState);
-            }
-          }
-        });
-      });
-      
-      observer.observe(container, { 
-        attributes: true, 
-        attributeFilter: ['aria-hidden', 'class'] 
-      });
-    });
-  }
-});
+		toggles.forEach( function ( toggle ) {
+			toggle.classList.toggle( 'open', isOpen );
+		} );
+	}
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Select the second header
-  const secondHeader = document.getElementById('header_main_sub_container');
-  if(secondHeader) {
-     // Add a scroll event listener
-      window.addEventListener('scroll', () => {
-        if (window.scrollY < 250) {
-            // When at the top of the page, hide the second header
-            secondHeader.classList.add('hidden');
-            secondHeader.classList.remove('show');
-        } else {
-            // After scrolling beyond 150px, show the header
-            secondHeader.classList.remove('hidden');
-            secondHeader.classList.add('show');
-        }
-    });
-  }
-});
+	function leggiStatoMenu() {
+		if ( ! offCanvasContainers.length ) {
+			return;
+		}
+
+		aggiornaIconaMenu( offCanvasContainers[ 0 ].getAttribute( 'aria-hidden' ) === 'false' );
+	}
+
+	if ( toggles.length && offCanvasContainers.length ) {
+		toggles.forEach( function ( toggle ) {
+			// Nessun preventDefault/stopPropagation: l'evento deve arrivare a Elementor.
+			// Il ritardo serve perché lo stato lo scrive Elementor dopo il click; resta
+			// come rete di sicurezza, la sincronizzazione vera la fa il MutationObserver.
+			toggle.addEventListener( 'click', function () {
+				setTimeout( leggiStatoMenu, 100 );
+			} );
+		} );
+
+		if ( 'MutationObserver' in window ) {
+			offCanvasContainers.forEach( function ( container ) {
+				new MutationObserver( function () {
+					var nuovoStato = container.getAttribute( 'aria-hidden' ) === 'false';
+
+					if ( nuovoStato !== isMenuOpen ) {
+						aggiornaIconaMenu( nuovoStato );
+					}
+				} ).observe( container, {
+					attributes: true,
+					attributeFilter: [ 'aria-hidden', 'class' ]
+				} );
+			} );
+		}
+
+		leggiStatoMenu();
+	}
+
+
+	/* ------------------------------------------------------------------
+	 * Secondo header: compare dopo 250px di scroll.
+	 * Listener passivo e scrittura solo al cambio di stato: prima girava a
+	 * ogni evento di scroll toccando le classi ogni volta.
+	 * ------------------------------------------------------------------ */
+
+	var secondHeader = document.getElementById( 'header_main_sub_container' );
+
+	if ( secondHeader ) {
+		var headerVisibile = null;
+
+		var aggiornaSecondHeader = function () {
+			var mostra = window.scrollY >= 250;
+
+			if ( mostra === headerVisibile ) {
+				return;
+			}
+
+			headerVisibile = mostra;
+			secondHeader.classList.toggle( 'hidden', ! mostra );
+			secondHeader.classList.toggle( 'show', mostra );
+		};
+
+		window.addEventListener( 'scroll', aggiornaSecondHeader, { passive: true } );
+		aggiornaSecondHeader();
+	}
+
+} );

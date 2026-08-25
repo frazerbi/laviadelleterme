@@ -17,11 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 function hello_elementor_child_enqueue_scripts() {
 	$version = wp_get_theme()->get( 'Version' );
 
+	// La dipendenza dal parent va dichiarata solo se quell'handle esiste davvero:
+	// disattivando "Theme Style" nelle impostazioni di Hello Elementor l'handle non
+	// viene registrato e WordPress salterebbe in silenzio tutto il foglio del child.
+	$parent_style = wp_style_is( 'hello-elementor-theme-style', 'registered' )
+		? [ 'hello-elementor-theme-style' ]
+		: [];
+
 	wp_enqueue_style('hello-elementor-child-style',
 		get_stylesheet_directory_uri() . '/style.css',
-		[
-			'hello-elementor-theme-style',
-		],
+		$parent_style,
 		$version
 	);
 
@@ -36,14 +41,14 @@ function hello_elementor_child_enqueue_scripts() {
 
 	wp_enqueue_script('custom-js',
 		get_stylesheet_directory_uri() . '/assets/js/script.js',
-		[
-			'jquery',
-		],
+		[],
 		$version,
 		true
 	);
 
-	wp_enqueue_style('controllo-codici-style',
+	// Solo registrato: lo carica laviadelleterme_render_controllo_codici() quando lo
+	// shortcode è effettivamente a video, invece di pesare su ogni pagina del sito.
+	wp_register_style('controllo-codici-style',
 		get_stylesheet_directory_uri() . '/controllo-codici/controllo-codici.css',
 		[],
 		$version

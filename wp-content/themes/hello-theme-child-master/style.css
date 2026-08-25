@@ -5,19 +5,16 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.36
+Version: 1.0.37
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
 */
 
-.wc-stripe-elements-field {
-  border-color: black;
-}
-.woocommerce-terms-and-conditions-wrapper {
-  margin-bottom: 2rem;
-}
+/* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
+   account: su checkout e order-pay le stesse proprietà sono ridichiarate, più
+   specifiche, in checkout/checkout.css (che lì è l'unico file caricato). */
 .payment_box.payment_method_stripe {
   padding: 0 !important;
 }
@@ -69,13 +66,8 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
   background-color: var( --e-global-color-31904c4d );
   border-color: var( --e-global-color-57f91e2 );
 }
-button.woocommerce-button {
-  color: var( --e-global-color-31904c4d ) !important;
-  background-color: var( --e-global-color-57f91e2 ) !important;
-  border-style: solid !important;
-  border-width: 1px 1px 1px 1px !important;
-  border-color: var( --e-global-color-57f91e2 ) !important;
-}
+/* WooCommerce stampa entrambe le grafie della classe, a seconda del template. */
+button.woocommerce-button,
 button.woocommerce-Button {
   color: var( --e-global-color-31904c4d ) !important;
   background-color: var( --e-global-color-57f91e2 ) !important;
@@ -83,13 +75,10 @@ button.woocommerce-Button {
   border-width: 1px 1px 1px 1px !important;
   border-color: var( --e-global-color-57f91e2 ) !important;
 }
+button.woocommerce-button:hover,
 button.woocommerce-Button:hover {
   color: var( --e-global-color-57f91e2 ) !important;
-    background-color: var( --e-global-color-31904c4d ) !important;
-}
-button.woocommerce-button:hover {
-  color: var( --e-global-color-57f91e2 ) !important;
-    background-color: var( --e-global-color-31904c4d ) !important;
+  background-color: var( --e-global-color-31904c4d ) !important;
 }
 .woocommerce-lost-password .e-my-account-tab > .woocommerce {
   display: flex;
@@ -104,13 +93,6 @@ button.woocommerce-button:hover {
 }
 .woocommerce-lost-password .elementor-widget-shortcode {
   display: none;
-}
-.woocommerce-lost-password .title-my-account::after {
-  content:"PASSWORD DIMENTICATA";
-  font-family: var( --e-global-typography-primary-font-family ), Sans-serif;
-  font-weight: var( --e-global-typography-primary-font-weight );
-  color: #424242;
-  font-size: 2em;
 }
 .woocommerce-lost-password .title-my-account {
   margin: 0;
@@ -488,7 +470,7 @@ body.woocommerce-lost-password .woocommerce-notices-wrapper {
     width: 25%;
   }
 }
-@media only screen and (min-width: 767px) {
+@media only screen and (min-width: 768px) {
   .post-password-form {
       padding-left: 2em;
       padding-right: 2em;

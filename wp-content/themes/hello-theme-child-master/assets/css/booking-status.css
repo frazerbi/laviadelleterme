@@ -18,6 +18,11 @@
 	letter-spacing: 0.02em;
 }
 
+/* I colori del testo sono la stessa terna scura di assets/css/wc-notices.css: la
+   precedente (#a51616 / #a05800 / #1a7a4a) su questi sfondi tinti stava sotto il 4.5:1
+   richiesto da WCAG AA per il testo normale, e a 0.78rem si leggeva slavata.
+   I colori di bordo e pallino restano quelli pieni, non sono testo. */
+
 .thankyou-booking-status__dot {
 	width: 7px;
 	height: 7px;
@@ -29,7 +34,7 @@
 .thankyou-booking-status--confirmed {
 	background: rgba(34, 160, 100, 0.1);
 	border: 1px solid rgba(34, 160, 100, 0.3);
-	color: #1a7a4a;
+	color: #14663d;
 }
 
 .thankyou-booking-status--confirmed .thankyou-booking-status__dot {
@@ -40,7 +45,7 @@
 .thankyou-booking-status--pending {
 	background: rgba(220, 120, 0, 0.08);
 	border: 1px solid rgba(220, 120, 0, 0.25);
-	color: #a05800;
+	color: #7a4100;
 }
 
 .thankyou-booking-status--pending .thankyou-booking-status__dot {
@@ -51,7 +56,7 @@
 .thankyou-booking-status--awaiting {
 	background: rgba(200, 30, 30, 0.08);
 	border: 1px solid rgba(200, 30, 30, 0.25);
-	color: #a51616;
+	color: #8e1414;
 }
 
 .thankyou-booking-status--awaiting .thankyou-booking-status__dot {

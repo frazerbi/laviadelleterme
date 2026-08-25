@@ -1,16 +1,14 @@
 ( function () {
 
 	function fixThankYouPage() {
-		// Nasconde il sottotitolo "Completa il pagamento..."
-		document.querySelectorAll( '.elementor-widget-text-editor p' ).forEach( function ( p ) {
-			if ( p.textContent.indexOf( 'Completa il pagamento' ) !== -1 ) {
-				p.closest( '.elementor-widget-text-editor' ).style.display = 'none';
-			}
-		} );
-
 		// Riformatta indirizzo: "Via X, CAP Città Provincia"
+		// (il sottotitolo "Completa il pagamento…" è rimosso lato server dal filtro
+		// elementor/widget/render_content in thankyou/thankyou.php)
 		var address = document.querySelector( '.woocommerce-customer-details address' );
-		if ( address ) {
+
+		// La funzione gira sia su DOMContentLoaded sia su window.load: senza questo
+		// controllo il secondo giro rileggerebbe un indirizzo già riscritto.
+		if ( address && ! address.querySelector( '.address-customer-name' ) ) {
 			var nodes = [];
 			var node = address.firstChild;
 			while ( node ) {
@@ -53,7 +51,7 @@
 		// Classe dinamica su license-codes-table: is-booked / is-pending
 		document.querySelectorAll( '.license-codes-table' ).forEach( function ( table ) {
 			var cell = table.closest( '.product-name' );
-			if ( ! cell ) return;
+			if ( ! cell || table.classList.contains( 'is-booked' ) || table.classList.contains( 'is-pending' ) ) return;
 			var isBooked = cell.querySelector( '.thankyou-booking-status--confirmed' ) !== null;
 			table.classList.add( isBooked ? 'is-booked' : 'is-pending' );
 		} );
