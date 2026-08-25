@@ -89,7 +89,7 @@ body.woocommerce-checkout form#order_review > table.shop_table tfoot tr:last-chi
 
 /* ---- Badge stato riga ordine dentro la tabella di order-pay ---- */
 
-body.woocommerce-checkout form#order_review .thankyou-booking-status {
+body.woocommerce-checkout form#order_review .booking-status {
 	margin: 0.5rem 0 0 !important;
 }
 

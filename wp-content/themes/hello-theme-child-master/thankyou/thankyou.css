@@ -26,9 +26,9 @@
 
 /* Normalizza i colori ereditati da Elementor/WooCommerce dentro il riquadro ordine.
    Il badge di stato è escluso: la regola vale `!important` e altrimenti vincerebbe
-   sui colori di assets/css/booking-status.css (rosso/arancio/verde), lasciando
+   sui colori di booking-status/booking-status.css (rosso/arancio/verde), lasciando
    visibile solo il pallino colorato. */
-.woocommerce-order *:not(.thankyou-booking-status) {
+.woocommerce-order *:not(.booking-status) {
 	font-family: inherit;
 	color: inherit !important;
 }

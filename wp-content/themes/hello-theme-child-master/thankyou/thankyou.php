@@ -1,17 +1,17 @@
 <?php
 /**
- * Thank You page customization
+ * Pagina order-received (thank you)
+ *
+ * Titolo e notice coerenti con lo stato reale del pagamento, box "Completa il
+ * pagamento" e polling che copre la race fra il redirect di ritorno del gateway
+ * e il suo webhook asincrono. Il badge per riga ordine sta in
+ * booking-status/booking-status.php: compare anche su order-pay.
+ *
+ * @package HelloElementorChild
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
-}
-
-// Stati ordine che indicano pagamento effettivamente concluso (dopo woocommerce_payment_complete).
-// 'booked'/'not-booked' sono raggiunti solo passando per 'completed' (vedi Booking_Order_Status),
-// quindi vanno inclusi esplicitamente: is_paid() da solo non li riconosce.
-function laviadelleterme_thankyou_order_is_confirmed( $order ) {
-	return $order && $order->has_status( array( 'processing', 'completed', 'booked', 'not-booked' ) );
 }
 
 // Cambia il titolo H1 Elementor hardcoded "Pagamento" → "Ordine ricevuto!" lato server,
@@ -44,7 +44,7 @@ add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
 	$order_id = absint( get_query_var( 'order-received' ) );
 	$order    = $order_id ? wc_get_order( $order_id ) : false;
 
-	$titolo = laviadelleterme_thankyou_order_is_confirmed( $order )
+	$titolo = laviadelleterme_order_is_confirmed( $order )
 		? 'Ordine ricevuto!'
 		: 'Ordine in attesa di pagamento';
 
@@ -59,90 +59,11 @@ add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
 // Cambia il notice generico WooCommerce "Grazie. Il tuo ordine è stato ricevuto."
 // quando il pagamento non risulta ancora confermato
 add_filter( 'woocommerce_thankyou_order_received_text', function ( $text, $order ) {
-	if ( ! laviadelleterme_thankyou_order_is_confirmed( $order ) ) {
+	if ( ! laviadelleterme_order_is_confirmed( $order ) ) {
 		return 'Il tuo ordine è stato ricevuto, ma il pagamento non risulta ancora completato.';
 	}
 	return $text;
 }, 10, 2 );
-
-/**
- * Segnala se siamo dentro il rendering della tabella item di una email WooCommerce.
- * `woocommerce_email_before/after_order_table` avvolgono esattamente quella tabella
- * (templates/emails/email-order-details.php), quindi anche il nostro hook sugli item.
- *
- * @param bool|null $set true/false per impostare, null per leggere.
- * @return bool
- */
-function laviadelleterme_rendering_email( $set = null ) {
-	static $rendering = false;
-
-	if ( null !== $set ) {
-		$rendering = (bool) $set;
-	}
-
-	return $rendering;
-}
-add_action( 'woocommerce_email_before_order_table', function () { laviadelleterme_rendering_email( true ); }, 1 );
-add_action( 'woocommerce_email_after_order_table', function () { laviadelleterme_rendering_email( false ); }, 999 );
-
-/**
- * True solo nei due contesti in cui il badge ha senso ed è anche stilato: pagina
- * order-received e pagina order-pay (le stesse due condizioni con cui functions.php
- * carica assets/css/booking-status.css).
- *
- * Serve perché `woocommerce_order_item_meta_end` NON è un hook di pagina: WooCommerce lo
- * fa scattare anche in templates/emails/email-order-items.php (quindi dentro le email al
- * cliente e la "nuovo ordine" all'admin, che parte con ordine ancora da pagare) e in
- * templates/order/order-details-item.php (Il mio account → Visualizza ordine), dove il CSS
- * del badge non viene nemmeno caricato e resterebbe testo nudo.
- *
- * @return bool
- */
-function laviadelleterme_show_booking_status_badge() {
-	if ( is_admin() || laviadelleterme_rendering_email() || ! function_exists( 'is_checkout' ) ) {
-		return false;
-	}
-
-	// wp_doing_ajax() esclude la POST `?wc-ajax=checkout`, dove is_checkout() sarebbe vera
-	// ma l'unico output prodotto sono le email transazionali dell'ordine appena creato.
-	if ( wp_doing_ajax() ) {
-		return false;
-	}
-
-	return is_wc_endpoint_url( 'order-received' ) || is_checkout();
-}
-
-// Badge stato prenotazione dopo i meta di ogni item
-add_action( 'woocommerce_order_item_meta_end', function( $item_id, $item, $order, $plain_text ) {
-	if ( $plain_text || ! laviadelleterme_show_booking_status_badge() ) {
-		return;
-	}
-
-	// _booking_id viene scritto in ordine già al checkout (prima di qualsiasi pagamento),
-	// quindi va sempre incrociato con lo stato reale dell'ordine: senza pagamento confermato
-	// né TermeGest né i codici licenza sono stati effettivamente assegnati.
-	if ( ! laviadelleterme_thankyou_order_is_confirmed( $order ) ) {
-		echo '<p class="thankyou-booking-status thankyou-booking-status--awaiting">'
-			. '<span class="thankyou-booking-status__dot"></span>'
-			. 'In attesa di pagamento'
-			. '</p>';
-		return;
-	}
-
-	$booking_id = $item->get_meta( '_booking_id' );
-
-	if ( $booking_id ) {
-		echo '<p class="thankyou-booking-status thankyou-booking-status--confirmed">'
-			. '<span class="thankyou-booking-status__dot"></span>'
-			. 'Prenotazione confermata'
-			. '</p>';
-	} else {
-		echo '<p class="thankyou-booking-status thankyou-booking-status--pending">'
-			. '<span class="thankyou-booking-status__dot"></span>'
-			. 'Usa i codici per completare la prenotazione'
-			. '</p>';
-	}
-}, 10, 4 );
 
 // Endpoint AJAX per il polling di stato (vedi sotto): usato solo dalla thank-you page quando
 // l'ordine risulta ancora "in attesa" ma necessita di pagamento. La order key va validata come
@@ -161,7 +82,7 @@ function laviadelleterme_ajax_check_order_confirmed() {
 		wp_send_json_error( null, 403 );
 	}
 
-	wp_send_json_success( array( 'confirmed' => laviadelleterme_thankyou_order_is_confirmed( $order ) ) );
+	wp_send_json_success( array( 'confirmed' => laviadelleterme_order_is_confirmed( $order ) ) );
 }
 
 // Box "Completa il pagamento" + polling automatico dello stato ordine, SOLO quando l'ordine
@@ -175,7 +96,7 @@ function laviadelleterme_ajax_check_order_confirmed() {
 add_action( 'woocommerce_thankyou', function ( $order_id ) {
 	$order = wc_get_order( $order_id );
 
-	if ( ! $order || laviadelleterme_thankyou_order_is_confirmed( $order ) || ! $order->needs_payment() ) {
+	if ( ! $order || laviadelleterme_order_is_confirmed( $order ) || ! $order->needs_payment() ) {
 		return;
 	}
 

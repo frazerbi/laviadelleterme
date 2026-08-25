@@ -1,12 +1,12 @@
 /* ============================================================
    Badge stato prenotazione / pagamento per riga ordine.
-   Stampato da thankyou/thankyou.php su woocommerce_order_item_meta_end,
+   Stampato da booking-status.php su woocommerce_order_item_meta_end,
    quindi compare sia sulla pagina order-received sia nella tabella
-   riepilogo della pagina order-pay: il CSS sta qui (file condiviso)
-   e viene caricato da entrambe le pagine.
+   riepilogo della pagina order-pay: functions.php lo accoda con le
+   stesse due condizioni del gate laviadelleterme_show_booking_status_badge().
    ============================================================ */
 
-.thankyou-booking-status {
+.booking-status {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.4rem;
@@ -23,7 +23,7 @@
    richiesto da WCAG AA per il testo normale, e a 0.78rem si leggeva slavata.
    I colori di bordo e pallino restano quelli pieni, non sono testo. */
 
-.thankyou-booking-status__dot {
+.booking-status__dot {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
@@ -31,34 +31,34 @@
 }
 
 /* Confermata — verde */
-.thankyou-booking-status--confirmed {
+.booking-status--confirmed {
 	background: rgba(34, 160, 100, 0.1);
 	border: 1px solid rgba(34, 160, 100, 0.3);
 	color: #14663d;
 }
 
-.thankyou-booking-status--confirmed .thankyou-booking-status__dot {
+.booking-status--confirmed .booking-status__dot {
 	background: #22a064;
 }
 
 /* Da prenotare — arancio */
-.thankyou-booking-status--pending {
+.booking-status--pending {
 	background: rgba(220, 120, 0, 0.08);
 	border: 1px solid rgba(220, 120, 0, 0.25);
 	color: #7a4100;
 }
 
-.thankyou-booking-status--pending .thankyou-booking-status__dot {
+.booking-status--pending .booking-status__dot {
 	background: #dc7800;
 }
 
 /* In attesa di pagamento — rosso */
-.thankyou-booking-status--awaiting {
+.booking-status--awaiting {
 	background: rgba(200, 30, 30, 0.08);
 	border: 1px solid rgba(200, 30, 30, 0.25);
 	color: #8e1414;
 }
 
-.thankyou-booking-status--awaiting .thankyou-booking-status__dot {
+.booking-status--awaiting .booking-status__dot {
 	background: #c81e1e;
 }

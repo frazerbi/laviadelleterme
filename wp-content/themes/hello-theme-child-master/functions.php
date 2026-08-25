@@ -98,10 +98,10 @@ function hello_elementor_child_enqueue_scripts() {
 
 	// Badge stato prenotazione: stampato su woocommerce_order_item_meta_end, quindi
 	// presente sia su order-received sia nella tabella riepilogo di order-pay.
-	// Stesse due condizioni di laviadelleterme_show_booking_status_badge().
+	// Stesse due condizioni del gate laviadelleterme_show_booking_status_badge().
 	if ( is_wc_endpoint_url( 'order-received' ) || is_checkout() ) {
 		wp_enqueue_style('booking-status-style',
-			get_stylesheet_directory_uri() . '/assets/css/booking-status.css',
+			get_stylesheet_directory_uri() . '/booking-status/booking-status.css',
 			[],
 			$version
 		);
@@ -155,6 +155,7 @@ function hello_elementor_child_enqueue_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
 
+require_once get_stylesheet_directory() . '/booking-status/booking-status.php';
 require_once get_stylesheet_directory() . '/thankyou/thankyou.php';
 require_once get_stylesheet_directory() . '/order-pay/order-pay.php';
 require_once get_stylesheet_directory() . '/satispay/satispay.php';

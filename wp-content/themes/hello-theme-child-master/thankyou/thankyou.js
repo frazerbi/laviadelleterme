@@ -52,7 +52,7 @@
 		document.querySelectorAll( '.license-codes-table' ).forEach( function ( table ) {
 			var cell = table.closest( '.product-name' );
 			if ( ! cell || table.classList.contains( 'is-booked' ) || table.classList.contains( 'is-pending' ) ) return;
-			var isBooked = cell.querySelector( '.thankyou-booking-status--confirmed' ) !== null;
+			var isBooked = cell.querySelector( '.booking-status--confirmed' ) !== null;
 			table.classList.add( isBooked ? 'is-booked' : 'is-pending' );
 		} );
 	}

@@ -16,7 +16,7 @@
    Il `!important` su padding/margin/list-style è necessario: woocommerce.css
    li dichiara a sua volta `!important`.
 
-   Palette del testo condivisa con i badge di stato (assets/css/booking-status.css):
+   Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
    rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
    ============================================================ */
 

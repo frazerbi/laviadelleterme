@@ -14,7 +14,8 @@ inclusa singolarmente da functions.php:
 
 * checkout/       stile della checkout (parti condivise anche con order-pay)
 * order-pay/      evidenziazione della checkbox termini e layout della pagina
-* thankyou/       pagina order-received: stato reale del pagamento, badge, polling
+* thankyou/       pagina order-received: stato reale del pagamento e polling
+* booking-status/ badge di riga ordine, condiviso fra order-received e order-pay
 * satispay/       recupero dell'ordine quando l'utente annulla il pagamento Satispay
 * my-account/     URL di login/registrazione, redirect post accesso e relativo stile
 * controllo-codici/  shortcode con le giacenze dei codici licenza (solo staff)
@@ -27,7 +28,6 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
 * assets/css/shop.css        catalogo, scheda prodotto, carrello
 * assets/css/promo-pages.css pagine protette da password (plugin PPWP)
 * assets/css/wc-notices.css  notice WooCommerce, in tutto il sito
-* assets/css/booking-status.css  badge prenotazione (order-received + order-pay)
 * assets/css/stripe-upe-appearance.css  campi carta dentro l'iframe Stripe
 * assets/css/mobile-menu-style.css      menu mobile e off-canvas
 
