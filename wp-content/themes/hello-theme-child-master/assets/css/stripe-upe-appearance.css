@@ -1,0 +1,41 @@
+/* ============================================================
+   Aspetto dei campi carta DENTRO l'iframe Stripe (UPE)
+   ============================================================
+   Il contenuto dell'iframe è cross-origin e non è raggiungibile dal CSS.
+   Il plugin `woocommerce-gateway-stripe` però costruisce l'oggetto
+   `appearance` di Stripe Elements leggendo il computed style di un input
+   nascosto stampato apposta nel markup:
+
+     upeThemeInputSelector: "#wc-stripe-hidden-style-input"   (build/upe-classic.js)
+
+   Quindi questo file NON stila un campo visibile: stila il "campione" da cui
+   Stripe ricopia l'aspetto di `.Input` dentro l'iframe. Le proprietà lette per
+   `.Input` sono color, tutti i padding, le font properties, l'intero set border
+   (width/color/style/radius per ogni lato), outline, backgroundColor e boxShadow.
+
+   L'input ha già inline `position:absolute; opacity:0; pointer-events:none`
+   (tutti `!important`): resta invisibile, serve solo come riferimento.
+
+   Sul plugin 10.8.5 l'appearance è calcolata client-side ad ogni caricamento —
+   i transient `wc_stripe_appearance` sono deprecati — quindi le modifiche qui
+   si vedono subito, senza cache da svuotare.
+
+   I colori sono in esadecimale e non in rgba() di proposito: il valore viene
+   ricopiato dentro l'iframe, dove lo sfondo alle spalle è quello di Stripe e
+   non quello del `.payment_box`, quindi un colore semitrasparente renderebbe
+   diverso da qui.
+   ============================================================ */
+
+#wc-stripe-hidden-style-input {
+	background-color: #ffffff;
+	border: 1px solid #d0d0d0;
+	border-radius: 8px;
+	padding: 0.7rem 0.75rem;
+	box-shadow: none;
+	outline: none;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.95rem;
+	font-weight: 400;
+	line-height: 1.4;
+	color: #424242;
+}

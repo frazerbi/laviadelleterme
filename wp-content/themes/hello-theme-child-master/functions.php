@@ -57,6 +57,15 @@ function hello_elementor_child_enqueue_scripts() {
 			[],
 			$version
 		);
+
+		// Aspetto dei campi carta dentro l'iframe Stripe: il plugin lo ricava dal
+		// computed style di #wc-stripe-hidden-style-input, stampato su checkout,
+		// order-pay e "aggiungi metodo di pagamento" nell'area account.
+		wp_enqueue_style('stripe-upe-appearance-style',
+			get_stylesheet_directory_uri() . '/assets/css/stripe-upe-appearance.css',
+			[],
+			$version
+		);
 	}
 
 	// Badge stato prenotazione: stampato su woocommerce_order_item_meta_end, quindi
