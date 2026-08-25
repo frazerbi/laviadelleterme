@@ -160,3 +160,31 @@ add_filter( 'woocommerce_registration_redirect', 'laviadelleterme_custom_registr
 function laviadelleterme_custom_registration_redirect( $redirect ) {
     return laviadelleterme_destinazione_dopo_accesso();
 }
+
+/**
+ * Titolo della pagina "Password dimenticata".
+ *
+ * L'H1 arriva dal template Elementor dell'area account (lo stesso per dashboard,
+ * ordini e recupero password), quindi è hardcoded "Il mio account". Il testo viene
+ * riscritto qui lato server, come fa thankyou.php con "Pagamento": prima era simulato
+ * in CSS nascondendo l'H1 e stampando la stringa in un ::after a 5rem fissi, che
+ * saltava la tipografia responsive del widget e, senza larghezza propria, andava a capo
+ * sotto il form.
+ */
+add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
+    // Il filtro gira su ogni pagina del sito: is_wc_endpoint_url() esiste solo con
+    // WooCommerce attivo.
+    if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'lost-password' ) ) {
+        return $content;
+    }
+
+    if ( 'heading' !== $widget->get_name() ) {
+        return $content;
+    }
+
+    // Si sostituisce solo il nodo di testo esattamente uguale a "Il mio account": uno
+    // str_replace secco colpirebbe qualsiasi altro heading che contenga quella stringa.
+    $replaced = preg_replace( '/>\s*Il mio account\s*</u', '>Password dimenticata<', $content, 1 );
+
+    return null === $replaced ? $content : $replaced;
+}, 10, 2 );

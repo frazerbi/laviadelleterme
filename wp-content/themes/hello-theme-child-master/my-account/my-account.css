@@ -34,9 +34,10 @@ body .container-social-login .elementor-shortcode {
 
 /* ============================================================
    Password dimenticata
-   Il titolo della pagina è riscritto via ::after perché l'H1 e il
-   sottotitolo arrivano dal template Elementor condiviso con il
-   resto dell'area account.
+   L'H1 e il sottotitolo arrivano dal template Elementor condiviso
+   con il resto dell'area account: il testo del titolo è riscritto
+   lato server nel filtro elementor/widget/render_content in
+   my-account.php, non più simulato qui con un ::after.
    ============================================================ */
 
 .woocommerce-lost-password .e-my-account-tab > .woocommerce {
@@ -68,18 +69,8 @@ body .container-social-login .elementor-shortcode {
   padding-right: 4%;
   padding-left: 4%;
 }
-body.woocommerce-lost-password .title-my-account h1 {
-  display: none;
-}
 body.woocommerce-lost-password .descr-my-account {
   display: none;
-}
-body.woocommerce-lost-password .title-my-account::after {
-    font-weight: 500 !important;
-    color: var(--e-global-color-secondary) !important;
-    font-family: "Amiri", Sans-serif !important;
-    font-size: 5rem !important;
-    content: "Password dimenticata" !important;
 }
 body.woocommerce-lost-password .woocommerce-ResetPassword p,
 body.woocommerce-lost-password .woocommerce > p {
