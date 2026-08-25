@@ -71,14 +71,68 @@
 	text-underline-offset: 2px;
 }
 
-/* Il bottone dentro ai notice di WooCommerce (es. "Visualizza carrello")
-   non deve prendere il colore del testo del notice. */
+/* Il bottone dentro ai notice di WooCommerce (es. "Continua con gli acquisti"
+   dopo l'aggiunta al carrello). Senza queste regole eredita `color: inherit`
+   dal blocco qui sopra e non ha né fondo né padding: resta indistinguibile da
+   un link. Il fondo riprende il colore del proprio tipo di notice, così il
+   bottone resta nella tavolozza del messaggio invece di introdurne una terza. */
 .woocommerce-error a.button,
 .woocommerce-info a.button,
 .woocommerce-message a.button {
+	display: inline-block;
+	padding: 0.55rem 1.1rem;
+	border: 0;
+	border-radius: 8px;
+	color: #fff !important;
 	text-decoration: none;
-	float: right;
-	margin-left: 1rem;
+	font-size: 0.9rem;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.woocommerce-error a.button:hover,
+.woocommerce-info a.button:hover,
+.woocommerce-message a.button:hover {
+	filter: brightness(1.25);
+}
+
+/* Fondo nella versione scura del colore del tipo, la stessa usata per il testo:
+   il bianco sopra questi tre sta oltre 6:1 di contrasto, mentre sopra le varianti
+   piene (#c81e1e, #dc7800, #22a064) scenderebbe sotto la soglia AA. */
+.woocommerce-error a.button {
+	background: #8e1414;
+}
+.woocommerce-info a.button {
+	background: #7a4100;
+}
+.woocommerce-message a.button {
+	background: #14663d;
+}
+
+/* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa
+   riga; appena il testo andava a capo il bottone restava incollato a sinistra.
+   Con il notice in flex il bottone si allinea a destra quando c'è spazio e va a
+   capo da solo quando non ce n'è. Il :has() serve a non trasformare in flex
+   anche i notice senza bottone, che sono la maggioranza. */
+.woocommerce-error:has( > a.button ),
+.woocommerce-info:has( > a.button ),
+.woocommerce-message:has( > a.button ) {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem 1rem;
+}
+
+/* Da mobile il bottone prende tutta la riga: allineato a sinistra sotto il testo
+   sembrava fuori posto, ed è anche l'area di tocco più comoda. */
+@media only screen and (max-width: 600px) {
+	.woocommerce-error a.button,
+	.woocommerce-info a.button,
+	.woocommerce-message a.button {
+		flex: 1 0 100%;
+		text-align: center;
+	}
 }
 
 /* I testi sono scelti per stare sopra 4.5:1 di contrasto sul proprio sfondo
