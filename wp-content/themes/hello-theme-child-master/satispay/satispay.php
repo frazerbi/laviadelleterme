@@ -44,6 +44,25 @@ function laviadelleterme_satispay_log( $message, $context = array() ) {
 }
 
 /**
+ * True se l'ordine risulta già pagato.
+ *
+ * Si guarda `get_date_paid()`, non lo stato: la data viene scritta una sola volta da
+ * `payment_complete()` e non viene più toccata dai passaggi di stato successivi, mentre
+ * `wc_get_is_paid_statuses()` vale solo ('processing','completed') e NON riconosce gli
+ * stati custom `booked` / `not-booked` (vedi Booking_Order_Status nel plugin, e lo stesso
+ * problema documentato in thankyou/thankyou.php). Senza questo controllo una callback
+ * `CANCELED` in ritardo — relativa al primo tentativo annullato — riporterebbe a `pending`
+ * un ordine nel frattempo pagato con un altro metodo, già sincronizzato con TermeGest e
+ * con i codici licenza assegnati.
+ *
+ * @param WC_Order $order Ordine.
+ * @return bool
+ */
+function laviadelleterme_satispay_order_is_paid( $order ) {
+	return (bool) $order->get_date_paid() || $order->has_status( wc_get_is_paid_statuses() );
+}
+
+/**
  * Riporta l'ordine a uno stato pagabile dopo un pagamento Satispay annullato/non riuscito.
  *
  * @param WC_Order $order Ordine.
@@ -51,7 +70,7 @@ function laviadelleterme_satispay_log( $message, $context = array() ) {
  */
 function laviadelleterme_satispay_restore_payable_status( $order, $reason ) {
 	// Se nel frattempo l'ordine è stato pagato (callback arrivata prima), non tocchiamo nulla.
-	if ( $order->has_status( wc_get_is_paid_statuses() ) ) {
+	if ( laviadelleterme_satispay_order_is_paid( $order ) ) {
 		laviadelleterme_satispay_log( 'Ordine già pagato, stato non modificato', array(
 			'order_id' => $order->get_id(),
 			'status'   => $order->get_status(),
@@ -67,6 +86,16 @@ function laviadelleterme_satispay_restore_payable_status( $order, $reason ) {
 		'pending',
 		'Pagamento Satispay non completato (' . $reason . '): ordine riportato in attesa di pagamento per consentire un nuovo tentativo.'
 	);
+
+	// Senza questo l'ordine resterebbe agganciato al pagamento annullato: il cron del
+	// plugin (`wc_satispay_finalize_orders_event`, ogni 4 ore, attivo se l'opzione
+	// "Finalize unhandled payments" è spuntata) scansiona proprio gli ordini `wc-pending`
+	// creati fra 4 e 1 ora fa e rimette in `wc-cancelled` quelli il cui transaction id
+	// risulta CANCELED lato Satispay — cioè annullerebbe di nuovo l'ordine che stiamo
+	// recuperando. Con l'id vuoto la Payment::get() del cron fallisce, il plugin la
+	// intercetta nel suo try/catch e l'ordine resta pagabile.
+	$order->set_transaction_id( '' );
+	$order->save();
 
 	laviadelleterme_satispay_log( 'Ordine riportato a pending', array(
 		'order_id' => $order->get_id(),
@@ -262,7 +291,7 @@ function laviadelleterme_satispay_handle_callback() {
 		return; // Nessun ordine: lascia fare al plugin.
 	}
 
-	if ( $order->has_status( wc_get_is_paid_statuses() ) ) {
+	if ( laviadelleterme_satispay_order_is_paid( $order ) ) {
 		if ( ob_get_length() ) {
 			ob_end_clean();
 		}
