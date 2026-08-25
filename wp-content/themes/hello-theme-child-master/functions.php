@@ -159,7 +159,6 @@ require_once get_stylesheet_directory() . '/thankyou/thankyou.php';
 require_once get_stylesheet_directory() . '/order-pay/order-pay.php';
 require_once get_stylesheet_directory() . '/satispay/satispay.php';
 require_once get_stylesheet_directory() . '/my-account/my-account.php';
-require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB.php';
-require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB_promo.php';
+require_once get_stylesheet_directory() . '/controllo-codici/controllo-codici.php';
 require_once get_stylesheet_directory() . '/ga4-elementor-compat.php';
 require_once get_stylesheet_directory() . '/performance-optimization.php';
