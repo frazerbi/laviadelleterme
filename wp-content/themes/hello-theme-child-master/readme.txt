@@ -12,8 +12,8 @@ Child theme di Hello Elementor per laviadelleterme.it.
 Una cartella per modulo funzionale, ognuna con il proprio PHP e i propri asset,
 inclusa singolarmente da functions.php:
 
-* checkout/       stile della checkout e della pagina order-pay
-* order-pay/      evidenziazione della checkbox termini quando blocca il pagamento
+* checkout/       stile della checkout (parti condivise anche con order-pay)
+* order-pay/      evidenziazione della checkbox termini e layout della pagina
 * thankyou/       pagina order-received: stato reale del pagamento, badge, polling
 * satispay/       recupero dell'ordine quando l'utente annulla il pagamento Satispay
 * my-account/     URL di login/registrazione, redirect post accesso e relativo stile

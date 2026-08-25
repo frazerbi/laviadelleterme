@@ -133,10 +133,22 @@ function hello_elementor_child_enqueue_scripts() {
 		);
 	}
 
+	// is_checkout() è vero sia sulla checkout normale sia su order-pay: è lo stesso
+	// template WooCommerce e non esiste una body class che le distingua (per questo
+	// order-pay.css si aggancia a form#order_review). is_checkout_pay_page() era
+	// stato provato per un enqueue più stretto ma il <link> non veniva stampato.
 	if ( is_checkout() ) {
 		wp_enqueue_style('checkout-style',
 			get_stylesheet_directory_uri() . '/checkout/checkout.css',
 			[],
+			$version
+		);
+
+		wp_enqueue_style('order-pay-style',
+			get_stylesheet_directory_uri() . '/order-pay/order-pay.css',
+			[
+				'checkout-style',
+			],
 			$version
 		);
 	}
