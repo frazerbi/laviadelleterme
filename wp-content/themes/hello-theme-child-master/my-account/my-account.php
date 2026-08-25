@@ -188,3 +188,23 @@ add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
 
     return null === $replaced ? $content : $replaced;
 }, 10, 2 );
+
+/**
+ * Body class per la schermata "link inviato" della password dimenticata.
+ *
+ * Dopo l'invio WooCommerce rimanda su .../lost-password/?reset-link-sent=true, dove il
+ * form sparisce e resta il solo paragrafo di conferma. Nel markup non c'è nient'altro
+ * che distingua i due stati e il CSS non vede la query string, quindi la distinzione
+ * arriva da qui — stesso schema di 'order-pay-terms-error' in order-pay/order-pay.php.
+ */
+add_filter( 'body_class', function ( $classes ) {
+    if ( ! function_exists( 'is_wc_endpoint_url' ) || ! is_wc_endpoint_url( 'lost-password' ) ) {
+        return $classes;
+    }
+
+    if ( isset( $_GET['reset-link-sent'] ) ) {
+        $classes[] = 'lost-password-link-sent';
+    }
+
+    return $classes;
+} );
