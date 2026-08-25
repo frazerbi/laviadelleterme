@@ -4,6 +4,10 @@
  * dei termini quando è quella a bloccare l'invio del pagamento.
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * True se questa richiesta è un tentativo di pagamento sulla pagina order-pay
  * fallito perché la checkbox dei termini non è stata spuntata.
@@ -16,7 +20,9 @@ function laviadelleterme_order_pay_terms_missing() {
 		return false;
 	}
 
-	if ( 'POST' !== $_SERVER['REQUEST_METHOD'] || empty( $_POST['woocommerce_pay'] ) ) {
+	$method = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '';
+
+	if ( 'POST' !== $method || empty( $_POST['woocommerce_pay'] ) ) {
 		return false;
 	}
 

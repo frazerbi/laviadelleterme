@@ -5,7 +5,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
+/**
+ * I due shortcode stampano le giacenze di codici licenza per prodotto: sono dati
+ * interni, non devono dipendere solo dal fatto che la pagina che li ospita sia
+ * protetta. Chi non ha il permesso vede un messaggio esplicito e non il silenzio,
+ * così ci si accorge subito se serve allargare la capability.
+ *
+ * @return bool
+ */
+function laviadelleterme_puo_vedere_controllo_codici() {
+	return is_user_logged_in() && current_user_can( 'manage_woocommerce' );
+}
+
 function laviadelleterme_controllo_codici() {
+
+    if ( ! laviadelleterme_puo_vedere_controllo_codici() ) {
+        return '<p class="controllo-codici-negato">Contenuto riservato allo staff.</p>';
+    }
 
     global $wpdb;
 

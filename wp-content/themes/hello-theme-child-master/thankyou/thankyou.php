@@ -3,6 +3,10 @@
  * Thank You page customization
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 // Stati ordine che indicano pagamento effettivamente concluso (dopo woocommerce_payment_complete).
 // 'booked'/'not-booked' sono raggiunti solo passando per 'completed' (vedi Booking_Order_Status),
 // quindi vanno inclusi esplicitamente: is_paid() da solo non li riconosce.

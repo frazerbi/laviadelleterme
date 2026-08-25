@@ -7,6 +7,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function laviadelleterme_controllo_codici_promo() {
 
+    // Helper definito in controllo_codici_DB.php, richiesto prima di questo da functions.php.
+    if ( ! laviadelleterme_puo_vedere_controllo_codici() ) {
+        return '<p class="controllo-codici-negato">Contenuto riservato allo staff.</p>';
+    }
+
     global $wpdb;
 
     $prodotti = [

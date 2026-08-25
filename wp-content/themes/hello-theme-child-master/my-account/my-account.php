@@ -41,23 +41,42 @@ function laviadelleterme_reindirizza_utenti_non_loggati_myaccount() {
         return;
     }
 
-    // Controlla se siamo in una pagina my-account
-    if (is_page('my-account') || (strpos($_SERVER['REQUEST_URI'], '/my-account/') !== false)) {
-        
-        // Esclude la pagina di recupero password
-        if (strpos($_SERVER['REQUEST_URI'], '/my-account/lost-password/') !== false) {
-            return; // Non fare nulla, permetti l'accesso alla pagina di recupero password
-        }
-        
-        // Verifica se l'utente non è loggato
-        if (!is_user_logged_in()) {
-            // Ottieni l'URL della pagina di login
-            $login_url = home_url('/login-e-registrazione/');
-            // Reindirizza alla pagina di login
-            wp_redirect($login_url);
-            exit;
-        }
+    if ( is_user_logged_in() ) {
+        return;
     }
+
+    // is_account_page() di WooCommerce al posto di uno strpos su REQUEST_URI: quello
+    // scattava su qualsiasi URL che contenesse la stringa '/my-account/' (es. un articolo
+    // del blog) e non seguiva la pagina realmente impostata in WooCommerce → Impostazioni.
+    if ( ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
+        return;
+    }
+
+    // Recupero e reimpostazione password devono restare raggiungibili da sloggati.
+    if ( is_wc_endpoint_url( 'lost-password' ) ) {
+        return;
+    }
+
+    // Salvagente contro il loop di redirect nel caso la pagina "Il mio account" di
+    // WooCommerce venisse impostata sulla pagina di login stessa.
+    if ( is_page( 'login-e-registrazione' ) ) {
+        return;
+    }
+
+    $login_url = home_url( '/login-e-registrazione/' );
+
+    // Conserva la pagina richiesta invece di scaricare tutti in dashboard: chi apre
+    // /my-account/view-order/123 da sloggato ci torna dopo il login. Il valore viene
+    // riletto da laviadelleterme_custom_login_redirect() e validato con
+    // laviadelleterme_is_local_url(). Il path è ricostruito su home_url(), così un
+    // REQUEST_URI manipolato non può spostare la destinazione su un altro host.
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+    if ( '' !== $request_uri ) {
+        $login_url = add_query_arg( 'redirect_to', rawurlencode( home_url( $request_uri ) ), $login_url );
+    }
+
+    wp_safe_redirect( $login_url );
+    exit;
 }
 // Aggiungi l'azione all'hook template_redirect
 add_action('template_redirect', 'laviadelleterme_reindirizza_utenti_non_loggati_myaccount');
