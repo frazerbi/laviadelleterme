@@ -111,27 +111,44 @@
 
 /* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa
    riga; appena il testo andava a capo il bottone restava incollato a sinistra.
-   Con il notice in flex il bottone si allinea a destra quando c'è spazio e va a
-   capo da solo quando non ce n'è. Il :has() serve a non trasformare in flex
-   anche i notice senza bottone, che sono la maggioranza. */
+   Il :has() serve a non trasformare in flex anche i notice senza bottone, che
+   sono la maggioranza. */
 .woocommerce-error:has( > a.button ),
 .woocommerce-info:has( > a.button ),
 .woocommerce-message:has( > a.button ) {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	justify-content: space-between;
 	gap: 0.75rem 1rem;
 }
 
-/* Da mobile il bottone prende tutta la riga: allineato a sinistra sotto il testo
-   sembrava fuori posto, ed è anche l'area di tocco più comoda. */
+/* Da desktop il bottone sta a destra. Il margine automatico al posto di
+   justify-content: space-between non è un dettaglio: con space-between il
+   bottone torna a sinistra proprio nel caso critico, cioè quando il testo è
+   lungo e lo manda a capo su una riga tutta sua, dove resta l'unico elemento da
+   distribuire. Il margine automatico assorbe lo spazio libero della riga in cui
+   si trova, quindi lo tiene a destra in entrambi i casi. */
+.woocommerce-error a.button,
+.woocommerce-info a.button,
+.woocommerce-message a.button {
+	margin-left: auto;
+}
+
+/* Da mobile testo e bottone si impilano, allineati a sinistra. In colonna il
+   margine automatico spingerebbe il bottone sull'asse trasversale, cioè a
+   destra: va riportato a zero. */
 @media only screen and (max-width: 600px) {
+	.woocommerce-error:has( > a.button ),
+	.woocommerce-info:has( > a.button ),
+	.woocommerce-message:has( > a.button ) {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
 	.woocommerce-error a.button,
 	.woocommerce-info a.button,
 	.woocommerce-message a.button {
-		flex: 1 0 100%;
-		text-align: center;
+		margin-left: 0;
 	}
 }
 
