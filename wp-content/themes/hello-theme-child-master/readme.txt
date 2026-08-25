@@ -18,6 +18,7 @@ inclusa singolarmente da functions.php:
 * booking-status/ badge di riga ordine, condiviso fra order-received e order-pay
 * satispay/       recupero dell'ordine quando l'utente annulla il pagamento Satispay
 * my-account/     URL di login/registrazione, redirect post accesso e relativo stile
+                 (lost-password.css: stile della sola pagina password dimenticata)
 * controllo-codici/  shortcode con le giacenze dei codici licenza (solo staff)
 
 assets/css e assets/js contengono gli asset globali e quelli condivisi da più pagine:

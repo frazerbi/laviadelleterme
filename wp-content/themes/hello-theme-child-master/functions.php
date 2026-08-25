@@ -131,6 +131,18 @@ function hello_elementor_child_enqueue_scripts() {
 			[],
 			$version
 		);
+
+		// Password dimenticata: markup e impaginazione a sé rispetto al resto
+		// dell'area account, quindi foglio dedicato e caricato solo qui.
+		if ( is_wc_endpoint_url( 'lost-password' ) ) {
+			wp_enqueue_style('lost-password-style',
+				get_stylesheet_directory_uri() . '/my-account/lost-password.css',
+				[
+					'my-account-style',
+				],
+				$version
+			);
+		}
 	}
 
 	// is_checkout() è vero sia sulla checkout normale sia su order-pay: è lo stesso

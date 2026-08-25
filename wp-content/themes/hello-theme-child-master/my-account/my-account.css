@@ -1,10 +1,11 @@
 /* ============================================================
-   Area account, login/registrazione e recupero password
+   Area account e login/registrazione
    Caricato da functions.php su is_account_page() e sulla pagina
    /login-e-registrazione/ (URL impostato dai filtri login_url e
    register_url in my-account.php): la registrazione NON è un
    endpoint WooCommerce, è una pagina a sé, quindi entrambe le
    condizioni servono.
+   Lo stile della pagina password dimenticata sta in lost-password.css.
    ============================================================ */
 
 /* ---- Dashboard: pulsante del plugin User Registration ---- */
@@ -30,68 +31,4 @@ body .container-social-login .elementor-shortcode {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-}
-
-/* ============================================================
-   Password dimenticata
-   L'H1 e il sottotitolo arrivano dal template Elementor condiviso
-   con il resto dell'area account: il testo del titolo è riscritto
-   lato server nel filtro elementor/widget/render_content in
-   my-account.php, non più simulato qui con un ::after.
-   ============================================================ */
-
-.woocommerce-lost-password .e-my-account-tab > .woocommerce {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.woocommerce-lost-password .text-one {
-  display: none;
-}
-.woocommerce-lost-password  .elementor-widget-divider {
-  display: none;
-}
-.woocommerce-lost-password .elementor-widget-shortcode {
-  display: none;
-}
-.woocommerce-lost-password .title-my-account {
-  margin: 0;
-}
-.woocommerce-lost-password .title-my-account h2 {
-  display: none;
-}
-.woocommerce-lost-password .title-my-account > div {
-  margin: 0;
-}
-.woocommerce-lost-password .section-my-account {
-  padding-top: 5% !important;
-  padding-bottom: 10% !important;
-  padding-right: 4%;
-  padding-left: 4%;
-}
-body.woocommerce-lost-password .descr-my-account {
-  display: none;
-}
-body.woocommerce-lost-password .woocommerce-ResetPassword p,
-body.woocommerce-lost-password .woocommerce > p {
-  font-size: 1.2rem !important;
-  color: var(--e-global-color-secondary) !important;
-  font-family: "Muli", Sans-serif !important;
-  font-weight: 400 !important;
-  line-height: 1.3em !important;
-}
-body.woocommerce-lost-password .woocommerce-ResetPassword label {
-  font-size: 1.2rem;
-  color: var(--e-global-color-secondary);
-  font-family: "Muli", Sans-serif;
-  font-weight: 400;
-  line-height: 1.3em;
-}
-body.woocommerce-lost-password .woocommerce-ResetPassword input {
-  background-color: #ffffff !important;
-  border: 1px solid #69727d !important;
-  color: var( --e-global-color-secondary ) !important;
-}
-body.woocommerce-lost-password .woocommerce-notices-wrapper {
-  width: 100%;
 }
