@@ -76,6 +76,7 @@ add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
 
 require_once get_stylesheet_directory() . '/thankyou/thankyou.php';
 require_once get_stylesheet_directory() . '/order-pay/order-pay.php';
+require_once get_stylesheet_directory() . '/satispay/satispay.php';
 require_once get_stylesheet_directory() . '/my-account/my-account.php';
 require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB.php';
 require_once get_stylesheet_directory() . '/controllo-codici/controllo_codici_DB_promo.php';
