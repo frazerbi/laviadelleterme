@@ -162,9 +162,13 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
   the markup they style — `wc-notices.css` (all WooCommerce notices, enqueued site-wide) and `booking-status.css`
   (the per-item booking/payment badge, enqueued on both order-received and checkout). Put a stylesheet here, not in a
   feature folder, whenever the markup it targets is emitted by a hook that fires on several pages.
+  `script.js` (password-protected promo pages, hamburger icon state, second header on scroll) is **vanilla JS with no
+  jQuery dependency** — don't reintroduce one, it was removed so the enqueue stops pulling jQuery in for four lines
+  used on a single page. Its scroll listener is registered `{ passive: true }` and writes classes only when the state
+  actually changes; keep both properties if you touch it.
 - `checkout/`, `order-pay/`, `thankyou/`, `satispay/`, `my-account/`, `controllo-codici/` — one folder per feature module, each bundling its own PHP + CSS/JS, required individually from `functions.php`
-- `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes
-- `woocommerce/emails/` — Custom WooCommerce email templates (prefixed with `__` = disabled/legacy)
+- `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes. These are forks of the plugin's stock templates and the plugin itself is not in this repo, so drift can only be checked against the copy installed on the server. Values that land in an attribute (`class`) go through `esc_attr`, and sku/weight/weight-unit/quantity through `esc_html`; item **name**, **meta**, prices and total labels are deliberately left raw — the plugin hands those over as ready-made HTML and escaping them breaks the documents.
+- `woocommerce/emails/` — Custom WooCommerce email templates. Only `customer-completed-order.php` is live; four `__`-prefixed disabled copies were deleted in the 2026-08-25 cleanup (WooCommerce resolves overrides by exact filename, so they were never loaded).
 - `ga4-elementor-compat.php` — GA4 event fallbacks for Elementor pages (see below)
 - `performance-optimization.php` — disables Gutenberg, emoji scripts, oEmbed, XML-RPC, comments (all post types, including products — no WC product reviews in use), throttles Heartbeat, limits post revisions to 3, strips self-pings. Required from `functions.php`; do **not** re-add a `?ver` query-string-stripping filter here — it was removed because it silently defeated the theme's asset cache-busting (see below).
 
@@ -181,6 +185,8 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 **`controllo-codici/`**: two shortcodes (`controllo_codici_prezzo_pieno`, `controllo_codici_promo`) that print remaining unassigned license-code counts per product. Both are thin wrappers around `laviadelleterme_render_controllo_codici( $prodotti )` in `controllo_codici_DB.php` — only the product map differs, so keep the shared renderer as the single place that touches the DB or the markup. It is gated by `laviadelleterme_puo_vedere_controllo_codici()` (`manage_woocommerce`); everyone else gets a "Contenuto riservato allo staff." line rather than silence, so a wrong capability is visible instead of looking like an empty page. One query (`WHERE order_id = 0 AND product_id IN (…) GROUP BY product_id`) covers the whole list — it used to be one query per product, 33 in total. Products with no rows are simply absent from the result and render as 0. `controllo-codici.css` is *registered* in `functions.php` and enqueued by the renderer itself, so it costs nothing on the rest of the site; it therefore prints in the footer, which is fine for an internal page.
 
 **`my-account/my-account.php`**: custom login/registration URLs and post-login/registration redirect logic. Redirect targets (explicit `redirect`/`redirect_to` params and the `Referer` fallback) are validated via `laviadelleterme_is_local_url()`, which compares hosts with `wp_parse_url(...,  PHP_URL_HOST)` — do not go back to a plain `strpos($url, home_url())` substring check, it's bypassable (`https://evil.tld/?x=` + `home_url()` passes it) and was an open-redirect vector here until fixed.
+
+The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` is the single implementation, and the `woocommerce_login_redirect` / `woocommerce_registration_redirect` callbacks are thin wrappers around it (they used to be two line-for-line identical copies). The logged-out gate on the account pages uses **`is_account_page()`**, not a `strpos` on `REQUEST_URI` — the string check fired on any URL that merely contained `/my-account/` and ignored whichever page WooCommerce is actually configured with. It exits early on `lost-password`, guards against a redirect loop if the account page were ever set to the login page itself, uses `wp_safe_redirect()`, and carries the requested URL over in `redirect_to` (rebuilt on `home_url()` so a manipulated `REQUEST_URI` cannot move the destination off-host) so that opening e.g. `/my-account/view-order/123` while logged out lands back there after login instead of on the dashboard.
 
 ### GA4 / Elementor Compatibility
 
@@ -282,5 +288,5 @@ GitHub Actions (`.github/workflows/deploy.yml`) deploys automatically to `stagin
 
 ### Disabled/Legacy Components
 
-- Files prefixed with `__` are disabled legacy code.
+- Files prefixed with `__` are disabled legacy code. None are left in the theme (the last four, in `woocommerce/emails/`, were deleted on 2026-08-25); the convention still applies elsewhere in the repo.
 - `plugin-custom-termeshop` — legacy plugin referenced in older docs; not present in this repo.
