@@ -174,4 +174,5 @@ require_once get_stylesheet_directory() . '/satispay/satispay.php';
 require_once get_stylesheet_directory() . '/my-account/my-account.php';
 require_once get_stylesheet_directory() . '/controllo-codici/controllo-codici.php';
 require_once get_stylesheet_directory() . '/ga4-elementor-compat.php';
+require_once get_stylesheet_directory() . '/elementor-element-cache.php';
 require_once get_stylesheet_directory() . '/performance-optimization.php';

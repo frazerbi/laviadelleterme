@@ -21,6 +21,14 @@ inclusa singolarmente da functions.php:
                  (lost-password.css: stile della sola pagina password dimenticata)
 * controllo-codici/  shortcode con le giacenze dei codici licenza (solo staff)
 
+Alla radice del tema, oltre a style.css e functions.php:
+
+* ga4-elementor-compat.php     eventi GA4 che gli hook WooCommerce non fanno scattare
+                               sulle pagine costruite con Elementor
+* elementor-element-cache.php  esclude dalla cache degli elementi di Elementor i widget
+                               il cui testo il tema riscrive in base alla richiesta
+* performance-optimization.php disattiva Gutenberg, emoji, oEmbed, XML-RPC, commenti
+
 assets/css e assets/js contengono gli asset globali e quelli condivisi da più pagine:
 
 * style.css                  solo regole realmente globali (header, mini carrello,
