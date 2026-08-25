@@ -112,7 +112,7 @@ class Booking_Checkout_Fields {
             </div>
 
             <!-- Checkbox Dichiarazione -->
-            <div style="padding: 12px; background: #fff; border: 1px solid #dee2e6; border-radius: 4px;">
+            <div class="health-certificate-check" style="padding: 12px; background: #fff; border: 1px solid #dee2e6; border-radius: 4px;">
                 <label for="health_certificate_accepted" style="display: flex; align-items: flex-start; cursor: pointer;">
                     <input
                         type="checkbox"
@@ -138,8 +138,12 @@ class Booking_Checkout_Fields {
                 color: #0074A0;
             }
             .health-certificate-content.health-cert-error {
-                border: 2px solid #d9534f;
-                box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.2);
+                border: 2px solid #8e1414;
+                box-shadow: 0 0 0 3px rgba(142, 20, 20, 0.2);
+            }
+            .health-certificate-content.health-cert-error .health-certificate-check {
+                border-color: #8e1414;
+                background: #fdf3f3;
             }
         </style>
         <?php
@@ -217,7 +221,22 @@ class Booking_Checkout_Fields {
                 if (!certBox) return;
 
                 certBox.classList.add('health-cert-error');
+
+                // WooCommerce (scroll_to_notices) lancia un'animazione jQuery di
+                // scroll verso le notice subito prima di 'checkout_error': senza
+                // fermarla vince lei e la nostra scrollIntoView non si vede.
+                if (typeof window.jQuery !== 'undefined') {
+                    window.jQuery('html, body').stop(true, false);
+                }
+
                 certBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Il box ha overflow:scroll e la checkbox e' il suo ultimo figlio:
+                // porta lo scroll interno in fondo, altrimenti resta fuori vista.
+                certBox.scrollTop = certBox.scrollHeight;
+
+                var checkbox = document.getElementById('health_certificate_accepted');
+                if (checkbox) checkbox.focus({ preventScroll: true });
             }
 
             function clearHealthCertHighlight() {
@@ -225,14 +244,18 @@ class Booking_Checkout_Fields {
                 if (certBox) certBox.classList.remove('health-cert-error');
             }
 
+            // La notice di errore porta un marcatore (.health-cert-error-notice)
+            // stampato da validate_health_certificate(): piu' affidabile del match
+            // sul testo, che dipende dalla traduzione.
+            function healthCertNoticeIsShown() {
+                return !!document.querySelector('.health-cert-error-notice');
+            }
+
             function bindCheckoutErrorHandler() {
                 if (typeof window.jQuery === 'undefined') return;
 
                 window.jQuery(document.body).on('checkout_error', function() {
-                    var notices = document.querySelector('.woocommerce-NoticeGroup-checkout, .woocommerce-notices-wrapper, .woocommerce-error');
-                    var noticeText = notices ? notices.textContent : '';
-
-                    if (noticeText.indexOf('dichiarazione di buona salute') !== -1) {
+                    if (healthCertNoticeIsShown()) {
                         highlightHealthCertBox();
                     }
                 });
@@ -263,6 +286,11 @@ class Booking_Checkout_Fields {
                 observer.observe(paymentArea, { childList: true, subtree: true });
 
                 bindCheckoutErrorHandler();
+
+                // Errore gia' a pagina caricata (submit non-AJAX / express payment)
+                if (healthCertNoticeIsShown()) {
+                    highlightHealthCertBox();
+                }
             }
 
             if (document.readyState === 'loading') {
@@ -308,7 +336,9 @@ class Booking_Checkout_Fields {
 
         if (!$accepted_post && !$accepted_session) {
             wc_add_notice(
-                __('Devi accettare la dichiarazione di buona salute per completare l\'ordine.', 'text-domain'),
+                '<span class="health-cert-error-notice">'
+                    . esc_html__('Devi accettare la dichiarazione di buona salute per completare l\'ordine.', 'text-domain')
+                    . '</span>',
                 'error'
             );
         }
