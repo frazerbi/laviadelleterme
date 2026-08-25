@@ -1,0 +1,110 @@
+/* ============================================================
+   Notice WooCommerce — stile unico per tutto il sito
+   ============================================================
+   WooCommerce stampa gli stessi tre tipi di notice con markup
+   diverso a seconda del contesto:
+
+   - `.woocommerce-notices-wrapper > div.woocommerce-info`   (cart, order-pay, my-account…)
+   - `.woocommerce-NoticeGroup > div[role=alert] > ul.woocommerce-error > li`
+     (validazione della checkout, anche via AJAX)
+   - `ul.woocommerce-error` / `ul.woocommerce-message` sciolti
+
+   Qui si stila la classe di tipo (`.woocommerce-error`, `.woocommerce-info`,
+   `.woocommerce-message`) indipendentemente dal wrapper, così tutte le
+   varianti hanno lo stesso aspetto.
+
+   Il `!important` su padding/margin/list-style è necessario: woocommerce.css
+   li dichiara a sua volta `!important`.
+
+   Palette allineata ai badge di stato (assets/css/booking-status.css):
+   rosso #a51616, arancio #a05800, verde #1a7a4a.
+   ============================================================ */
+
+.woocommerce-error,
+.woocommerce-info,
+.woocommerce-message {
+	display: block;
+	list-style: none !important;
+	margin: 0 0 1.25rem !important;
+	padding: 1rem 1.25rem !important;
+	border-radius: 10px;
+	border: 1px solid transparent;
+	/* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
+	   quello che li rende riconoscibili a colpo d'occhio. */
+	border-left-width: 4px;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.95rem;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+/* WooCommerce mette un'icona in ::before contando su un padding-left ampio:
+   qui il padding è simmetrico, quindi l'icona va tolta. */
+.woocommerce-error::before,
+.woocommerce-info::before,
+.woocommerce-message::before {
+	display: none !important;
+}
+
+/* Righe multiple (ul > li), es. più errori di validazione insieme */
+.woocommerce-error > li,
+.woocommerce-info > li,
+.woocommerce-message > li {
+	list-style: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.woocommerce-error > li + li,
+.woocommerce-info > li + li,
+.woocommerce-message > li + li {
+	margin-top: 0.5rem !important;
+}
+
+/* I link dentro al notice (es. "#terms" nell'errore dei termini)
+   restano del colore del notice, sottolineati per restare cliccabili. */
+.woocommerce-error a,
+.woocommerce-info a,
+.woocommerce-message a {
+	color: inherit !important;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Il bottone dentro ai notice di WooCommerce (es. "Visualizza carrello")
+   non deve prendere il colore del testo del notice. */
+.woocommerce-error a.button,
+.woocommerce-info a.button,
+.woocommerce-message a.button {
+	text-decoration: none;
+	float: right;
+	margin-left: 1rem;
+}
+
+/* I testi sono scelti per stare sopra 4.5:1 di contrasto sul proprio sfondo
+   tinto (WCAG AA per testo normale): l'arancio e il verde precedenti
+   (#a05800, #1a7a4a) erano al limite e risultavano slavati. */
+
+/* ---- Errore — rosso ---- */
+.woocommerce-error {
+	background: rgba(200, 30, 30, 0.1);
+	border-color: rgba(200, 30, 30, 0.35);
+	border-left-color: #c81e1e;
+	color: #8e1414 !important;
+}
+
+/* ---- Informazione / attesa — arancio ---- */
+.woocommerce-info {
+	background: rgba(220, 120, 0, 0.12);
+	border-color: rgba(220, 120, 0, 0.35);
+	border-left-color: #dc7800;
+	color: #7a4100 !important;
+}
+
+/* ---- Conferma — verde ---- */
+.woocommerce-message {
+	background: rgba(34, 160, 100, 0.12);
+	border-color: rgba(34, 160, 100, 0.35);
+	border-left-color: #22a064;
+	color: #14663d !important;
+}

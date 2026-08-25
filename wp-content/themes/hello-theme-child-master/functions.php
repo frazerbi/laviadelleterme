@@ -49,6 +49,26 @@ function hello_elementor_child_enqueue_scripts() {
 		$version
 	);
 
+	// Notice WooCommerce (errore / info / conferma): compaiono su carrello, checkout,
+	// order-pay, my-account e pagine prodotto, quindi lo stile è caricato ovunque.
+	if ( class_exists( 'WooCommerce' ) ) {
+		wp_enqueue_style('wc-notices-style',
+			get_stylesheet_directory_uri() . '/assets/css/wc-notices.css',
+			[],
+			$version
+		);
+	}
+
+	// Badge stato prenotazione: stampato su woocommerce_order_item_meta_end, quindi
+	// presente sia su order-received sia nella tabella riepilogo di order-pay.
+	if ( is_wc_endpoint_url( 'order-received' ) || is_checkout() ) {
+		wp_enqueue_style('booking-status-style',
+			get_stylesheet_directory_uri() . '/assets/css/booking-status.css',
+			[],
+			$version
+		);
+	}
+
 	if ( is_wc_endpoint_url( 'order-received' ) ) {
 		wp_enqueue_style('thankyou-style',
 			get_stylesheet_directory_uri() . '/thankyou/thankyou.css',

@@ -26,20 +26,6 @@ add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
 	return $content;
 }, 10, 2 );
 
-// Classe sul <body> quando l'ordine non è confermato, per nascondere via CSS
-// il box istruzioni Mollie solo in questo caso (altrimenti resta visibile)
-add_filter( 'body_class', function ( $classes ) {
-	if ( is_wc_endpoint_url( 'order-received' ) ) {
-		$order_id = absint( get_query_var( 'order-received' ) );
-		$order    = $order_id ? wc_get_order( $order_id ) : false;
-
-		if ( ! laviadelleterme_thankyou_order_is_confirmed( $order ) ) {
-			$classes[] = 'thankyou-awaiting-payment';
-		}
-	}
-	return $classes;
-} );
-
 // Cambia il notice generico WooCommerce "Grazie. Il tuo ordine è stato ricevuto."
 // quando il pagamento non risulta ancora confermato
 add_filter( 'woocommerce_thankyou_order_received_text', function ( $text, $order ) {
@@ -97,7 +83,7 @@ add_action( 'woocommerce_thankyou', function ( $order_id ) {
 
 // Endpoint AJAX per il polling di stato (vedi sotto): usato solo dalla thank-you page quando
 // l'ordine risulta ancora "in attesa" ma necessita di pagamento. La order key va validata come
-// fa il webhook di Mollie stesso ($order->key_is_valid()), altrimenti chiunque potrebbe
+// fa il webhook del gateway stesso ($order->key_is_valid()), altrimenti chiunque potrebbe
 // interrogare lo stato di un ordine arbitrario passando solo un order_id.
 add_action( 'wp_ajax_laviadelleterme_check_order_confirmed', 'laviadelleterme_ajax_check_order_confirmed' );
 add_action( 'wp_ajax_nopriv_laviadelleterme_check_order_confirmed', 'laviadelleterme_ajax_check_order_confirmed' );
@@ -117,9 +103,10 @@ function laviadelleterme_ajax_check_order_confirmed() {
 
 // Polling automatico dello stato ordine, SOLO quando l'ordine è ancora "in attesa" ma richiede
 // pagamento (stessa condizione del box "Completa il pagamento" sopra). Copre la race condition
-// per cui il browser torna sulla thank-you page da Mollie prima che il webhook asincrono di
-// Mollie (separato dal redirect del browser, vedi MollieOrderService::onWebhookAction) abbia
-// aggiornato lo stato dell'ordine: se nel frattempo l'ordine viene confermato, la pagina si
+// per cui il browser torna sulla thank-you page prima che il webhook asincrono del gateway
+// (richiesta separata dal redirect del browser) abbia aggiornato lo stato dell'ordine:
+// diagnosticata su Mollie ma vale per qualsiasi gateway asincrono, Stripe e Satispay inclusi.
+// Se nel frattempo l'ordine viene confermato, la pagina si
 // ricarica da sola. Nessun impatto per gli ordini già confermati (nessuno script stampato) né
 // per chi resta davvero in attesa a lungo (es. bonifico): il polling si ferma da solo dopo ~30s.
 add_action( 'woocommerce_thankyou', function ( $order_id ) {
