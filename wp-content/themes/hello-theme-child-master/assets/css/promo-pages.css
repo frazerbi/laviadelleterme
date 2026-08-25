@@ -1,0 +1,197 @@
+/* ============================================================
+   Pagine protette da password (plugin PPWP)
+   Landing promozionali e pagina convenzione ADAVA: il form di
+   sblocco è stampato dal plugin, qui viene solo ristilato.
+   La controparte JS (campo in chiaro + lowercase) sta in
+   assets/js/script.js.
+
+   Caricato su tutto il sito di proposito: PPWP può proteggere
+   qualsiasi pagina o porzione di pagina, non c'è un conditional
+   tag affidabile su cui agganciare l'enqueue.
+   ============================================================ */
+
+.custom-password-message {
+    display: flex;
+    justify-content: center;
+    color: red;
+    font-size: 1.6rem;
+    padding-bottom: 20vh;
+    margin-top: -20vh;
+    padding-left: 10%;
+    padding-right: 10%;
+    text-align: center;
+}
+
+/* ---- Convenzione ADAVA (Associazione Albergatori Valle d'Aosta) ---- */
+
+.form-adava-cont p.ppw-input {
+  align-items: center !important;
+  justify-content: center !important;
+}
+.form-adava-cont .ppw-description p {
+  font-size: 1.5rem !important;
+}
+.form-adava-cont input.ppw-password-input.ppw-pcp-pf-password-input {
+  height: auto !important;
+}
+
+/* ---- Form di sblocco: pagina intera ---- */
+
+.post-password-form {
+  display: flex;
+  flex-direction: row;
+  padding-top: 12rem;
+  padding-bottom: 6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.post-password-form > p {
+  width: 100%;
+  display: flex;
+}
+.post-password-form > p:first-child {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+}
+.post-password-form > p:nth-child(2) {
+  font-size: 1.3rem;
+  display: flex;
+  justify-content: center;
+}
+.post-password-form > p:nth-child(2) > input {
+  border: white solid 1px;
+  background-color: #0074A0;
+  color: white;
+  border-radius: 0;
+  padding: 0.7em 2em 0.7em 2em;
+}
+.post-password-form > p:nth-child(2) > input:hover {
+  background-color: white;
+  color: #0074A0;
+  border: #0074A0 solid 1px;
+}
+.ppwp-wrong-pw-error.ppw-ppf-error-msg {
+  width: 100%;
+  text-align: center;
+}
+.ppw-ppf-field-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.ppw-ppf-field-container > .ppw-pwd-label {
+  display: flex;
+  height: auto;
+}
+.ppw-ppf-desc {
+  padding-bottom: 2%;
+  text-align: center;
+  color: var(--e-global-color-secondary);
+  font-size: 1.8rem;
+}
+.ppw-ppf-desc p {
+  text-align: center;
+  display:  block !important;
+}
+.ppw-ppf-field-container > .ppw-pwd-submit-btn {
+  border: white solid 1px;
+  border-radius: 0 !important;
+}
+.ppw-ppf-headline {
+  text-align: center;
+  color: var(--e-global-color-secondary);
+  font-family: "Muli", Sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.ppw-ppf-headline p {
+  display: block;
+}
+
+/* ---- Form di sblocco: contenuto parziale (PCP) ---- */
+
+.ppw-headline.ppw-pcp-pf-headline {
+  color: var(--e-global-color-secondary);
+  font-family: "Muli", Sans-serif;
+  font-size: 3rem !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1rem;
+  line-height: 1.2em;
+}
+.ppw-description.ppw-pcp-pf-desc {
+  text-align: center;
+  color: #424242;
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1.2em;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.ppw-description.ppw-pcp-pf-desc p {
+  display: block;
+}
+.ppw-pcp-password-form p.ppw-input {
+  justify-content: center;
+}
+.post-password-form.ppw-form.ppw-pcp-password-form {
+  padding-top: 2rem;
+}
+.ppw-pcp-pf-submit-btn {
+  font-family: "Muli", Sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+  height: 100%;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media only screen and (min-width: 768px) {
+  .post-password-form {
+      padding-left: 2em;
+      padding-right: 2em;
+  }
+  .post-password-form > p:nth-child(2) {
+      display: flex;
+      justify-content:center;
+      flex-direction:row;
+      flex-wrap:wrap;
+  }
+  .post-password-form > p > label > input {
+      max-width:40vw;
+      height:3rem;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .post-password-form > p > label > input {
+      max-width:50vw;
+      height: 3rem;
+  }
+  .post-password-form {
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 5em;
+      padding-bottom: 5em;
+  }
+  .post-password-form p {
+    font-size: 1.3rem;
+  }
+  .ppw-ppf-desc {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 1rem;
+  }
+  .ppw-headline.ppw-pcp-pf-headline {
+    font-size: 2.2rem !important;
+  }
+}

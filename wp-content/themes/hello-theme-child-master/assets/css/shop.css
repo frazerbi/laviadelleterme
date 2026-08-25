@@ -1,0 +1,118 @@
+/* ============================================================
+   Catalogo, scheda prodotto e carrello
+   Ritocchi al markup WooCommerce e ai widget prodotto di
+   Elementor. Nessuna di queste classi è nel repository: sono
+   classi custom assegnate nei contenuti Elementor (.cont-prodotti,
+   .sticky-column, .tab-mobile, .link-img-cont), quindi possono
+   comparire su pagine costruite a mano oltre che sugli archivi
+   WooCommerce — per questo il foglio è caricato su tutto il sito
+   e non dietro is_woocommerce()/is_cart().
+   ============================================================ */
+
+/* ---- Carrello ---- */
+
+.shop_table.shop_table_responsive.woocommerce-cart-form__contents  > thead > tr {
+  font-size: 1rem!important;
+  font-weight: 400 !important;
+  text-transform: uppercase;
+  background-color: #FBFBFB !important;
+}
+.shop_table.shop_table_responsive.woocommerce-cart-form__contents  > thead > tr th {
+  padding-top: 0.9rem !important;
+  border-bottom-style: solid !important;
+  border-bottom-color: #E5E5E5!important;
+  border-bottom-width: 1px!important;
+}
+.woocommerce-cart-form__cart-item td.product-remove {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+.woocommerce-cart table.shop_table td.product-name a:hover {
+  color: var(--e-global-color-3a6fd30) !important;
+}
+
+/* ---- Griglia prodotti (archivi e widget Elementor) ---- */
+
+.link-img-cont a {
+  width: 100%;
+}
+.cont-prodotti li {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    align-content: space-between !important;
+    justify-content: center !important;
+}
+.cont-prodotti img {
+  height: 30vh !important;
+  object-fit: cover;
+  object-position: center;
+}
+.cont-prodotti a {
+  width: 100%;
+}
+.cont-prodotti a.button {
+  width: auto !important;
+}
+.cont-prodotti .woocommerce-LoopProduct-link h2 {
+    padding-right: 2rem !important;
+    padding-left: 2rem !important;
+}
+
+/* ---- Scheda prodotto ---- */
+
+.woocommerce-variation-description {
+  font-size: inherit !important;
+}
+.sticky-column {
+  position: sticky;
+  top: 10vh;
+  height: fit-content;
+}
+.single-product .woocommerce-variation-price {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+.single-product .woocommerce-variation-price span.woocommerce-Price-amount {
+  color: var(--e-global-color-secondary);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+.single-product .elementor-add-to-cart.elementor-product-variable table.variations th {
+  text-align: left;
+}
+.single-product .accordio-single-prodotto .elementor-accordion-item {
+  border-top: 1px solid var(--e-global-color-text) !important;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media only screen and (max-width: 992px) {
+  .cross-sell li.product {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .cont-prodotti img {
+    height: 40vh !important;
+    object-fit: cover;
+    object-position: center;
+  }
+  .products-shop-page li.product {
+    width:100% !important;
+    margin:0 !important;
+  }
+  .tab-mobile ol {
+    margin-left: 0 !important;
+    padding-left: 1rem !important;
+  }
+  .elementor-widget-woocommerce-products li.product.type-product {
+    width: 100% !important;
+  }
+  .single-product .elementor-add-to-cart .variations th.label {
+    width: 25%;
+  }
+}

@@ -16,10 +16,25 @@ inclusa singolarmente da functions.php:
 * order-pay/      evidenziazione della checkbox termini quando blocca il pagamento
 * thankyou/       pagina order-received: stato reale del pagamento, badge, polling
 * satispay/       recupero dell'ordine quando l'utente annulla il pagamento Satispay
-* my-account/     URL di login/registrazione e redirect post accesso
+* my-account/     URL di login/registrazione, redirect post accesso e relativo stile
 * controllo-codici/  shortcode con le giacenze dei codici licenza (solo staff)
 
-assets/css e assets/js contengono gli asset globali e quelli condivisi da più pagine.
+assets/css e assets/js contengono gli asset globali e quelli condivisi da più pagine:
+
+* style.css                  solo regole realmente globali (header, mini carrello,
+                             pulsanti WooCommerce). Non è una discarica: se una regola
+                             appartiene a una pagina, va nel file di quella pagina.
+* assets/css/shop.css        catalogo, scheda prodotto, carrello
+* assets/css/promo-pages.css pagine protette da password (plugin PPWP)
+* assets/css/wc-notices.css  notice WooCommerce, in tutto il sito
+* assets/css/booking-status.css  badge prenotazione (order-received + order-pay)
+* assets/css/stripe-upe-appearance.css  campi carta dentro l'iframe Stripe
+* assets/css/mobile-menu-style.css      menu mobile e off-canvas
+
+Un foglio sta in assets/css, e non in una cartella di modulo, quando il markup che
+stila è stampato su più pagine oppure da contenuti Elementor / plugin di terze parti,
+cioè quando non esiste un conditional tag affidabile su cui restringere l'enqueue.
+
 woocommerce/ è riservata agli override dei template WooCommerce e ai template PDF:
 non aggiungere lì cartelle di modulo, i percorsi sono riservati da WooCommerce.
 

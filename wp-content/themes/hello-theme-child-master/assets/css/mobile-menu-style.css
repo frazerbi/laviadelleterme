@@ -92,3 +92,17 @@ transform-origin: 4px 50%;
     transform: translateY(0) !important;
     visibility: visible;
 }
+
+/* Menu off-canvas (widget Dynamic.ooo)
+   Spostate qui da style.css: stessa area funzionale del resto del file. */
+.menu-mobile-container .dce-button-hamburger {
+  display: flex;
+  justify-content: flex-end;
+}
+.animatedoffcanvasmenu .dce-nav .dce-menu-aocm {
+  z-index: 99999 !important;
+  box-shadow: 2px 8px 23px 3px rgba(0,0,0,0.2);
+}
+.animatedoffcanvasmenu .dce-nav .dce-menu-aocm .current-menu-item {
+  font-weight: 600;
+}

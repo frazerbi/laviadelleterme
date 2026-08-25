@@ -39,6 +39,25 @@ function hello_elementor_child_enqueue_scripts() {
 		$version
 	);
 
+	// Catalogo/prodotto/carrello e pagine protette da password: le classi che
+	// stilano arrivano dai contenuti Elementor e da plugin di terze parti, non
+	// c'è un conditional tag affidabile su cui restringere l'enqueue.
+	wp_enqueue_style('shop-style',
+		get_stylesheet_directory_uri() . '/assets/css/shop.css',
+		[
+			'hello-elementor-child-style',
+		],
+		$version
+	);
+
+	wp_enqueue_style('promo-pages-style',
+		get_stylesheet_directory_uri() . '/assets/css/promo-pages.css',
+		[
+			'hello-elementor-child-style',
+		],
+		$version
+	);
+
 	wp_enqueue_script('custom-js',
 		get_stylesheet_directory_uri() . '/assets/js/script.js',
 		[],
@@ -100,6 +119,17 @@ function hello_elementor_child_enqueue_scripts() {
 			[],
 			$version,
 			true
+		);
+	}
+
+	// Area account: is_account_page() copre dashboard e password dimenticata,
+	// ma NON la registrazione, che qui è una pagina a sé (vedi i filtri
+	// login_url / register_url in my-account/my-account.php).
+	if ( is_account_page() || is_page( 'login-e-registrazione' ) ) {
+		wp_enqueue_style('my-account-style',
+			get_stylesheet_directory_uri() . '/my-account/my-account.css',
+			[],
+			$version
 		);
 	}
 
