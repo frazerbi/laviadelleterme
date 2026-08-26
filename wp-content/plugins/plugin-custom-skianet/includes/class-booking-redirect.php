@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 class Booking_Redirect {
 
     /**
-     * Product ID, variazioni e categoria TermeGest in base a giorno settimana + ticket_type
+     * Product ID e variazioni per categoria TermeGest — PRODUZIONE.
      */
     private static $product_config = array(
         'p1' => array(
@@ -35,7 +35,42 @@ class Booking_Redirect {
             'variation_id' => null
         ),
         'v3' => array(
-            'product_id'   => 93933, //staging ID
+            'product_id'   => 109134,
+            'variation_id' => null
+        )
+    );
+
+    /**
+     * Stessa mappa per STAGING: fra i due ambienti cambiano solo gli ID.
+     *
+     * Si sceglie con WP_ENVIRONMENT_TYPE, definita in plugin-custom-skianet.php.
+     * Si legge la costante e non wp_get_environment_type() perche' quella
+     * funzione memorizza il valore alla prima chiamata, che puo' capitare prima
+     * del caricamento dei plugin.
+     */
+    private static $product_config_staging = array(
+        'p1' => array(
+            'product_id'   => 14,
+            'variation_id' => 225
+        ),
+        'p2' => array(
+            'product_id'   => 228,
+            'variation_id' => 229
+        ),
+        'p3' => array(
+            'product_id'   => 14,
+            'variation_id' => 224
+        ),
+        'p4' => array(
+            'product_id'   => 228,
+            'variation_id' => 230
+        ),
+        'pm' => array(
+            'product_id'   => 27370,
+            'variation_id' => null
+        ),
+        'v3' => array(
+            'product_id'   => 93933,
             'variation_id' => null
         )
     );
@@ -94,11 +129,17 @@ class Booking_Redirect {
 
         $category = strtolower($category);
 
-        if (!isset(self::$product_config[$category])) {
+        $config = (\defined('WP_ENVIRONMENT_TYPE') && WP_ENVIRONMENT_TYPE === 'staging')
+            ? self::$product_config_staging
+            : self::$product_config;
+
+        // Una voce senza product_id e' una categoria non mappata su questo
+        // ambiente: meglio fermarsi qui che mandare wc_get_product() su null.
+        if (empty($config[$category]['product_id'])) {
             return false;
         }
 
-        return self::$product_config[$category];
+        return $config[$category];
     }
 
     /**

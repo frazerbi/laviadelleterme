@@ -31,6 +31,14 @@ if ( ! defined( 'LOGO_TERME_FOOTER_PATH' ) ) {
     define( 'LOGO_TERME_FOOTER_PATH', PLUGIN_SKIANET_PATH . '/assets/img/footer-coupon.JPG' );
 }
 
+// Ambiente: decide quale mappa product ID usa Booking_Redirect. Vale 'staging'
+// perche' il deploy automatico va su staging2; in produzione, che si aggiorna a
+// mano file per file, questo file va caricato con 'production'.
+// Il guard lascia comunque l'ultima parola a un define nel wp-config.
+if (! \defined('WP_ENVIRONMENT_TYPE')) {
+    \define('WP_ENVIRONMENT_TYPE', 'staging');
+}
+
 require_once PLUGIN_SKIANET_PATH.'/vendor/autoload.php';
 
 require_once PLUGIN_SKIANET_PATH . '/includes/class-termegest-api.php';
