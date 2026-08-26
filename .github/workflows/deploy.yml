@@ -21,4 +21,16 @@ jobs:
         private-ssh-key: ${{ secrets.SSH_KEY }}
         destination-path: /home/u2-hnksdm9lq7dq/www/staging2.laviadelleterme.it/public_html/
         ssh-port: 18765
-        rsync-options: --archive --verbose --compress --update
+        # Escludi tutto cio' che serve solo allo sviluppo: non deve finire nella
+        # webroot. In particolare .git/ - actions/checkout lascia il repo completo
+        # nella workspace e senza questa exclude finisce dentro public_html,
+        # rendendo l'intero sorgente scaricabile da chiunque.
+        rsync-options: >-
+          --archive --verbose --compress --update
+          --exclude=.git/
+          --exclude=.github/
+          --exclude=.claude/
+          --exclude=.gitignore
+          --exclude=CLAUDE.md
+          --exclude=TEST-TEMA.md
+          --exclude=.DS_Store

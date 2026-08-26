@@ -24,6 +24,13 @@ mollie-payments-for-woocommerce/
 .vscode/*
 ftp-kr.json
 
+# impostazioni locali di Claude Code (per-macchina, non condivise).
+# NB: .claude/, CLAUDE.md e .github/ restano TRACCIATI di proposito - sono
+# documentazione del progetto. Che non finiscano sul server non dipende da
+# questo file ma dagli --exclude in .github/workflows/deploy.yml.
+.claude/settings.local.json
+.claude/*.local.json
+
 # ignore 💩 files
 .DS_Store
 .DS_store
