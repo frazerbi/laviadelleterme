@@ -164,12 +164,27 @@ body.order-pay-terms-error .form-row.validate-required input.input-checkbox {
 	outline-offset: 2px;
 }
 
+/* Pulsante d'ordine: stesso aspetto dei pulsanti Elementor del sito.
+   Le misure arrivano dalle variabili --lvdt-button-* definite in style.css.
+   Il padding vuole !important perché la regola del tema sul pulsante è più
+   specifica; i colori lo vogliono per lo stesso motivo del blocco globale. */
 body.woocommerce-checkout #place_order {
 	width: 100%;
-	border-radius: 10px;
-	padding: 0.9rem 1.5rem !important;
-	font-size: 1rem;
-	font-weight: 700;
+	padding: var(--lvdt-button-padding) !important;
+	border-radius: var(--lvdt-button-radius);
+	font-family: var(--lvdt-button-font);
+	font-size: var(--lvdt-button-font-size);
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: var(--lvdt-button-line-height);
+	text-transform: uppercase;
+	color: var(--lvdt-button-color) !important;
+	background-color: var(--lvdt-button-bg) !important;
+	border: 1px solid var(--lvdt-button-bg) !important;
+}
+
+body.woocommerce-checkout #place_order:hover {
+	color: var(--lvdt-button-bg) !important;
+	background-color: var(--lvdt-button-color) !important;
 }
 
 /* ============================================================

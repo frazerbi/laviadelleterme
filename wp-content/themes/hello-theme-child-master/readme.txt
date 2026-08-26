@@ -34,6 +34,12 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
 * style.css                  solo regole realmente globali (header, mini carrello,
                              pulsanti WooCommerce). Non è una discarica: se una regola
                              appartiene a una pagina, va nel file di quella pagina.
+                             Qui stanno anche le variabili --lvdt-button-* con
+                             l'aspetto standard dei pulsanti (colori del kit
+                             Elementor, Muli maiuscolo, padding, raggio): le
+                             riusano checkout, order-pay, thank you, notice e
+                             password dimenticata, così i pulsanti che WooCommerce
+                             stampa fuori da Elementor restano tutti uguali.
 * assets/css/shop.css        catalogo, scheda prodotto, carrello
 * assets/css/promo-pages.css pagine protette da password (plugin PPWP)
 * assets/css/wc-notices.css  notice WooCommerce, in tutto il sito

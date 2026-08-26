@@ -207,8 +207,29 @@
 	font-weight: 500;
 }
 
-.thankyou-complete-payment__button {
+/* Stesso aspetto degli altri pulsanti del sito (variabili --lvdt-button-* in
+   style.css). Il selettore parte da .woocommerce-order per battere il
+   `color: inherit !important` della normalizzazione in cima al file: a parità
+   di !important vince la specificità, e con la sola classe del pulsante
+   (una classe contro due) il colore del testo verrebbe ereditato. */
+.woocommerce-order a.thankyou-complete-payment__button {
 	display: inline-block;
+	padding: var(--lvdt-button-padding);
+	border: 1px solid var(--lvdt-button-bg);
+	border-radius: var(--lvdt-button-radius);
+	background: var(--lvdt-button-bg);
+	color: var(--lvdt-button-color) !important;
+	text-decoration: none;
+	font-family: var(--lvdt-button-font);
+	font-size: var(--lvdt-button-font-size);
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: var(--lvdt-button-line-height);
+	text-transform: uppercase;
+}
+
+.woocommerce-order a.thankyou-complete-payment__button:hover {
+	background: var(--lvdt-button-color);
+	color: var(--lvdt-button-bg) !important;
 }
 
 /* Badge quantità */

@@ -10,18 +10,21 @@
 
 /* ---- Dashboard: pulsante del plugin User Registration ---- */
 
+/* Colori dal blocco pulsanti di style.css (variabili --lvdt-button-*): il
+   pulsante arriva da un plugin e non ha le classi WooCommerce, quindi lo stile
+   va riapplicato qui invece di ereditarlo. */
 .woocommerce-account.woocommerce-page #my-account-dashboard input.user-registration-Button {
-  color: var( --e-global-color-31904c4d );
-  background-color: var( --e-global-color-57f91e2 );
+  color: var( --lvdt-button-color );
+  background-color: var( --lvdt-button-bg );
   border-style: solid;
   border-width: 1px 1px 1px 1px;
-  border-color: var( --e-global-color-57f91e2 );
+  border-color: var( --lvdt-button-bg );
 }
 
 .woocommerce-account.woocommerce-page #my-account-dashboard input.user-registration-Button:hover  {
-  color: var( --e-global-color-57f91e2 );
-  background-color: var( --e-global-color-31904c4d );
-  border-color: var( --e-global-color-57f91e2 );
+  color: var( --lvdt-button-bg );
+  background-color: var( --lvdt-button-color );
+  border-color: var( --lvdt-button-bg );
 }
 
 /* ---- Login e registrazione ---- */

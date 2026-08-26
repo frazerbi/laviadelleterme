@@ -18,6 +18,8 @@
 
    Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
    rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
+   Il pulsante eventualmente contenuto nel notice non segue questa palette: usa
+   l'aspetto standard dei pulsanti del sito (variabili --lvdt-button-* in style.css).
    ============================================================ */
 
 .woocommerce-error,
@@ -74,39 +76,37 @@
 /* Il bottone dentro ai notice di WooCommerce (es. "Continua con gli acquisti"
    dopo l'aggiunta al carrello). Senza queste regole eredita `color: inherit`
    dal blocco qui sopra e non ha né fondo né padding: resta indistinguibile da
-   un link. Il fondo riprende il colore del proprio tipo di notice, così il
-   bottone resta nella tavolozza del messaggio invece di introdurne una terza. */
+   un link.
+
+   Aspetto uguale agli altri pulsanti del sito (variabili --lvdt-button-* in
+   style.css) e non più nel colore del proprio tipo di notice: il fondo per tipo
+   faceva sembrare il bottone parte del messaggio invece che l'azione da
+   compiere, ed era una terza grafia di pulsante rispetto a checkout e account.
+   Il colore del tipo resta comunque leggibile dal testo e dalla barra laterale
+   del notice. `color` vuole !important per battere il `color: inherit !important`
+   sui link del notice qui sopra. */
 .woocommerce-error a.button,
 .woocommerce-info a.button,
 .woocommerce-message a.button {
 	display: inline-block;
-	padding: 0.55rem 1.1rem;
-	border: 0;
-	border-radius: 8px;
-	color: #fff !important;
+	padding: var(--lvdt-button-padding);
+	border: 1px solid var(--lvdt-button-bg);
+	border-radius: var(--lvdt-button-radius);
+	background: var(--lvdt-button-bg);
+	color: var(--lvdt-button-color) !important;
 	text-decoration: none;
-	font-size: 0.9rem;
-	font-weight: 600;
-	line-height: 1.2;
+	font-family: var(--lvdt-button-font);
+	font-size: var(--lvdt-button-font-size);
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: var(--lvdt-button-line-height);
+	text-transform: uppercase;
 }
 
 .woocommerce-error a.button:hover,
 .woocommerce-info a.button:hover,
 .woocommerce-message a.button:hover {
-	filter: brightness(1.25);
-}
-
-/* Fondo nella versione scura del colore del tipo, la stessa usata per il testo:
-   il bianco sopra questi tre sta oltre 6:1 di contrasto, mentre sopra le varianti
-   piene (#c81e1e, #dc7800, #22a064) scenderebbe sotto la soglia AA. */
-.woocommerce-error a.button {
-	background: #8e1414;
-}
-.woocommerce-info a.button {
-	background: #7a4100;
-}
-.woocommerce-message a.button {
-	background: #14663d;
+	background: var(--lvdt-button-color);
+	color: var(--lvdt-button-bg) !important;
 }
 
 /* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa

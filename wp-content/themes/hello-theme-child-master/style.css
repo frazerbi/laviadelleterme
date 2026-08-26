@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.52
+Version: 1.0.53
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -65,25 +65,58 @@ header.header-main {
 }
 
 /* ============================================================
-   Pulsanti WooCommerce
-   Globale di proposito: la stessa classe esce nell'area account,
+   Pulsanti — aspetto condiviso
+   ============================================================
+   I pulsanti stampati dai template WooCommerce non passano da
+   Elementor, quindi il look dei pulsanti del sito (colori globali
+   del kit, Muli maiuscolo, bordo pieno da 1px) va replicato a mano.
+   Le misure stanno qui una volta sola perché questo foglio è l'unico
+   caricato su tutte le pagine: le riusano checkout/checkout.css
+   (#place_order), order-pay/order-pay.css, assets/css/wc-notices.css
+   (pulsante dentro ai notice), thankyou/thankyou.css e
+   my-account/lost-password.css.
+
+   --lvdt-button-radius non fa parte dello stile Elementor di
+   riferimento (che ha gli angoli vivi): è l'unico scostamento, per
+   restare in linea con le card arrotondate di checkout e order-pay.
+   Per tornare agli angoli vivi basta portarlo a 0 qui.
+   ============================================================ */
+
+:root {
+  --lvdt-button-bg: var( --e-global-color-57f91e2 );
+  --lvdt-button-color: var( --e-global-color-31904c4d, #fff );
+  --lvdt-button-font: "Muli", Sans-serif;
+  --lvdt-button-font-size: 1.3rem;
+  --lvdt-button-font-weight: 400;
+  --lvdt-button-line-height: 1.3rem;
+  --lvdt-button-padding: 0.9rem 2rem 1.1rem;
+  --lvdt-button-radius: 10px;
+}
+
+/* Globale di proposito: la stessa classe esce nell'area account,
    nel form di login incorporato nella checkout e nel carrello.
    WooCommerce stampa entrambe le grafie della classe, a seconda
-   del template.
-   ============================================================ */
+   del template. */
 
 button.woocommerce-button,
 button.woocommerce-Button {
-  color: var( --e-global-color-31904c4d ) !important;
-  background-color: var( --e-global-color-57f91e2 ) !important;
+  font-family: var( --lvdt-button-font );
+  font-size: var( --lvdt-button-font-size );
+  font-weight: var( --lvdt-button-font-weight );
+  line-height: var( --lvdt-button-line-height );
+  text-transform: uppercase;
+  padding: var( --lvdt-button-padding ) !important;
+  color: var( --lvdt-button-color ) !important;
+  background-color: var( --lvdt-button-bg ) !important;
   border-style: solid !important;
   border-width: 1px 1px 1px 1px !important;
-  border-color: var( --e-global-color-57f91e2 ) !important;
+  border-color: var( --lvdt-button-bg ) !important;
+  border-radius: var( --lvdt-button-radius );
 }
 button.woocommerce-button:hover,
 button.woocommerce-Button:hover {
-  color: var( --e-global-color-57f91e2 ) !important;
-  background-color: var( --e-global-color-31904c4d ) !important;
+  color: var( --lvdt-button-bg ) !important;
+  background-color: var( --lvdt-button-color ) !important;
 }
 
 /* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
