@@ -31,8 +31,10 @@
 
    Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
    rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
-   Il pulsante eventualmente contenuto nel notice non segue questa palette: usa
-   l'aspetto standard dei pulsanti del sito (variabili --lvdt-button-* in style.css).
+   Ogni blocco di tipo pubblica quel colore anche come --lvdt-notice-color: è
+   una proprietà personalizzata, quindi eredita a tutto il contenuto del notice
+   ed è così che il pulsante prende il colore del proprio tipo senza dover
+   triplicare le sue regole.
    ============================================================ */
 
 body .woocommerce-error.woocommerce-error,
@@ -95,19 +97,29 @@ body .woocommerce-message.woocommerce-message {
    dal blocco qui sopra e non ha né fondo né padding: resta indistinguibile da
    un link.
 
-   Aspetto uguale agli altri pulsanti del sito (variabili --lvdt-button-* in
-   style.css) e non più nel colore del proprio tipo di notice: il fondo per tipo
-   faceva sembrare il bottone parte del messaggio invece che l'azione da
-   compiere, ed era una terza grafia di pulsante rispetto a checkout e account.
-   Il colore del tipo resta comunque leggibile dal testo e dalla barra laterale
-   del notice.
+   Colori: quelli del proprio notice, non il blu dei pulsanti del sito. In
+   pieno il blu si prendeva la scena — è un colore estraneo al messaggio,
+   messo su un fondo tinto di un'altra tinta, e finiva per pesare più del
+   testo che dovrebbe leggersi per primo. Qui il pulsante è delineato: fondo
+   trasparente (passa la tinta del notice), bordo e testo nel colore del tipo,
+   e solo in hover il colore riempie il fondo con il testo in bianco. Così a
+   riposo resta secondario e in hover diventa chiaramente premibile.
 
-   Unico scostamento dal riferimento: la scala. Le --lvdt-button-* sono tarate
-   sui pulsanti d'azione a piena pagina (1.3rem, padding 0.9/2/1.1) mentre il
-   notice è una striscia compatta il cui testo sta a 0.95rem: alla misura piena
-   il pulsante pesava più del messaggio. Qui font e padding sono ridotti, tutto
-   il resto — colori, famiglia, bordo, raggio, maiuscolo — resta condiviso, così
-   il pulsante è riconoscibile come lo stesso pulsante, solo in piccolo.
+   Il colore arriva da --lvdt-notice-color, dichiarata nei blocchi per tipo in
+   fondo al file ed ereditata dal contenitore: un solo gruppo di regole invece
+   di tre. Il fallback su --lvdt-button-bg copre l'ipotesi di un notice senza
+   classe di tipo riconosciuta.
+
+   Contrasto: a riposo il testo è lo stesso colore del testo del notice, quindi
+   già verificato sopra 4,5:1 sulla propria tinta; il bordo è a piena intensità,
+   sopra il 3:1 richiesto agli elementi non testuali. In hover il bianco sui tre
+   colori sta fra 6,9:1 e 8,7:1.
+
+   Dalle --lvdt-button-* restano forma e impaginazione (famiglia, peso, raggio,
+   maiuscolo), non i colori. La scala però è ridotta: quelle variabili sono
+   tarate sui pulsanti d'azione a piena pagina (1.3rem, padding 0.9/2/1.1)
+   mentre il notice è una striscia compatta il cui testo sta a 0.95rem, e alla
+   misura piena il pulsante pesava più del messaggio.
 
    Niente !important: è il default del pulsante, non l'ultima parola. Il `body`
    in testa al selettore porta la specificità a (0,2,2), quel tanto che basta a
@@ -119,23 +131,27 @@ body .woocommerce-info a.button,
 body .woocommerce-message a.button {
 	display: inline-block;
 	padding: 0.55rem 1.25rem 0.65rem;
-	border: 1px solid var(--lvdt-button-bg);
+	border: 1px solid var(--lvdt-notice-color, var(--lvdt-button-bg));
 	border-radius: var(--lvdt-radius-sm);
-	background: var(--lvdt-button-bg);
-	color: var(--lvdt-button-color);
+	background: transparent;
+	color: var(--lvdt-notice-color, var(--lvdt-button-bg));
 	text-decoration: none;
 	font-family: var(--lvdt-button-font);
 	font-size: 0.9rem;
 	font-weight: var(--lvdt-button-font-weight);
 	line-height: 1.2;
 	text-transform: uppercase;
+	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 body .woocommerce-error a.button:hover,
+body .woocommerce-error a.button:focus-visible,
 body .woocommerce-info a.button:hover,
-body .woocommerce-message a.button:hover {
-	background: var(--lvdt-button-color);
-	color: var(--lvdt-button-bg);
+body .woocommerce-info a.button:focus-visible,
+body .woocommerce-message a.button:hover,
+body .woocommerce-message a.button:focus-visible {
+	background: var(--lvdt-notice-color, var(--lvdt-button-bg));
+	color: #fff;
 }
 
 /* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa
@@ -204,6 +220,7 @@ body .woocommerce-message a.button:hover {
 
 /* ---- Errore — rosso ---- */
 body .woocommerce-error.woocommerce-error {
+	--lvdt-notice-color: #8e1414;
 	background: rgba(200, 30, 30, 0.18);
 	border-color: #c81e1e;
 	color: #8e1414 !important;
@@ -211,6 +228,7 @@ body .woocommerce-error.woocommerce-error {
 
 /* ---- Informazione / attesa — arancio ---- */
 body .woocommerce-info.woocommerce-info {
+	--lvdt-notice-color: #7a4100;
 	background: rgba(220, 120, 0, 0.18);
 	border-color: #dc7800;
 	color: #7a4100 !important;
@@ -218,6 +236,7 @@ body .woocommerce-info.woocommerce-info {
 
 /* ---- Conferma — verde ---- */
 body .woocommerce-message.woocommerce-message {
+	--lvdt-notice-color: #14663d;
 	background: rgba(34, 160, 100, 0.18);
 	border-color: #22a064;
 	color: #14663d !important;
