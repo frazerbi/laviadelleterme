@@ -96,12 +96,10 @@ class Booking_Handler {
      */
     private function init_hooks() {
 
-        add_action('init', function() {
-        if (!session_id()) {
-                session_start();
-            }
-        });
-
+        // Nessun session_start() globale: ogni punto che tocca $_SESSION
+        // avvia la sessione da se'. Avviarla su ogni richiesta significava un
+        // Set-Cookie: PHPSESSID ovunque, cioe' nessuna pagina cacheabile e le
+        // richieste concorrenti serializzate sul file di sessione.
         add_shortcode('booking_form', array($this, 'render_booking_form'));
         add_action('wp_ajax_submit_booking_ajax', array($this, 'handle_ajax_submission'));
         add_action('wp_ajax_nopriv_submit_booking_ajax', array($this, 'handle_ajax_submission'));

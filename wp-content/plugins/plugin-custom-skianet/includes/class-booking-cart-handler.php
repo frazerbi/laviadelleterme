@@ -275,6 +275,18 @@ class Booking_Cart_Handler {
     }
     
     /**
+     * Cache per richiesta della lista completa dei codici per order_id:product_id.
+     *
+     * La stessa coppia viene interrogata piu' volte nella stessa richiesta: dentro
+     * woocommerce_payment_complete la leggono email di conferma, sync TermeGest ed
+     * email coupon. E' popolata sempre dopo Booking_Code_Assignment (priorita' 10),
+     * quindi non puo' restituire una lista vuota antecedente all'assegnazione.
+     *
+     * @var array
+     */
+    private static $license_codes_cache = array();
+
+    /**
      * Recupera i codici licenza spettanti a uno specifico order item (metodo statico per uso condiviso).
      *
      * wc_ld_license_codes associa i codici a order_id+product_id, senza distinguere
@@ -292,6 +304,14 @@ class Booking_Cart_Handler {
         $product_id   = $item->get_product_id();
         $variation_id = $item->get_variation_id();
         $check_id     = $variation_id > 0 ? $variation_id : $product_id;
+
+        $cache_key = $order_id . ':' . $check_id;
+
+        if (isset(self::$license_codes_cache[$cache_key])) {
+            $all_codes = self::$license_codes_cache[$cache_key];
+
+            return self::slice_codes_for_item($item, $check_id, $all_codes);
+        }
 
         $query = $wpdb->prepare(
             "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes
@@ -318,6 +338,16 @@ class Booking_Cart_Handler {
             }
         }
 
+        self::$license_codes_cache[$cache_key] = $all_codes;
+
+        return self::slice_codes_for_item($item, $check_id, $all_codes);
+    }
+
+    /**
+     * Ritaglia dalla lista completa dei codici di order_id+product_id la porzione
+     * spettante a questo item (vedi get_item_license_codes()).
+     */
+    private static function slice_codes_for_item($item, $check_id, array $all_codes) {
         $order = $item->get_order();
         if (!$order) {
             return $all_codes;

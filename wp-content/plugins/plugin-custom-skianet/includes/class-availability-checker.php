@@ -42,10 +42,8 @@ class Availability_Checker {
 
         $this->json_path = plugin_dir_path(PLUGIN_SKIANET_FILE) . 'assets/data';
 
-        // Crea directory se non esiste
-        if (!file_exists($this->json_path)) {
-            wp_mkdir_p($this->json_path);
-        }
+        // La directory viene creata da save_json_file(), l'unico punto che ci
+        // scrive: qui costava uno stat del filesystem su ogni richiesta.
 
         $this->init_hooks();
     }
@@ -57,7 +55,16 @@ class Availability_Checker {
         // Cron giornaliero per aggiornare disponibilità
         add_action('termegest_check_availability', array($this, 'check_all_locations'));
         
-        // Registra cron se non esiste (controlla ad ogni page load)
+        // Rete di sicurezza per l'evento cron: register_activation_hook non
+        // scatta quando il plugin viene aggiornato via FTP senza riattivarlo.
+        // Solo in backoffice, non su ogni page load del front-end.
+        add_action('admin_init', array($this, 'maybe_schedule_cron'));
+    }
+
+    /**
+     * Registra l'evento cron giornaliero se manca
+     */
+    public function maybe_schedule_cron() {
         if (!wp_next_scheduled('termegest_check_availability')) {
             wp_schedule_event(time(), 'daily', 'termegest_check_availability');
         }
@@ -231,6 +238,10 @@ class Availability_Checker {
      * Salva disponibilità in file JSON
      */
     private function save_json_file($location, $data) {
+        if (!is_dir($this->json_path)) {
+            wp_mkdir_p($this->json_path);
+        }
+
         $filename = $this->get_json_filename($location);
         $filepath = $this->json_path . '/' . $filename;
 

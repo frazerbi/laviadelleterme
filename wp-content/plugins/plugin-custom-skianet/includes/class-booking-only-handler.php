@@ -184,46 +184,30 @@ class Booking_Only_Handler {
 
     /**
      * Ottiene i codici da un ordine specifico
-     * 
+     *
      * @param WC_Order $order Oggetto ordine WooCommerce
      * @return array Array di codici
      */
     private static function get_codes_from_order($order) {
-        global $wpdb;
-        
         $all_codes = [];
-        
-        // Itera su tutti gli item dell'ordine
+
         foreach ($order->get_items() as $item_id => $item) {
-            $order_id = $item->get_order_id();
-            $product_id = $item->get_product_id();
             $variation_id = $item->get_variation_id();
-            $check_id = $variation_id > 0 ? $variation_id : $product_id;
-            
-            // Query per ottenere i codici licenza
-            $query = $wpdb->prepare(
-                "SELECT license_code1 FROM {$wpdb->prefix}wc_ld_license_codes 
-                WHERE order_id = %d AND product_id = %d",
-                $order_id,
-                $check_id
-            );
-            
-            $results = $wpdb->get_results($query, ARRAY_A);
-            
-            if (!empty($results)) {
-                foreach ($results as $row) {
-                    if (!empty($row['license_code1'])) {
-                        $all_codes[] = [
-                            'code' => $row['license_code1'],
-                            'product_id' => $check_id,
-                            'item_id' => $item_id,
-                            'product_name' => $item->get_name()
-                        ];
-                    }
-                }
+            $check_id = $variation_id > 0 ? $variation_id : $item->get_product_id();
+
+            // Delega all'helper condiviso: la query diretta che stava qui non era
+            // scoped sull'item, quindi due righe dello stesso prodotto nello stesso
+            // ordine ricevevano entrambe la lista completa dei codici.
+            foreach (Booking_Cart_Handler::get_item_license_codes($item) as $code) {
+                $all_codes[] = [
+                    'code' => $code,
+                    'product_id' => $check_id,
+                    'item_id' => $item_id,
+                    'product_name' => $item->get_name()
+                ];
             }
         }
-        
+
         return $all_codes;
     }
 }

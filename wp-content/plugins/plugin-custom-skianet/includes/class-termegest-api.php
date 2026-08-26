@@ -74,7 +74,10 @@ class TermeGest_API {
                 if (!$is_pre_send_curl_error || $attempt >= $max_attempts) {
                     throw $exception;
                 }
-                sleep(1);
+                // Pausa breve e crescente: questo retry gira dentro
+                // woocommerce_payment_complete, cioe' nella richiesta di
+                // checkout del cliente, moltiplicata per il numero di codici.
+                usleep(200000 * $attempt);
             }
         } while ($attempt < $max_attempts);
     }
