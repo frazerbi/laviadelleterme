@@ -64,10 +64,14 @@
 }
 
 /* I link dentro al notice (es. "#terms" nell'errore dei termini)
-   restano del colore del notice, sottolineati per restare cliccabili. */
-.woocommerce-error a,
-.woocommerce-info a,
-.woocommerce-message a {
+   restano del colore del notice, sottolineati per restare cliccabili.
+   Il pulsante è escluso: la regola vale `!important` e altrimenti gli
+   imporrebbe il colore del notice, costringendo il blocco del pulsante qui
+   sotto a rispondere con un altro !important — che è proprio quello che
+   impedirebbe a Elementor di sovrascriverlo. */
+.woocommerce-error a:not(.button),
+.woocommerce-info a:not(.button),
+.woocommerce-message a:not(.button) {
 	color: inherit !important;
 	text-decoration: underline;
 	text-underline-offset: 2px;
@@ -83,24 +87,29 @@
    faceva sembrare il bottone parte del messaggio invece che l'azione da
    compiere, ed era una terza grafia di pulsante rispetto a checkout e account.
    Il colore del tipo resta comunque leggibile dal testo e dalla barra laterale
-   del notice. `color` vuole !important per battere il `color: inherit !important`
-   sui link del notice qui sopra.
+   del notice.
 
    Unico scostamento dal riferimento: la scala. Le --lvdt-button-* sono tarate
    sui pulsanti d'azione a piena pagina (1.3rem, padding 0.9/2/1.1) mentre il
    notice è una striscia compatta il cui testo sta a 0.95rem: alla misura piena
    il pulsante pesava più del messaggio. Qui font e padding sono ridotti, tutto
    il resto — colori, famiglia, bordo, raggio, maiuscolo — resta condiviso, così
-   il pulsante è riconoscibile come lo stesso pulsante, solo in piccolo. */
-.woocommerce-error a.button,
-.woocommerce-info a.button,
-.woocommerce-message a.button {
+   il pulsante è riconoscibile come lo stesso pulsante, solo in piccolo.
+
+   Niente !important: è il default del pulsante, non l'ultima parola. Il `body`
+   in testa al selettore porta la specificità a (0,2,2), quel tanto che basta a
+   battere `.woocommerce a.button` di woocommerce.css (0,2,1) senza dipendere
+   dall'ordine dei fogli, e resta comunque sotto alle regole per-elemento di
+   Elementor. */
+body .woocommerce-error a.button,
+body .woocommerce-info a.button,
+body .woocommerce-message a.button {
 	display: inline-block;
 	padding: 0.55rem 1.25rem 0.65rem;
 	border: 1px solid var(--lvdt-button-bg);
 	border-radius: var(--lvdt-button-radius);
 	background: var(--lvdt-button-bg);
-	color: var(--lvdt-button-color) !important;
+	color: var(--lvdt-button-color);
 	text-decoration: none;
 	font-family: var(--lvdt-button-font);
 	font-size: 0.9rem;
@@ -109,11 +118,11 @@
 	text-transform: uppercase;
 }
 
-.woocommerce-error a.button:hover,
-.woocommerce-info a.button:hover,
-.woocommerce-message a.button:hover {
+body .woocommerce-error a.button:hover,
+body .woocommerce-info a.button:hover,
+body .woocommerce-message a.button:hover {
 	background: var(--lvdt-button-color);
-	color: var(--lvdt-button-bg) !important;
+	color: var(--lvdt-button-bg);
 }
 
 /* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa

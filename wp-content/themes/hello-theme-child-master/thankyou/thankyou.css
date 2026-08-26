@@ -25,10 +25,15 @@
 }
 
 /* Normalizza i colori ereditati da Elementor/WooCommerce dentro il riquadro ordine.
-   Il badge di stato è escluso: la regola vale `!important` e altrimenti vincerebbe
-   sui colori di booking-status/booking-status.css (rosso/arancio/verde), lasciando
-   visibile solo il pallino colorato. */
-.woocommerce-order *:not(.booking-status) {
+   Due esclusioni, entrambe perché la regola vale `!important` e altrimenti
+   vincerebbe su chi il colore ce l'ha di suo:
+   - il badge di stato, che ha i propri rosso/arancio/verde in
+     booking-status/booking-status.css (senza l'esclusione resterebbe visibile
+     solo il pallino colorato);
+   - il CTA "Completa il pagamento", che così può tenere il proprio colore senza
+     doverlo a sua volta dichiarare !important — e quindi restare sovrascrivibile
+     da Elementor. */
+.woocommerce-order *:not(.booking-status):not(.thankyou-complete-payment__button) {
 	font-family: inherit;
 	color: inherit !important;
 }
@@ -208,17 +213,16 @@
 }
 
 /* Stesso aspetto degli altri pulsanti del sito (variabili --lvdt-button-* in
-   style.css). Il selettore parte da .woocommerce-order per battere il
-   `color: inherit !important` della normalizzazione in cima al file: a parità
-   di !important vince la specificità, e con la sola classe del pulsante
-   (una classe contro due) il colore del testo verrebbe ereditato. */
+   style.css). Niente !important sul colore: la normalizzazione in cima al file
+   ora esclude questo pulsante dal proprio `color: inherit !important`, quindi
+   basta una regola normale e lo stile resta sovrascrivibile da Elementor. */
 .woocommerce-order a.thankyou-complete-payment__button {
 	display: inline-block;
 	padding: var(--lvdt-button-padding);
 	border: 1px solid var(--lvdt-button-bg);
 	border-radius: var(--lvdt-button-radius);
 	background: var(--lvdt-button-bg);
-	color: var(--lvdt-button-color) !important;
+	color: var(--lvdt-button-color);
 	text-decoration: none;
 	font-family: var(--lvdt-button-font);
 	font-size: var(--lvdt-button-font-size);
@@ -229,7 +233,7 @@
 
 .woocommerce-order a.thankyou-complete-payment__button:hover {
 	background: var(--lvdt-button-color);
-	color: var(--lvdt-button-bg) !important;
+	color: var(--lvdt-button-bg);
 }
 
 /* Badge quantità */

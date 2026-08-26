@@ -166,25 +166,36 @@ body.order-pay-terms-error .form-row.validate-required input.input-checkbox {
 
 /* Pulsante d'ordine: stesso aspetto dei pulsanti Elementor del sito.
    Le misure arrivano dalle variabili --lvdt-button-* definite in style.css.
-   Il padding vuole !important perché la regola del tema sul pulsante è più
-   specifica; i colori lo vogliono per lo stesso motivo del blocco globale. */
+
+   Niente !important, di proposito: questo è il DEFAULT del pulsante, non
+   l'ultima parola. Il selettore `body.woocommerce-checkout #place_order`
+   vale (1,1,1) — un ID batte le tre classi di `.woocommerce button.button.alt`
+   di woocommerce.css, che è l'unica regola da superare qui — e resta invece
+   sotto alle regole per-elemento di Elementor, che partono da
+   `.elementor-NNN .elementor-element.elementor-element-XXX …`. Così quello che
+   viene impostato dall'editor Elementor sul widget vince senza dover
+   rincorrere con altri !important.
+
+   Attenzione se cambi il fondo da Elementor: il border-color qui sotto NON
+   segue, va impostato anche quello nell'editor o resterà del colore di
+   default. */
 body.woocommerce-checkout #place_order {
 	width: 100%;
-	padding: var(--lvdt-button-padding) !important;
+	padding: var(--lvdt-button-padding);
 	border-radius: var(--lvdt-button-radius);
 	font-family: var(--lvdt-button-font);
 	font-size: var(--lvdt-button-font-size);
 	font-weight: var(--lvdt-button-font-weight);
 	line-height: var(--lvdt-button-line-height);
 	text-transform: uppercase;
-	color: var(--lvdt-button-color) !important;
-	background-color: var(--lvdt-button-bg) !important;
-	border: 1px solid var(--lvdt-button-bg) !important;
+	color: var(--lvdt-button-color);
+	background-color: var(--lvdt-button-bg);
+	border: 1px solid var(--lvdt-button-bg);
 }
 
 body.woocommerce-checkout #place_order:hover {
-	color: var(--lvdt-button-bg) !important;
-	background-color: var(--lvdt-button-color) !important;
+	color: var(--lvdt-button-bg);
+	background-color: var(--lvdt-button-color);
 }
 
 /* ============================================================

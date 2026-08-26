@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.55
+Version: 1.0.56
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -111,7 +111,22 @@ body {
 /* Globale di proposito: la stessa classe esce nell'area account,
    nel form di login incorporato nella checkout e nel carrello.
    WooCommerce stampa entrambe le grafie della classe, a seconda
-   del template. */
+   del template.
+
+   Questo è l'unico blocco pulsanti rimasto con !important, ed è
+   un'eccezione consapevole: altrove (checkout/checkout.css su
+   #place_order, thankyou/thankyou.css sul CTA, assets/css/wc-notices.css
+   sul pulsante dei notice) le regole sono state ripulite proprio perché
+   uno stile impostato dall'editor Elementor potesse vincere. Qui non si
+   può fare lo stesso a costo zero: la regola da battere è
+   `.woocommerce button.button.alt` di woocommerce.css, che vale tre
+   classi, mentre questo selettore ne ha una. Senza !important servirebbe
+   agganciarsi anche a `.button` e a un antenato `.woocommerce`, e la
+   regola smetterebbe di applicarsi in silenzio il giorno in cui un
+   template cambia quelle classi. Nessuna regola Elementor compete oggi
+   su questi pulsanti (non sono widget, sono markup di template
+   WooCommerce dentro a widget); se dovesse servire, la strada è alzare
+   la specificità qui, non aggiungere !important dall'altra parte. */
 
 button.woocommerce-button,
 button.woocommerce-Button {

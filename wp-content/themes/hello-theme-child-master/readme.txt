@@ -44,6 +44,13 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
                              Il blocco è dichiarato su :root e su body: i colori
                              globali del kit Elementor sono definiti sul body, su
                              :root non si risolverebbero.
+                             Le regole che applicano queste variabili sono scritte
+                             SENZA !important e con la specificità minima che
+                             basta a battere woocommerce.css: sono il default del
+                             pulsante, non l'ultima parola, così quello che si
+                             imposta dall'editor Elementor sul widget vince.
+                             L'unica eccezione, spiegata sul posto, è il blocco
+                             button.woocommerce-Button in style.css.
 * assets/css/shop.css        catalogo, scheda prodotto, carrello
 * assets/css/promo-pages.css pagine protette da password (plugin PPWP): base
                              condivisa, caricata ovunque perché PPWP può
