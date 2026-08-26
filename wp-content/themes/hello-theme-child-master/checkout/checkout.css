@@ -196,6 +196,7 @@ body.woocommerce-checkout #place_order {
 body.woocommerce-checkout #place_order:hover {
 	color: var(--lvdt-button-bg);
 	background-color: var(--lvdt-button-color);
+	border-color: var(--lvdt-button-bg);
 }
 
 /* ============================================================

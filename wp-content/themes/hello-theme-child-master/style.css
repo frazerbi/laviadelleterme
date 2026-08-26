@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.56
+Version: 1.0.57
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -77,10 +77,12 @@ header.header-main {
    (pulsante dentro ai notice), thankyou/thankyou.css e
    my-account/lost-password.css.
 
-   --lvdt-button-radius non fa parte dello stile Elementor di
-   riferimento (che ha gli angoli vivi): è l'unico scostamento, per
-   restare in linea con le card arrotondate di checkout e order-pay.
-   Per tornare agli angoli vivi basta portarlo a 0 qui.
+   --lvdt-button-radius è l'unico scostamento dallo stile Elementor di
+   riferimento, che ha gli angoli vivi: 3px, appena smussati. Non segue
+   il raggio delle card di checkout e order-pay (10-12px), che resta
+   volutamente più morbido. Per tornare agli angoli vivi basta portarlo
+   a 0 qui: e' l'unico punto da toccare, tutti i pulsanti del tema
+   leggono questa variabile.
 
    Il blocco è dichiarato su :root E su body, e i due colori del kit
    hanno un fallback esplicito. Non è ridondanza: Elementor stampa i
@@ -105,7 +107,7 @@ body {
   --lvdt-button-font-weight: 400;
   --lvdt-button-line-height: 1.3rem;
   --lvdt-button-padding: 0.9rem 2rem 1.1rem;
-  --lvdt-button-radius: 10px;
+  --lvdt-button-radius: 3px;
 }
 
 /* Globale di proposito: la stessa classe esce nell'area account,
@@ -147,6 +149,7 @@ button.woocommerce-button:hover,
 button.woocommerce-Button:hover {
   color: var( --lvdt-button-bg ) !important;
   background-color: var( --lvdt-button-color ) !important;
+  border-color: var( --lvdt-button-bg ) !important;
 }
 
 /* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
