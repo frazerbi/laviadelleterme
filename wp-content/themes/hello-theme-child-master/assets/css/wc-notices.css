@@ -16,15 +16,28 @@
    Il `!important` su padding/margin/list-style è necessario: woocommerce.css
    li dichiara a sua volta `!important`.
 
+   La classe di tipo è ripetuta due volte, con `body` davanti. Non è un
+   refuso: il widget "Checkout" di Elementor Pro azzera i notice con
+   `.elementor-widget-woocommerce-checkout-page .woocommerce-info`, che
+   vale due classi (0,2,0) e batterebbe una regola sulla sola classe di
+   tipo (0,1,0) — in checkout il fondo e il bordo superiore tornavano
+   trasparenti. Ripetere la classe porta a (0,2,0) e `body` aggiunge
+   l'elemento che decide, (0,2,1), senza dipendere da un wrapper o da
+   una body class: i notice escono in contesti troppo diversi perché
+   agganciarsi a quelli sia affidabile. La quota resta comunque sotto
+   alle regole per-elemento di Elementor (almeno (0,4,0)), quindi uno
+   stile impostato a mano dall'editor continua a vincere. Per lo stesso
+   motivo qui non si usa `!important`.
+
    Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
    rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
    Il pulsante eventualmente contenuto nel notice non segue questa palette: usa
    l'aspetto standard dei pulsanti del sito (variabili --lvdt-button-* in style.css).
    ============================================================ */
 
-.woocommerce-error,
-.woocommerce-info,
-.woocommerce-message {
+body .woocommerce-error.woocommerce-error,
+body .woocommerce-info.woocommerce-info,
+body .woocommerce-message.woocommerce-message {
 	display: block;
 	list-style: none !important;
 	margin: 0 0 1.25rem !important;
@@ -190,21 +203,21 @@ body .woocommerce-message a.button:hover {
    dichiarata nel blocco comune in cima al file. */
 
 /* ---- Errore — rosso ---- */
-.woocommerce-error {
+body .woocommerce-error.woocommerce-error {
 	background: rgba(200, 30, 30, 0.18);
 	border-color: #c81e1e;
 	color: #8e1414 !important;
 }
 
 /* ---- Informazione / attesa — arancio ---- */
-.woocommerce-info {
+body .woocommerce-info.woocommerce-info {
 	background: rgba(220, 120, 0, 0.18);
 	border-color: #dc7800;
 	color: #7a4100 !important;
 }
 
 /* ---- Conferma — verde ---- */
-.woocommerce-message {
+body .woocommerce-message.woocommerce-message {
 	background: rgba(34, 160, 100, 0.18);
 	border-color: #22a064;
 	color: #14663d !important;
