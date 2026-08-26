@@ -20,6 +20,7 @@ inclusa singolarmente da functions.php:
 * my-account/     URL di login/registrazione, redirect post accesso e relativo stile
                  (lost-password.css: stile della sola pagina password dimenticata)
 * controllo-codici/  shortcode con le giacenze dei codici licenza (solo staff)
+* promozioni-speciali/ form di sblocco PPWP della pagina /promozioni-speciali/
 
 Alla radice del tema, oltre a style.css e functions.php:
 
@@ -41,7 +42,11 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
                              password dimenticata, così i pulsanti che WooCommerce
                              stampa fuori da Elementor restano tutti uguali.
 * assets/css/shop.css        catalogo, scheda prodotto, carrello
-* assets/css/promo-pages.css pagine protette da password (plugin PPWP)
+* assets/css/promo-pages.css pagine protette da password (plugin PPWP): base
+                             condivisa, caricata ovunque perché PPWP può
+                             proteggere qualsiasi pagina. Gli scostamenti della
+                             singola pagina stanno nel modulo di quella pagina
+                             (vedi promozioni-speciali/)
 * assets/css/wc-notices.css  notice WooCommerce, in tutto il sito
 * assets/css/stripe-upe-appearance.css  campi carta dentro l'iframe Stripe
 * assets/css/mobile-menu-style.css      menu mobile e off-canvas

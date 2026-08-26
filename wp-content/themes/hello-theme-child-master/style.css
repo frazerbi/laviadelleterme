@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.53
+Version: 1.0.54
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -17,6 +17,7 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    Tutto ciò che appartiene a una pagina o a una funzionalità sta
    nel proprio file (vedi readme.txt):
      assets/css/promo-pages.css  pagine protette da password
+     promozioni-speciali/        pagina /promozioni-speciali/
      assets/css/shop.css         catalogo, prodotto, carrello
      my-account/my-account.css   account, login, password persa
      checkout/checkout.css       checkout e order-pay

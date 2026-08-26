@@ -58,6 +58,19 @@ function hello_elementor_child_enqueue_scripts() {
 		$version
 	);
 
+	// Promozioni speciali: qui il conditional tag c'è (la pagina è una sola),
+	// quindi le personalizzazioni di questa pagina stanno in un foglio a parte
+	// caricato solo qui, dipendente dalla base condivisa dei form PPWP.
+	if ( is_page( 'promozioni-speciali' ) ) {
+		wp_enqueue_style('promozioni-speciali-style',
+			get_stylesheet_directory_uri() . '/promozioni-speciali/promozioni-speciali.css',
+			[
+				'promo-pages-style',
+			],
+			$version
+		);
+	}
+
 	wp_enqueue_script('custom-js',
 		get_stylesheet_directory_uri() . '/assets/js/script.js',
 		[],

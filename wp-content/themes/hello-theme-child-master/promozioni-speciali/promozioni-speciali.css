@@ -1,0 +1,147 @@
+/* ============================================================
+   Pagina "Promozioni speciali" (/promozioni-speciali/)
+   ============================================================
+   Il form di sblocco lo stampa il plugin PPWP nella variante
+   "contenuto parziale" (PCP), dentro un widget Elementor:
+   markup non modificabile, qui viene solo ristilato.
+
+   Questo foglio è caricato SOLO su questa pagina
+   (is_page( 'promozioni-speciali' ) in functions.php) e dipende
+   da promo-pages-style, che resta la base condivisa da tutte le
+   pagine protette da password: qui stanno solo gli scostamenti
+   di questa pagina, non le regole comuni.
+
+   Il campo password è mostrato in chiaro e normalizzato in
+   minuscolo da assets/js/script.js: la password è unica e
+   condivisa, non è un dato personale.
+
+   Struttura del markup (classi PPWP):
+     .ppw-pcp-container
+       form.post-password-form.ppw-form.ppw-pcp-password-form
+         .ppw-headline.ppw-pcp-pf-headline       titolo
+         .ppw-description.ppw-pcp-pf-desc        testo introduttivo
+         p.ppw-input                             campo + pulsante (fratelli)
+           label.ppw-pcp-password-label > input.ppw-pcp-pf-password-input
+           input.ppw-pcp-pf-submit-btn
+         .ppw-pcp-pf-desc-below-form
+         .ppw-error.ppw-pcp-pf-error-msg
+   ============================================================ */
+
+/* ============================================================
+   Contenitore
+   ============================================================ */
+
+.ppw-pcp-container {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.post-password-form.ppw-form.ppw-pcp-password-form {
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 2rem;
+}
+
+/* ============================================================
+   Campo e pulsante
+   ============================================================
+   Dentro p.ppw-input input, label e pulsante sono FRATELLI, non
+   annidati: la riga si costruisce sui figli diretti. Con
+   flex-wrap il pulsante scende sotto al campo quando non ci sta,
+   invece di comprimerlo.
+   ============================================================ */
+
+.ppw-pcp-password-form p.ppw-input {
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+}
+
+.ppw-pcp-password-form .ppw-pcp-password-label {
+  flex: 1 1 16rem;
+  max-width: 24rem;
+  display: flex;
+}
+
+.ppw-pcp-password-form input.ppw-pcp-pf-password-input {
+  width: 100%;
+  height: auto;
+  font-family: "Muli", Sans-serif;
+  font-size: 1.3rem;
+  line-height: 1.3rem;
+  padding: 0.9rem 1.2rem 1.1rem;
+  color: #424242;
+  background-color: #fff;
+  border: 1px solid #c9c9c9;
+  border-radius: var( --lvdt-button-radius );
+}
+
+.ppw-pcp-password-form input.ppw-pcp-pf-password-input:focus {
+  outline: none;
+  border-color: var( --lvdt-button-bg );
+}
+
+/* Stesso aspetto dei pulsanti del resto del sito: le misure sono
+   le variabili --lvdt-button-* dichiarate in style.css. */
+
+.ppw-pcp-password-form input.ppw-pcp-pf-submit-btn {
+  flex: 0 0 auto;
+  height: auto;
+  font-family: var( --lvdt-button-font );
+  font-size: var( --lvdt-button-font-size );
+  font-weight: var( --lvdt-button-font-weight );
+  line-height: var( --lvdt-button-line-height );
+  text-transform: uppercase;
+  padding: var( --lvdt-button-padding );
+  color: var( --lvdt-button-color );
+  background-color: var( --lvdt-button-bg );
+  border: 1px solid var( --lvdt-button-bg );
+  border-radius: var( --lvdt-button-radius );
+  cursor: pointer;
+}
+
+.ppw-pcp-password-form input.ppw-pcp-pf-submit-btn:hover {
+  color: var( --lvdt-button-bg );
+  background-color: var( --lvdt-button-color );
+}
+
+/* ============================================================
+   Messaggio di errore
+   ============================================================
+   Il colore inline (#dc3232) lo scrive il plugin nell'attributo
+   style del div, quindi qui si possono correggere solo
+   impaginazione e dimensione del testo.
+   ============================================================ */
+
+.ppw-pcp-password-form .ppw-error.ppw-pcp-pf-error-msg {
+  width: 100%;
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.ppw-pcp-password-form .ppw-error.ppw-pcp-pf-error-msg:empty {
+  margin-top: 0;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media only screen and (max-width: 767px) {
+  .ppw-pcp-password-form .ppw-pcp-password-label {
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .ppw-pcp-password-form input.ppw-pcp-pf-password-input {
+    max-width: none;
+  }
+
+  .ppw-pcp-password-form input.ppw-pcp-pf-submit-btn {
+    width: 100%;
+  }
+}
