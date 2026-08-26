@@ -102,6 +102,19 @@ On `woocommerce_payment_complete` (priority order):
 3. `Booking_Email_Notification` (priority 20) — sends confirmation email (booking details + coupon codes)
 4. `Booking_Nonbooking_Email` — sends coupon email for non-booking products in mixed orders
 
+### Custom Order Statuses (`booked` / `not-booked`)
+
+These two statuses are **registered by the "Custom Order Status" plugin, which is not in this repo** —
+it lives only on the server. Searching here for a `register_post_status` / `wc_order_statuses` call
+that creates them finds nothing; that is expected, not a missing piece.
+`Booking_Order_Status::move_to_booked_status()` only ever *moves* orders into them.
+
+Because they are registered outside WooCommerce's own set, they are **not** in
+`wc_get_is_paid_statuses()` (which returns just `processing` and `completed`). Anywhere the code asks
+"is this order paid?", the two must therefore be listed explicitly — or the check must use something
+else entirely: `laviadelleterme_order_is_confirmed()` in the theme names all four statuses, and
+`satispay/satispay.php` sidesteps the list by testing `$order->get_date_paid()` instead.
+
 ### License Code Assignment & Per-Item Scoping
 
 WooCommerce License Delivery's `wc_ld_license_codes` DB table associates codes with `order_id` + `product_id` only — it has **no `order_item_id` column**. This matters because an order can contain two separate line items for the *same product* with different booking details (e.g. same ticket type booked for two different dates/times/locations). A naive `WHERE order_id = %d AND product_id = %d` query returns **all** codes for that product in the order to every matching item, not just the ones belonging to that specific item.
@@ -239,7 +252,7 @@ The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` i
 
 **Why this matters**: `_booking_id` order item meta (see `Booking_Cart_Handler::add_booking_data_to_order_items`) is written at checkout time — before any payment happens — so its mere presence can't be used to mean "booking confirmed". Likewise the Elementor heading widget on the thank-you page has hardcoded text ("Pagamento") that used to be replaced with "Ordine ricevuto!" unconditionally.
 
-**`laviadelleterme_order_is_confirmed( $order )`** (defined in `booking-status/booking-status.php`, shared with `thankyou.php` and used on order-pay too — it was called `laviadelleterme_thankyou_order_is_confirmed` while it lived in `thankyou.php`) is the single source of truth: `true` only for order status `processing`, `completed`, `booked`, `not-booked`. `booked`/`not-booked` are reached only by passing through `completed` first (see `Booking_Order_Status`), so plain `$order->is_paid()` is not enough — those two statuses aren't in WC's default paid-statuses list.
+**`laviadelleterme_order_is_confirmed( $order )`** (defined in `booking-status/booking-status.php`, shared with `thankyou.php` and used on order-pay too — it was called `laviadelleterme_thankyou_order_is_confirmed` while it lived in `thankyou.php`) is the single source of truth: `true` only for order status `processing`, `completed`, `booked`, `not-booked`. `booked`/`not-booked` are reached only by passing through `completed` first (see `Booking_Order_Status`), so plain `$order->is_paid()` is not enough — those two statuses aren't in WC's default paid-statuses list (they come from the Custom Order Status plugin — see "Custom Order Statuses" above).
 
 Driven by that helper, `thankyou.php` conditionally:
 - Rewrites the Elementor H1 to "Ordine ricevuto!" (confirmed) vs "Ordine in attesa di pagamento" (not confirmed). The `elementor/widget/render_content` filter that does this replaces only the text node that is *exactly* "Pagamento" (a plain `str_replace` also hit headings like "Metodo di Pagamento"), and it runs for guest orders too — it used to be gated on `is_user_logged_in()`, which left guest orders showing the raw hardcoded heading. The same filter also strips the Elementor text-editor subtitle containing "Completa il pagamento": doing it server-side replaced a `display:none` CSS rule plus a JS text match that made it flash on screen before disappearing.
