@@ -82,11 +82,16 @@ class TermeGest_Encryption {
 
     /**
      * Genera un Initialization Vector casuale
+     *
+     * Restituisce IV_LENGTH caratteri esadecimali ASCII: stesso formato che
+     * str_shuffle(md5(microtime())) produceva, ma da una sorgente crittografica.
+     * L'IV viaggia in chiaro concatenato davanti al ciphertext, quindi il
+     * cambio e' trasparente per TermeGest.
      * 
      * @return string IV di 16 caratteri
      */
     private function generate_iv(): string {
-        return mb_substr(str_shuffle(md5(microtime())), 0, self::IV_LENGTH);
+        return bin2hex(random_bytes(intdiv(self::IV_LENGTH, 2)));
     }
 
     /**

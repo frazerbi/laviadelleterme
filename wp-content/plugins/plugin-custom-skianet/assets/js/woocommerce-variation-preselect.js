@@ -10,12 +10,24 @@ function getVars() {
         'monterosa-spa': 'Monterosa SPA'
     };
 
+    // location e ticket_type passano dalle lookup table qui sopra, quindi qualsiasi
+    // valore non previsto diventa null. date e time_slot_label non hanno una tabella
+    // di valori ammessi e finiscono in innerHTML in buildDataUI(): vanno validati qui,
+    // altrimenti un link costruito ad arte inietta HTML nella pagina prodotto.
+    const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+    // \p{L} e non \w perche' le etichette fascia arrivano da TermeGest e possono
+    // contenere accenti ("Ingresso pomeridiano più sauna"); restano fuori < > " ' & /
+    const TIME_SLOT_PATTERN = /^[\p{L}\p{N}\s:.\-]{1,40}$/u;
+
     const urlParams = new URLSearchParams(window.location.search);
     const locationId = urlParams.get('location');
-    const dateParam = urlParams.get('date');
+    const dateParamRaw = urlParams.get('date');
     const ticketType = urlParams.get('ticket_type');
     const totalGuests = parseInt(urlParams.get('total_guests')) || 1;
-    const timeSlotLabel = urlParams.get('time_slot_label');
+    const timeSlotLabelRaw = urlParams.get('time_slot_label');
+
+    const dateParam = DATE_PATTERN.test(dateParamRaw || '') ? dateParamRaw : null;
+    const timeSlotLabel = TIME_SLOT_PATTERN.test(timeSlotLabelRaw || '') ? timeSlotLabelRaw : null;
 
     const niceDate = dateParam ? dateParam.split('-').reverse().join('/') : null;
     const locationLabel = LOCATION_LABELS[locationId] || null;
