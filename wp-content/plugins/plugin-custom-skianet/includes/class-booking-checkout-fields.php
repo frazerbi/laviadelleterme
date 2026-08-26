@@ -71,42 +71,42 @@ class Booking_Checkout_Fields {
         <div class="health-certificate-content" style="max-height: 25vh; overflow:scroll; margin-bottom: 2rem; padding: 1.6rem; background: var(--e-global-color-29fcec7);">
 
             <h5 style="margin-top: 0; margin-bottom: 1.6rem; font-weight: bold; text-transform: uppercase;">
-                <?php _e('Dichiarazione di Idoneità', 'text-domain'); ?>
+                <?php _e('Dichiarazione di Idoneità', 'skianet-custom'); ?>
             </h5>
 
             <div style="font-size: 1rem;">
                 <p style="margin-bottom: 15px;">
-                    <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'text-domain'); ?></strong>
+                    <strong><?php _e('Il sottoscritto/la sottoscritta dichiara sotto la propria responsabilità di:', 'skianet-custom'); ?></strong>
                 </p>
 
                 <ol style="padding-left: 20px; margin-bottom: 15px;">
                     <li style="margin-bottom: 12px;">
-                        <?php _e('trovarsi in condizioni psicofisiche idonee a usufruire dei trattamenti di benessere offerti dalle Strutture compresi bagno turco, sauna, vasche idromassaggio e, in particolare:', 'text-domain'); ?>
+                        <?php _e('trovarsi in condizioni psicofisiche idonee a usufruire dei trattamenti di benessere offerti dalle Strutture compresi bagno turco, sauna, vasche idromassaggio e, in particolare:', 'skianet-custom'); ?>
                         <ul style="margin-top: 8px; padding-left: 20px; list-style-type: disc;">
-                            <li style="margin-bottom: 6px;"><?php _e('di essere a conoscenza che l\'uso di sauna e bagno turco non sono idonei a coloro che hanno disturbi di pressione arteriosa e presenza di patologie a carico del sistema venoso superficiale e profondo;', 'text-domain'); ?></li>
-                            <li style="margin-bottom: 6px;"><?php _e('non accusare sintomi quali: febbre, tosse, difficoltà respiratorie;', 'text-domain'); ?></li>
-                            <li style="margin-bottom: 6px;"><?php _e('di godere di sana e robusta costituzione e di essersi sottoposto di recente a visita medica per accertare la propria idoneità fisica;', 'text-domain'); ?></li>
+                            <li style="margin-bottom: 6px;"><?php _e('di essere a conoscenza che l\'uso di sauna e bagno turco non sono idonei a coloro che hanno disturbi di pressione arteriosa e presenza di patologie a carico del sistema venoso superficiale e profondo;', 'skianet-custom'); ?></li>
+                            <li style="margin-bottom: 6px;"><?php _e('non accusare sintomi quali: febbre, tosse, difficoltà respiratorie;', 'skianet-custom'); ?></li>
+                            <li style="margin-bottom: 6px;"><?php _e('di godere di sana e robusta costituzione e di essersi sottoposto di recente a visita medica per accertare la propria idoneità fisica;', 'skianet-custom'); ?></li>
                         </ul>
                     </li>
 
                     <li style="margin-bottom: 12px;">
-                        <?php _e('dover informare correttamente il personale delle Strutture circa eventuali patologie, allergie, condizioni mediche, stati di gravidanza, terapie in corso, interventi chirurgici recenti o altre condizioni che possano costituire controindicazione, anche temporanea, ai trattamenti offerti dalle Strutture;', 'text-domain'); ?>
+                        <?php _e('dover informare correttamente il personale delle Strutture circa eventuali patologie, allergie, condizioni mediche, stati di gravidanza, terapie in corso, interventi chirurgici recenti o altre condizioni che possano costituire controindicazione, anche temporanea, ai trattamenti offerti dalle Strutture;', 'skianet-custom'); ?>
                     </li>
 
                     <li style="margin-bottom: 12px;">
-                        <?php _e('essere consapevole che i trattamenti benessere hanno esclusiva finalità di benessere e rilassamento e non sostituiscono in alcun modo prestazioni mediche o terapeutiche;', 'text-domain'); ?>
+                        <?php _e('essere consapevole che i trattamenti benessere hanno esclusiva finalità di benessere e rilassamento e non sostituiscono in alcun modo prestazioni mediche o terapeutiche;', 'skianet-custom'); ?>
                     </li>
 
                     <li style="margin-bottom: 12px;">
-                        <?php _e('impegnarsi a comunicare tempestivamente alle Strutture qualsiasi variazione del proprio stato di salute che possa insorgere prima o durante l\'erogazione delle prestazioni dello Stabilimento;', 'text-domain'); ?>
+                        <?php _e('impegnarsi a comunicare tempestivamente alle Strutture qualsiasi variazione del proprio stato di salute che possa insorgere prima o durante l\'erogazione delle prestazioni dello Stabilimento;', 'skianet-custom'); ?>
                     </li>
 
                     <li style="margin-bottom: 12px;">
-                        <?php _e('essere a conoscenza dell\'obbligo di indossare ciabattine durante il soggiorno nelle Strutture;', 'text-domain'); ?>
+                        <?php _e('essere a conoscenza dell\'obbligo di indossare ciabattine durante il soggiorno nelle Strutture;', 'skianet-custom'); ?>
                     </li>
 
                     <li style="margin-bottom: 12px;">
-                        <?php _e('esonerare da qualsivoglia responsabilità le Strutture, i suoi dipendenti e collaboratori per eventuali danni, malesseri o conseguenze derivanti da informazioni incomplete, inesatte o omesse sul proprio stato di salute; dal mancato rispetto delle indicazioni fornite dal personale delle Strutture da condizioni personali non risultanti dalla presente dichiarazione o non conosciute.', 'text-domain'); ?>
+                        <?php _e('esonerare da qualsivoglia responsabilità le Strutture, i suoi dipendenti e collaboratori per eventuali danni, malesseri o conseguenze derivanti da informazioni incomplete, inesatte o omesse sul proprio stato di salute; dal mancato rispetto delle indicazioni fornite dal personale delle Strutture da condizioni personali non risultanti dalla presente dichiarazione o non conosciute.', 'skianet-custom'); ?>
                     </li>
                 </ol>
             </div>
@@ -122,7 +122,7 @@ class Booking_Checkout_Fields {
                         style="margin-right: 10px; margin-top: 4px; width: 18px; height: 18px; cursor: pointer; flex-shrink: 0;"
                     />
                     <span style="font-size: 14px; font-weight: 600; color: #333;">
-                        <?php _e('Confermo di dichiarare e accettare quanto sopra.', 'text-domain'); ?>
+                        <?php _e('Confermo di dichiarare e accettare quanto sopra.', 'skianet-custom'); ?>
                         <span style="color: #d9534f;">*</span>
                     </span>
                 </label>
@@ -337,7 +337,7 @@ class Booking_Checkout_Fields {
         if (!$accepted_post && !$accepted_session) {
             wc_add_notice(
                 '<span class="health-cert-error-notice">'
-                    . esc_html__('Devi accettare la dichiarazione di buona salute per completare l\'ordine.', 'text-domain')
+                    . esc_html__('Devi accettare la dichiarazione di buona salute per completare l\'ordine.', 'skianet-custom')
                     . '</span>',
                 'error'
             );

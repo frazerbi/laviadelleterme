@@ -181,8 +181,8 @@ class Booking_Handler {
         wp_localize_script('booking-form-script', 'bookingFormData', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('booking_form_nonce'),
-            'success_message' => __('Prenotazione effettuata con successo!', 'text-domain'),
-            'error_message' => __('Si è verificato un errore. Riprova.', 'text-domain'),
+            'success_message' => __('Prenotazione effettuata con successo!', 'skianet-custom'),
+            'error_message' => __('Si è verificato un errore. Riprova.', 'skianet-custom'),
             'christmas_dates' => $this->get_christmas_dates()
         ));
     }
