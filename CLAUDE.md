@@ -108,7 +108,16 @@ WooCommerce License Delivery's `wc_ld_license_codes` DB table associates codes w
 
 `Booking_Cart_Handler::get_item_license_codes( $item )` is the single shared helper that gets this right: it fetches the full code list for order+product, then slices it using the **cumulative quantity of preceding sibling items with the same product** (in `$order->get_items()` iteration order — the same order WC License Delivery assigns codes in) as the offset, and takes the current item's own quantity from there. Always call this shared method (passing the `WC_Order_Item`, not raw ids) rather than re-querying `wc_ld_license_codes` directly — `Booking_Termegest_Sync::get_license_codes_for_item()` used to have its own duplicate (and buggy, non-item-scoped) copy of this query; it now delegates to the shared method instead.
 
-**Known not-yet-fixed instance of the same non-item-scoped query pattern** (found but out of scope when the shared method was fixed): `Booking_Only_Handler::get_codes_from_order()` (`class-booking-only-handler.php`). It would show the same duplication symptom if a customer's account/order ever contains two line items of the same product with different booking data. The `controllo-codici` shortcodes were listed here too but do **not** have this bug — they only ever count unassigned codes (`WHERE order_id = 0`) and never touch order items.
+**Every call site now goes through that helper.** `Booking_Only_Handler::get_codes_from_order()` was the last
+place with its own non-item-scoped copy of the query; on 2026-08-26 it was changed to iterate the order items and
+delegate. The `controllo-codici` shortcodes never had the bug — they only count unassigned codes (`WHERE order_id = 0`)
+and never touch order items.
+
+`get_item_license_codes()` keeps a **per-request cache** keyed on `order_id:product_id` of the full (pre-slice) code
+list, because inside `woocommerce_payment_complete` the same pair is queried by the confirmation email, the TermeGest
+sync and the coupon email. It is always populated *after* `Booking_Code_Assignment` (priority 10), so it can never
+freeze a list from before the codes were assigned — a future caller that read codes earlier in the same request would
+break that assumption. The slicing itself lives in `slice_codes_for_item()`.
 
 ### Availability Cron
 
@@ -329,6 +338,17 @@ on the three colours. Do not add per-page notice color or font-size overrides �
 - Build output: `assets/js/dist/booking-form.min.js` + `booking-form.min.css` with sourcemaps
 - Build tool: esbuild (`build.js`) + PostCSS with prefix-selector; `vanilla-calendar-pro` is bundled at build time
 - `booking-only-form.js` is a hand-written IIFE served directly — it is **not** processed by esbuild
+
+**Enqueue gates**: `Booking_Handler::enqueue_assets()` loads `pdp.css` only on `is_product()` (it styles
+`.product.customDataLoaded`, a class set by `woocommerce-variation-preselect.js`) and the form's CSS/JS only where
+`page_has_booking_form()` says the shortcode is present. That check reads `post_content` **and** the `_elementor_data`
+meta — pages here are built with Elementor, which keeps the content in a JSON meta, so `has_shortcode($post->post_content, …)`
+alone (what `Booking_Only_Handler` does) would miss it. It would also miss a form placed in an Elementor *template*
+rather than in page content. All enqueues use `PLUGIN_SKIANET_VERSION`, never a hardcoded version string.
+
+**No global `session_start()`**: it used to run on `init` for every request, which put a `Set-Cookie: PHPSESSID` on
+every response — nothing cacheable, concurrent requests serialized on the session file. Each of the five places that
+touch `$_SESSION` starts the session itself, and all of them run before any output.
 
 ### Vendor in Production
 
