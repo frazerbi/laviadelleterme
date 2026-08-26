@@ -34,3 +34,4 @@ jobs:
           --exclude=CLAUDE.md
           --exclude=TEST-TEMA.md
           --exclude=.DS_Store
+          --exclude=wp-content/plugins/plugin-custom-skianet/assets/data/

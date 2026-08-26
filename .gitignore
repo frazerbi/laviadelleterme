@@ -6,6 +6,13 @@ package-lock.json
 
 # ignore all /dist
 */dist/
+
+# I JSON di disponibilita' sono GENERATI dal cron termegest_check_availability
+# e vivono solo sul server: quelli buoni sono quelli li'. Non vanno tracciati,
+# e soprattutto non vanno deployati - una copia locale stantia sovrascriverebbe
+# la disponibilita' reale e il calendario mostrerebbe date sbagliate.
+# NB: che non finiscano sul server non dipende da questo file ma dall'--exclude
+# in .github/workflows/deploy.yml (rsync carica anche i file ignorati da git).
 **/plugin-custom-skianet/assets/data/
 woocommerce-google-analytics-pro/
 woo-satispay/
