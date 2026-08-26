@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.54
+Version: 1.0.55
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -81,10 +81,24 @@ header.header-main {
    riferimento (che ha gli angoli vivi): è l'unico scostamento, per
    restare in linea con le card arrotondate di checkout e order-pay.
    Per tornare agli angoli vivi basta portarlo a 0 qui.
+
+   Il blocco è dichiarato su :root E su body, e i due colori del kit
+   hanno un fallback esplicito. Non è ridondanza: Elementor stampa i
+   --e-global-color-* nella regola .elementor-kit-NNN, e quella classe
+   sta sul BODY, non su html. Una var() dentro una custom property si
+   risolve nello scope in cui la custom property è dichiarata, quindi
+   su :root --e-global-color-57f91e2 non esiste e --lvdt-button-bg
+   diventa guaranteed-invalid: background e border-color cadono a
+   trasparente/currentColor mentre --lvdt-button-color sopravvive
+   grazie al suo fallback #fff. Risultato: pulsante bianco sul nulla.
+   La dichiarazione su body risolve le variabili dove il kit le
+   definisce davvero; il fallback copre il caso in cui l'ID globale
+   cambi (gli ID del kit non sono stabili fra installazioni).
    ============================================================ */
 
-:root {
-  --lvdt-button-bg: var( --e-global-color-57f91e2 );
+:root,
+body {
+  --lvdt-button-bg: var( --e-global-color-57f91e2, #0074a0 );
   --lvdt-button-color: var( --e-global-color-31904c4d, #fff );
   --lvdt-button-font: "Muli", Sans-serif;
   --lvdt-button-font-size: 1.3rem;

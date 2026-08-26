@@ -41,6 +41,9 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
                              riusano checkout, order-pay, thank you, notice e
                              password dimenticata, così i pulsanti che WooCommerce
                              stampa fuori da Elementor restano tutti uguali.
+                             Il blocco è dichiarato su :root e su body: i colori
+                             globali del kit Elementor sono definiti sul body, su
+                             :root non si risolverebbero.
 * assets/css/shop.css        catalogo, scheda prodotto, carrello
 * assets/css/promo-pages.css pagine protette da password (plugin PPWP): base
                              condivisa, caricata ovunque perché PPWP può

@@ -84,21 +84,28 @@
    compiere, ed era una terza grafia di pulsante rispetto a checkout e account.
    Il colore del tipo resta comunque leggibile dal testo e dalla barra laterale
    del notice. `color` vuole !important per battere il `color: inherit !important`
-   sui link del notice qui sopra. */
+   sui link del notice qui sopra.
+
+   Unico scostamento dal riferimento: la scala. Le --lvdt-button-* sono tarate
+   sui pulsanti d'azione a piena pagina (1.3rem, padding 0.9/2/1.1) mentre il
+   notice è una striscia compatta il cui testo sta a 0.95rem: alla misura piena
+   il pulsante pesava più del messaggio. Qui font e padding sono ridotti, tutto
+   il resto — colori, famiglia, bordo, raggio, maiuscolo — resta condiviso, così
+   il pulsante è riconoscibile come lo stesso pulsante, solo in piccolo. */
 .woocommerce-error a.button,
 .woocommerce-info a.button,
 .woocommerce-message a.button {
 	display: inline-block;
-	padding: var(--lvdt-button-padding);
+	padding: 0.55rem 1.25rem 0.65rem;
 	border: 1px solid var(--lvdt-button-bg);
 	border-radius: var(--lvdt-button-radius);
 	background: var(--lvdt-button-bg);
 	color: var(--lvdt-button-color) !important;
 	text-decoration: none;
 	font-family: var(--lvdt-button-font);
-	font-size: var(--lvdt-button-font-size);
+	font-size: 0.9rem;
 	font-weight: var(--lvdt-button-font-weight);
-	line-height: var(--lvdt-button-line-height);
+	line-height: 1.2;
 	text-transform: uppercase;
 }
 
