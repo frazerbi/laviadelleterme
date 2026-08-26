@@ -89,6 +89,10 @@
 .ppw-pcp-password-form input.ppw-pcp-pf-submit-btn {
   flex: 0 0 auto;
   height: auto;
+  /* Hello Elementor mette margin-inline-start: 3px su
+     .post-password-form [type=submit]: qui la riga la spaziano gap e
+     flex-wrap, e a capo il pulsante resterebbe rientrato di 3px. */
+  margin-inline-start: 0;
   font-family: var( --lvdt-button-font );
   font-size: var( --lvdt-button-font-size );
   font-weight: var( --lvdt-button-font-weight );

@@ -37,7 +37,23 @@
 
 /* ---- Form di sblocco: pagina intera ---- */
 
+/* Hello Elementor stila gia' .post-password-form nel suo theme.css
+   (dev/scss/theme/_general.scss):
+
+     .post-password-form            { max-width: 500px; margin: 50px auto }
+     .post-password-form p          { width: 100%; display: flex; align-items: flex-end }
+     .post-password-form [type=submit] { margin-inline-start: 3px }
+
+   Stessa specificita' della nostra (0,1,0): il foglio del child vince solo
+   perche' e' caricato dopo, quindi restano attive tutte le proprieta' che
+   qui NON ridichiariamo. Le due che davano fastidio si azzerano in modo
+   esplicito: max-width tagliava il form a 500px (e sulla PCP annullava di
+   fatto i 720px di .ppw-pcp-container, che contiene il form) e il margin
+   di 50px si sommava al padding verticale impostato qui sotto. */
+
 .post-password-form {
+  max-width: none;
+  margin: 0;
   display: flex;
   flex-direction: row;
   padding-top: 12rem;
