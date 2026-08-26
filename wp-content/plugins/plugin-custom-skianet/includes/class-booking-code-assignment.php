@@ -42,13 +42,32 @@ class Booking_Code_Assignment {
         if (!$order) {
             return;
         }
-        
+
         // Verifica che WC License Delivery sia attivo
         if (!class_exists('WC_LD_Code_Assignment')) {
             $order->add_order_note('ERRORE: WooCommerce License Delivery non attivo.');
             return;
         }
         
+        // WC_Order::payment_complete() lancia questo hook solo se l'ordine e'
+        // ancora in uno stato pagabile, quindi un secondo webhook che arriva a
+        // distanza non rifa' nulla. Restano pero' due strade per una doppia
+        // esecuzione: due callback concorrenti che leggono entrambi lo stato
+        // vecchio, e il payment_complete() replicato da satispay/satispay.php
+        // nel tema. Senza questa guardia si tradurrebbero in codici assegnati
+        // due volte e in prenotazioni doppie su TermeGest.
+        if ($order->get_meta('_skianet_payment_processed')) {
+            $order->add_order_note('Pagamento gia\' elaborato: assegnazione codici e sincronizzazione TermeGest saltate.');
+            return;
+        }
+
+        // Il flag si salva PRIMA del lavoro: e' una prenotazione del turno, non
+        // un attestato di riuscita. Un fallimento a meta' strada non si ripara
+        // da solo, resta la nota d'ordine - e' la scelta voluta, un doppione su
+        // TermeGest e' piu' difficile da correggere di un sync mancato.
+        $order->update_meta_data('_skianet_payment_processed', current_time('mysql'));
+        $order->save();
+
         // ✅ STEP 1: Assegna codici
         try {
             $codeAssign = new WC_LD_Code_Assignment();
