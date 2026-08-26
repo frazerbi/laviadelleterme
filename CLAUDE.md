@@ -331,6 +331,23 @@ on the three colours. Do not add per-page notice color or font-size overrides �
 
 **Activation code is per-environment**: staging2 needs its **own** Satispay activation code. Credentials cloned into the staging DB from production fail with `Unauthorized, request id: …` on `Payment::create()`, surfaced as a checkout notice. Gotcha in the plugin's `process_admin_options()`: keys are regenerated **only when the activation code string changes** — re-saving the same code, or toggling only the Sandbox checkbox, does not re-authenticate. To force it: clear the Activation Code field → Save (this wipes `keyId`/`privateKey`/`publicKey`) → paste the new code → Save. Sandbox mode needs a sandbox account's code; production mode needs the production code with Sandbox off — the two cannot be crossed.
 
+### Ambiente (staging vs produzione)
+
+`plugin-custom-skianet.php` definisce **`WP_ENVIRONMENT_TYPE`** (`'staging'`, dietro un
+`if ( ! defined() )` che lascia l'ultima parola a un define nel `wp-config.php`). Sta li' e non nel wp-config del
+server perche' il deploy automatico va solo su staging2, mentre la produzione si aggiorna a mano file per file: **se
+carichi `plugin-custom-skianet.php` via FTP su `laviadelleterme.it`, il valore va cambiato in `'production'`**,
+altrimenti `Booking_Redirect` usa i product ID di staging (e WordPress mostra "Staging" nella barra admin, che e' la
+spia piu' rapida per accorgersene).
+
+Chi legge l'ambiente usa la **costante**, non `wp_get_environment_type()`: quella funzione memorizza il valore in una
+static alla prima chiamata, che puo' capitare prima del caricamento dei plugin.
+
+Unico consumatore oggi: `Booking_Redirect`, che tiene due mappe gemelle categoria TermeGest → product/variation ID
+(`$product_config` per la produzione, `$product_config_staging` per staging). Fra i due ambienti cambiano solo gli ID,
+percio' la mappa e' duplicata per intero invece di avere una base con override. Una voce con `product_id` vuoto vale
+"categoria non mappata su questo ambiente" e ferma il redirect prima di passare `null` a `wc_get_product()`.
+
 ### Assets Pipeline (plugin-custom-skianet)
 
 - Source CSS: `assets/css/booking-form.css`, `assets/css/booking-only-form.css`, `assets/css/pdp.css`
