@@ -168,30 +168,44 @@ body .woocommerce-message a.button:hover {
 	}
 }
 
-/* I testi sono scelti per stare sopra 4.5:1 di contrasto sul proprio sfondo
-   tinto (WCAG AA per testo normale): l'arancio e il verde precedenti
-   (#a05800, #1a7a4a) erano al limite e risultavano slavati. */
+/* Tre valori per tipo, con tre criteri diversi.
+
+   TESTO: sopra 4.5:1 sul proprio sfondo tinto, cioè WCAG AA per testo
+   normale. L'arancio e il verde ancora precedenti (#a05800, #1a7a4a)
+   erano al limite e risultavano slavati.
+
+   FONDO: tinta del colore del tipo al 18% su bianco. Era al 10-12% e il
+   notice si confondeva con la pagina: la differenza rispetto al bianco
+   era di pochi punti per canale. Il 18% è il massimo utile prima che il
+   testo cominci a perdere contrasto — a questa tinta i tre restano fra
+   5,7:1 e 6,9:1, quindi c'è ancora margine.
+
+   BORDO: colore del tipo a piena intensità, non più una versione
+   trasparente. Al 35% l'arancio su bianco valeva ~1,4:1 — il bordo
+   semplicemente non si vedeva, ed è il motivo per cui il notice
+   sembrava sfumare nella pagina. A piena intensità i tre stanno fra
+   3,1:1 e 5,7:1, cioè sopra la soglia 3:1 che WCAG chiede agli elementi
+   non testuali. Non c'è più un border-left-color separato: la barra
+   laterale ora si distingue per la sola larghezza (4px contro 1px)
+   dichiarata nel blocco comune in cima al file. */
 
 /* ---- Errore — rosso ---- */
 .woocommerce-error {
-	background: rgba(200, 30, 30, 0.1);
-	border-color: rgba(200, 30, 30, 0.35);
-	border-left-color: #c81e1e;
+	background: rgba(200, 30, 30, 0.18);
+	border-color: #c81e1e;
 	color: #8e1414 !important;
 }
 
 /* ---- Informazione / attesa — arancio ---- */
 .woocommerce-info {
-	background: rgba(220, 120, 0, 0.12);
-	border-color: rgba(220, 120, 0, 0.35);
-	border-left-color: #dc7800;
+	background: rgba(220, 120, 0, 0.18);
+	border-color: #dc7800;
 	color: #7a4100 !important;
 }
 
 /* ---- Conferma — verde ---- */
 .woocommerce-message {
-	background: rgba(34, 160, 100, 0.12);
-	border-color: rgba(34, 160, 100, 0.35);
-	border-left-color: #22a064;
+	background: rgba(34, 160, 100, 0.18);
+	border-color: #22a064;
 	color: #14663d !important;
 }
