@@ -38,85 +38,46 @@ class Booking_TermeGest_Sync {
      * Sincronizza tutti i prodotti dell'ordine con TermeGest
      */
     public function sync_order_to_termegest($order_id) {
-        error_log("=== TERMEGEST SYNC: Ordine {$order_id} ===");
         
         $order = wc_get_order($order_id);
         if (!$order) {
-            error_log("Ordine {$order_id} non trovato");
             return;
         }
         
         // Verifica funzioni API disponibili
         if (!function_exists('skianet_termegest_set_venduto')) {
-            error_log("❌ Funzione skianet_termegest_set_venduto non disponibile");
             return;
         }
         
         $has_prenotazione_function = function_exists('skianet_termegest_set_prenotazione');
-        if (!$has_prenotazione_function) {
-            error_log("⚠️ Funzione skianet_termegest_set_prenotazione non disponibile - skip prenotazioni");
-        }
         
         // Processa TUTTI gli items dell'ordine
-        $booking_items = 0;
-        $nonbooking_items = 0;
-        
         foreach ($order->get_items() as $item) {
             if ($item->get_meta('_booking_id')) {
                 $this->sync_booking_item($order, $item, $has_prenotazione_function);
-                $booking_items++;
             } else {
                 $this->sync_nonbooking_item($order, $item);
-                $nonbooking_items++;
             }
         }
-        
-        error_log("✅ Sync completato: {$booking_items} con prenotazione, {$nonbooking_items} senza prenotazione");
     }
 
     /**
      * Sincronizza item CON prenotazione (setVenduto + setPrenotazione)
      */
     private function sync_booking_item($order, $item, $has_prenotazione_function) {
-        $item_id = $item->get_id();
-        $booking_id = $item->get_meta('_booking_id');
-
-        error_log("Sync BOOKING item {$item_id} - Prenotazione {$booking_id}");
-
         // Recupera codici direttamente dal DB (usa_db_query = true).
         // La lettura da order item meta (_license_code_ids) fallisce perché WC License
         // Delivery scrive su wc_ld_license_codes bypassando la WP object cache,
         // quindi l'oggetto WC_Order_Item in memoria risulta ancora vuoto nella stessa request.
         $codes = $this->get_license_codes_for_item($item, true);
 
-        error_log("=== CODICI RECUPERATI PER ITEM {$item_id} ===");
-        error_log("Totale codici: " . count($codes));
-        foreach ($codes as $index => $code) {
-            error_log(sprintf(
-                "  Codice [%d]: '%s' (lunghezza: %d, hex: %s)",
-                $index + 1,
-                $code,
-                strlen($code),
-                bin2hex($code)
-            ));
-        }
-        error_log("===========================================");
-
         if (empty($codes)) {
-            error_log("❌ Nessun codice trovato per booking item {$item_id}");
             $order->add_order_note("ERRORE: Nessun codice per " . $item->get_name());
             return;
         }
         
         // Recupera dati prenotazione
         $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
-        
-        error_log('=== BOOKING DATA FROM ORDER ITEM === ' . var_export($booking_data, true));
-        error_log(print_r($booking_data, true));
-        // Valida numero codici
-        if (count($codes) !== (int)$booking_data['total_guests']) {
-            error_log("⚠️ Codici: " . count($codes) . " vs Ospiti: " . $booking_data['total_guests']);
-        }
         
         // Invia codici con prenotazione
         $results = $this->send_booking_codes($order, $item, $codes, $booking_data, $has_prenotazione_function);
@@ -129,14 +90,10 @@ class Booking_TermeGest_Sync {
      * Sincronizza item SENZA prenotazione (solo setVenduto)
      */
     private function sync_nonbooking_item($order, $item) {
-        $item_id = $item->get_id();
-        error_log("Sync NON-BOOKING item {$item_id}: " . $item->get_name());
-        
         // Recupera codici
         $codes = $this->get_license_codes_for_item($item, true);
         
         if (empty($codes)) {
-            error_log("⚠️ Nessun codice per non-booking item {$item_id} - skip");
             return;
         }
         
@@ -150,11 +107,8 @@ class Booking_TermeGest_Sync {
         $results = array('venduto_success' => 0, 'venduto_error' => 0);
         
         foreach ($codes as $index => $code) {
-            error_log("[NON-BOOKING] Codice [" . ($index + 1) . "/" . count($codes) . "]: {$code}");
-            error_log("   Ordine: {$order->get_id()}, Item: {$item_id}, Prezzo: {$price_per_code}");
             
             if ($this->send_venduto($code, $price_per_code, $customer['name'], $customer['email'])) {
-                error_log("✅ [NON-BOOKING] Codice {$code} sincronizzato");
                 $results['venduto_success']++;
             } else {
                 $results['venduto_error']++;
@@ -179,7 +133,6 @@ class Booking_TermeGest_Sync {
         $protection = $encryption->encrypt($booking_data['location_name']);
 
         if (empty($protection)) {
-            error_log("❌ Impossibile criptare location per protection");
             return array(
                 'venduto_success' => 0,
                 'venduto_error' => 0,
@@ -188,7 +141,6 @@ class Booking_TermeGest_Sync {
             );
         }
         
-        error_log("Protection generato per location {$booking_data['location_name']}: {$protection}");
 
         // Calcola prezzo per codice
         $price_per_code = $this->calculate_price_per_code($item, count($codes));
@@ -211,12 +163,9 @@ class Booking_TermeGest_Sync {
         foreach ($codes as $index => $code) {
             $is_male = $index < $num_male;
             
-            error_log("[BOOKING] Codice [" . ($index + 1) . "/" . count($codes) . "]: {$code}");
-            error_log("   Ordine: {$order_id}, Sesso: " . ($is_male ? 'M' : 'F'));
             
             // STEP 1: setVenduto
             if ($this->send_venduto($code, $price_per_code, $customer['name'], $customer['email'])) {
-                error_log("✅ [BOOKING] setVenduto OK per codice {$code}");
                 $results['venduto_success']++;
                 
                 // STEP 2: setPrenotazione
@@ -262,12 +211,9 @@ class Booking_TermeGest_Sync {
                 return true;
             }
             
-            $error_msg = is_wp_error($response) ? $response->get_error_message() : 'Risposta non valida';
-            error_log("❌ setVenduto ERRORE: {$error_msg}");
             return false;
             
         } catch (Exception $e) {
-            error_log("❌ Eccezione setVenduto: " . $e->getMessage());
             return false;
         }
     }
@@ -285,19 +231,6 @@ class Booking_TermeGest_Sync {
             $allInclusive = in_array(strtolower($categoria), array('p3', 'p4'), true);
 
             // Log parametri per debug
-            error_log("SetPrenotazione params:");
-            error_log("  idDisponibilita: " . (int)$booking_data['fascia_id']);
-            error_log("  codice: {$code}");
-            error_log("  Cognome: {$customer['last_name']} (" . strlen($customer['last_name']) . " chars)");
-            error_log("  Nome: {$customer['first_name']} (" . strlen($customer['first_name']) . " chars)");
-            error_log("  Telefono: {$customer['phone']} (" . strlen($customer['phone']) . " chars)");
-            error_log("  Note: {$order_notes} (" . strlen($order_notes) . " chars)");
-            error_log("  Provincia: '{$customer['state']}' (" . strlen($customer['state']) . " chars)");
-            error_log("  uomodonna: " . ($is_male ? 'true' : 'false'));
-            error_log("  Email: {$customer['email']} (" . strlen($customer['email']) . " chars)");
-            error_log("  AllInclusive: " . ($allInclusive ? 'true' : 'false'));
-            error_log(" Categoria: {$categoria} (" . strlen($categoria) . " chars)");
-            error_log("  Protection: " . strlen($protection) . " chars");
             
         try {
             $response = skianet_termegest_set_prenotazione(
@@ -317,15 +250,12 @@ class Booking_TermeGest_Sync {
             );
             
             if ($response['status']) {
-                error_log("✅ [BOOKING] setPrenotazione OK per codice {$code}");
                 return true;
             } else {
-                error_log("❌ [BOOKING] setPrenotazione ERRORE: " . $response['message']);
                 return false;
             }
             
         } catch (Exception $e) {
-            error_log("❌ Eccezione setPrenotazione: " . $e->getMessage());
             return false;
         }
     }
@@ -443,7 +373,6 @@ class Booking_TermeGest_Sync {
         $code_ids = wc_get_order_item_meta($item_id, '_license_code_ids');
         
         if (empty($code_ids) || !is_array($code_ids)) {
-            error_log("Nessun ID codice trovato per item {$item_id}");
             return array();
         }
         
@@ -456,7 +385,6 @@ class Booking_TermeGest_Sync {
             }
         }
 
-        error_log("Recuperati " . count($codes) . " codici per item {$item_id}");
         return $codes;
     }
 

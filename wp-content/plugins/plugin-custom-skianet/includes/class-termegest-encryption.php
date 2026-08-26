@@ -44,10 +44,6 @@ class TermeGest_Encryption {
      * Costruttore privato per singleton
      */
     private function __construct() {
-        // Verifica che OpenSSL sia disponibile
-        if (!function_exists('openssl_encrypt')) {
-            error_log('TermeGest_Encryption: OpenSSL non disponibile!');
-        }
     }
 
     /**
@@ -58,7 +54,6 @@ class TermeGest_Encryption {
      */
     public function encrypt(string $data): string {
         if (empty($data)) {
-            error_log('TermeGest_Encryption: Tentativo di criptare stringa vuota');
             return '';
         }
 
@@ -75,14 +70,12 @@ class TermeGest_Encryption {
         );
 
         if ($encrypted === false) {
-            error_log('TermeGest_Encryption: Errore durante la criptazione di: ' . $data);
             return '';
         }
 
         // Concatena IV + dati criptati (base64)
         $result = $iv . base64_encode($encrypted);
 
-        error_log("TermeGest_Encryption: '{$data}' -> '{$result}'");
 
         return $result;
     }

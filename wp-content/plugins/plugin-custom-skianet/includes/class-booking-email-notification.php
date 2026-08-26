@@ -59,7 +59,6 @@ class Booking_Email_Notification {
         $order = wc_get_order($order_id);
 
         if (!$order) {
-            error_log("Ordine {$order_id} non trovato");
             return;
         }
 
@@ -81,14 +80,13 @@ class Booking_Email_Notification {
      */
     public function send_to_customer($order) {
         if (!$order) {
-            error_log('No order object provided for customer email');
             return;
         }
         
         try {
             $this->send_booking_details($order);
         } catch (Exception $e) {
-            error_log("Error sending booking email: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 
@@ -97,14 +95,13 @@ class Booking_Email_Notification {
      */
     public function send_to_admin($order) {
         if (!$order) {
-            error_log('No order object provided for admin email');
             return;
         }
         
         try {
             $this->send_booking_details($order, true);
         } catch (Exception $e) {
-            error_log("Error sending admin booking email: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 
@@ -112,22 +109,17 @@ class Booking_Email_Notification {
      * Invia email con dettagli prenotazione
      */
     private function send_booking_details($order, $send_to_admin = false) {
-        error_log('send_booking_details called');
 
         if (!$order) {
-            error_log('Order object is not valid');
             return;
         }
 
         $order = is_object($order) ? $order : wc_get_order($order);
 
         if (!$order) {
-            error_log('Unable to load order');
             return;
         }
 
-        $order_id = $order->get_id();
-        
         // Verifica se l'ordine ha prenotazioni
         $has_booking = false;
         foreach ($order->get_items() as $item) {
@@ -139,13 +131,11 @@ class Booking_Email_Notification {
 
         // Email per prodotti con prenotazione
         if ($has_booking) {
-            error_log("Order {$order_id} has booking items - sending booking email");
 
             // Prepara dettagli ordine
             $order_details = $this->build_order_details($order);
             
             if (empty($order_details)) {
-                error_log("No booking details to send for order {$order_id}");
                 return;
             }
 
@@ -181,10 +171,6 @@ class Booking_Email_Notification {
                 continue; // Skip prodotti senza prenotazione
             }
             
-            if (!class_exists('Booking_Cart_Handler')) {
-                error_log('Booking_Cart_Handler NON caricata');
-            }
-
             // Recupera codici
             $booking_data = Booking_Cart_Handler::get_booking_data_from_order_item($item);
         
@@ -315,7 +301,6 @@ class Booking_Email_Notification {
         $recipient = $send_to_admin ? 'francesco.zerbinato@gmail.com' : $to_email;
 
         if (!$recipient) {
-            error_log('No email address provided');
             return;
         }
         
@@ -326,9 +311,8 @@ class Booking_Email_Notification {
         
         try {
             $mailer->send($recipient, $subject, $html_message);
-            error_log("Booking email sent to {$recipient}");
         } catch (Exception $e) {
-            error_log("Error sending email to {$recipient}: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 

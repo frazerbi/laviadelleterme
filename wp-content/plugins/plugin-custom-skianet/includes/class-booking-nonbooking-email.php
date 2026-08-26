@@ -52,7 +52,6 @@ class Booking_Nonbooking_Email {
         $order = wc_get_order($order_id);
 
         if (!$order) {
-            error_log("Ordine {$order_id} non trovato");
             return;
         }
 
@@ -74,14 +73,13 @@ class Booking_Nonbooking_Email {
      */
     public function send_to_customer($order) {
         if (!$order) {
-            error_log('No order object provided for customer coupon email');
             return;
         }
         
         try {
             $this->send_coupon_email($order, false);
         } catch (Exception $e) {
-            error_log("Error sending coupon email: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 
@@ -90,14 +88,13 @@ class Booking_Nonbooking_Email {
      */
     public function send_to_admin($order) {
         if (!$order) {
-            error_log('No order object provided for admin coupon email');
             return;
         }
         
         try {
             $this->send_coupon_email($order, true);
         } catch (Exception $e) {
-            error_log("Error sending admin coupon email: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 
@@ -106,19 +103,13 @@ class Booking_Nonbooking_Email {
      */
     private function send_coupon_email($order, $send_to_admin = false) {
         if (!$order) {
-            error_log('Order is not valid in send_coupon_email');
             return;
         }
 
         $order = is_object($order) ? $order : wc_get_order($order);
         if (!$order) {
-            error_log('Unable to load order');
             return;
         }
-
-        $order_id = $order->get_id();
-
-        error_log("Processing coupon email for order {$order_id}");
 
         // Raccoglie i codici dei prodotti con prenotazione per escluderli dal PDF non-booked
         $booked_codes = array();
@@ -136,7 +127,6 @@ class Booking_Nonbooking_Email {
         foreach ($order->get_items() as $item) {
             // Skip prodotti CON prenotazione
             if ($item->get_meta('_booking_id')) {
-                error_log("Skipped booking product: " . $item->get_name());
                 continue;
             }
 
@@ -152,7 +142,6 @@ class Booking_Nonbooking_Email {
 
         // Invia email solo se ci sono PDF
         if (empty($attachment_paths)) {
-            error_log("No non-booking items found for order {$order_id}");
             return;
         }
 
@@ -189,7 +178,6 @@ class Booking_Nonbooking_Email {
         }
 
         if (empty($codes)) {
-            error_log("No license codes found for product {$product_name}");
             return false;
         }
 
@@ -230,7 +218,6 @@ class Booking_Nonbooking_Email {
      */
     private function create_pdf($product_name, $body_pdf, $order_id, $product_id, $variation_id = null) {
         if (!class_exists('FPDF')) {
-            error_log('FPDF class not found');
             return false;
         }
 
@@ -277,7 +264,6 @@ class Booking_Nonbooking_Email {
             return file_exists($filename) ? $filename : false;
 
         } catch (Exception $e) {
-            error_log("Error generating PDF: " . $e->getMessage());
             return false;
         }
     }
@@ -337,13 +323,11 @@ class Booking_Nonbooking_Email {
      */
     private function send_email($to_email, $subject, $heading, $body, $attachments, $send_to_admin = false) {
         if (!is_email($to_email) && !$send_to_admin) {
-            error_log("Invalid email address: {$to_email}");
             return false;
         }
 
         $mailer = WC()->mailer();
         if (!$mailer) {
-            error_log("WooCommerce mailer not available");
             return false;
         }
 
@@ -360,9 +344,7 @@ class Booking_Nonbooking_Email {
         foreach ($recipients as $recipient) {
             $result = $mailer->send($recipient, $subject, $html_message, '', $attachments);
             if ($result) {
-                error_log("Coupon email sent to {$recipient}");
             } else {
-                error_log("Failed to send coupon email to {$recipient}");
                 $success = false;
             }
         }
@@ -389,18 +371,14 @@ class Booking_Nonbooking_Email {
     private function cleanup_attachments($attachment_paths) {
         foreach ($attachment_paths as $path) {
             if (file_exists($path)) {
-                if (!unlink($path)) {
-                    error_log("Failed to delete attachment: {$path}");
-                }
+                unlink($path);
             }
         }
     }
 
     public function send_mixed_order_coupons($order) {
-        error_log("=== INVIO COUPON PER ORDINE MISTO ===");
         
         if (!$order) {
-            error_log('Order non valido per ordine misto');
             return;
         }
         

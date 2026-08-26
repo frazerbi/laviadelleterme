@@ -95,7 +95,6 @@ class Booking_Redirect {
         $category = strtolower($category);
 
         if (!isset(self::$product_config[$category])) {
-            error_log("Categoria {$category} non trovata in product_config");
             return false;
         }
 
@@ -112,7 +111,6 @@ class Booking_Redirect {
         $mapping = $this->get_product_mapping_from_category($category);
 
         if (!$mapping) {
-            error_log("ERRORE: impossibile mappare categoria {$category}");
             return false;
         }
 
@@ -121,7 +119,6 @@ class Booking_Redirect {
 
         $product = wc_get_product($product_id);
         if (!$product) {
-            error_log("ERRORE: Prodotto ID {$product_id} non trovato");
             return false;
         }
 
@@ -150,7 +147,6 @@ class Booking_Redirect {
 
         $redirect_url = add_query_arg($params, $product_url);
 
-        error_log("Redirect URL: {$redirect_url}");
 
         return $redirect_url;
     }

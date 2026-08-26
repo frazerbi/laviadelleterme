@@ -81,12 +81,10 @@ class Booking_Cart_Handler {
 
                 if ($session_id !== $cart_id) {
                     unset($_SESSION['termegest_booking']);
-                    error_log("Sessione prenotazione ignorata: prodotto in sessione ({$session_id}) diverso da quello aggiunto al carrello ({$cart_id})");
                     return $cart_item_data;
                 }
             }
 
-            error_log('Aggiunta prenotazione al carrello: ' . print_r($booking_data, true));
             
             // Aggiungi tutti i dati della prenotazione
             $cart_item_data['booking_id'] = $booking_data['booking_id'];
@@ -105,7 +103,6 @@ class Booking_Cart_Handler {
             $cart_item_data['unique_key'] = $booking_data['booking_id'];
 
             unset($_SESSION['termegest_booking']);
-            error_log('Sessione prenotazione pulita dopo aggiunta al carrello');
         }
         
         return $cart_item_data;
@@ -206,7 +203,6 @@ class Booking_Cart_Handler {
             $item->add_meta_data('Categoria', $values['booking_category'], true); // Visibile
             $item->add_meta_data('_booking_category', $values['booking_category'], true); // Raw per API
             
-            error_log('Dati prenotazione salvati nell\'ordine: ' . $values['booking_id']);
         }
     }
 

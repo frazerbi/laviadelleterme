@@ -364,7 +364,6 @@ class Booking_Checkout_Fields {
             $item->add_meta_data('_health_certificate_ip', $cert_ip, true);
             $item->add_meta_data('Certificato Salute', 'Accettato', true);
 
-            error_log("Certificato salute salvato per item - Booking: {$values['booking_id']}");
         }
     }
 
@@ -415,7 +414,6 @@ class Booking_Checkout_Fields {
                 'Ordine in sospeso: dichiarazione di idoneità sanitaria non accettata (possibile pagamento express).'
             );
             $order->save();
-            error_log("Order {$order_id}: health certificate not accepted - set to on-hold");
         }
     }
 

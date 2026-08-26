@@ -67,19 +67,14 @@ class Availability_Checker {
      * Controlla disponibilità per tutte le location
      */
     public function check_all_locations() {
-        error_log('=== INIZIO CONTROLLO DISPONIBILITÀ [CRON] ===');
-        error_log('Timestamp: ' . current_time('mysql'));
-        error_log('Context: ' . (defined('DOING_CRON') ? 'CRON' : 'MANUAL'));
                 
         // Verifica che Booking_Handler sia caricata
         if (!class_exists('Booking_Handler')) {
-            error_log('ERRORE: Booking_Handler non caricata!');
             return;
         }
         
         // Verifica che il metodo esista
         if (!method_exists('Booking_Handler', 'get_locations_to_encrypt')) {
-            error_log('ERRORE: Metodo get_locations_to_encrypt non trovato!');
             return;
         }
 
@@ -87,16 +82,13 @@ class Availability_Checker {
         $locations = Booking_Handler::get_locations_to_encrypt();
         
         if (empty($locations)) {
-            error_log('ERRORE: Nessuna location trovata');
             return;
         }
 
         foreach ($locations as $slug => $location_name) {
-            error_log("Controllando: {$location_name} ({$slug})");
             $this->check_location_availability($location_name);
         }
 
-        error_log('=== FINE CONTROLLO DISPONIBILITÀ ===');
     }
 
     /**
@@ -105,12 +97,10 @@ class Availability_Checker {
     private function check_location_availability($location) {
 
         if (!class_exists('TermeGest_Encryption')) {
-            error_log("ERRORE CRON: TermeGest_Encryption non caricata per {$location}");
             return;
         }
 
         if (!function_exists('skianet_termegest_get_disponibilita')) {
-            error_log("ERRORE CRON: skianet_termegest_get_disponibilita non disponibile per {$location}");
             return;
         }
 
@@ -120,16 +110,13 @@ class Availability_Checker {
         $encrypted_location = $encryption->encrypt($location);
         
         if (empty($encrypted_location)) {
-            error_log("ERRORE: Impossibile criptare location: {$location}");
             return;
         }
 
-        error_log("Location criptata: {$encrypted_location}");
 
         // Step 1: Crea array con tutti i giorni dei 2 mesi
         $all_dates = $this->get_all_dates_for_two_months();
         
-        error_log("Totale giorni da controllare: " . count($all_dates));
         
         // Step 2: Inizializza risultati con tutti i giorni a false
         $results = array();
@@ -144,7 +131,6 @@ class Availability_Checker {
             $month = $period['month'];
             $year = $period['year'];
             
-            error_log("Controllando: {$location} - {$month}/{$year}");
             
             // Determina categoria in base al mese
             if ($month == 12 || $month == 1) {
@@ -157,14 +143,9 @@ class Availability_Checker {
             $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
 
             // LOG: Struttura dati
-            error_log("=== STRUTTURA dispArr per {$location} - {$month}/{$year} ===");
-            error_log("Tipo: " . gettype($dispArr));
-            error_log("Count: " . (is_array($dispArr) ? count($dispArr) : 'N/A'));
-            error_log("=== FINE STRUTTURA ===");
 
 
             if (empty($dispArr)) {
-                error_log("Nessuna disponibilità API per {$location} - {$month}/{$year}");
                 continue;
             }
             
@@ -177,7 +158,6 @@ class Availability_Checker {
                 // Parse data (formato: "2025-12-09 00:00:00")
                 $date_obj = DateTime::createFromFormat('Y-m-d H:i:s', $dispo->data);
                 if (!$date_obj) {
-                    error_log("ERRORE parsing data: {$dispo->data}");
                     continue;
                 }
                 
@@ -191,7 +171,6 @@ class Availability_Checker {
                 // Verifica se questa fascia ha disponibilità
                 if (isset($dispo->disponibili) && (int)$dispo->disponibili > 0) {
                     $results[$date_key] = true; // ✅ SALVA TRUE per questo giorno
-                    error_log("✅ {$date_key}: Disponibile");
                 }
             }
             
@@ -199,12 +178,7 @@ class Availability_Checker {
             usleep(500000); // 0.5 secondi
         }
         
-        // Step 5: Log riepilogo
-        $available_count = count(array_filter($results));
-        $total_count = count($results);
-        error_log("Riepilogo {$location}: {$available_count}/{$total_count} giorni disponibili");
-        
-        // Step 6: Salva nel file JSON
+        // Step 5: Salva nel file JSON
         $this->save_json_file($location, $results);
     }
 
@@ -240,13 +214,11 @@ class Availability_Checker {
         $current_month = (int) $current_date->format('n');
         $current_year = (int) $current_date->format('Y');
 
-        error_log("get_months_to_check: current={$current_month}/{$current_year}, wp_timezone=" . $wp_timezone->getName());
 
         $next_date = new DateTime('first day of next month', $wp_timezone);
         $next_month = (int) $next_date->format('n');
         $next_year = (int) $next_date->format('Y');
 
-        error_log("get_months_to_check: next={$next_month}/{$next_year}");
 
         return array(
             array('month' => $current_month, 'year' => $current_year),
@@ -261,24 +233,9 @@ class Availability_Checker {
         $filename = $this->get_json_filename($location);
         $filepath = $this->json_path . '/' . $filename;
 
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-        $caller_info = array();
-        foreach ($backtrace as $trace) {
-            if (isset($trace['file'], $trace['line'])) {
-                $caller_info[] = basename($trace['file']) . ':' . $trace['line'];
-            }
-        }
-        
-        error_log("=== SAVE JSON CHIAMATO ===");
-        error_log("Location: {$location}");
-        error_log("Timestamp: " . current_time('mysql'));
-        error_log("Chiamato da: " . implode(' -> ', $caller_info));
-
         if (file_exists($filepath)) {
-            $old_timestamp = date('Y-m-d H:i:s', filemtime($filepath));
             unlink($filepath);
             clearstatcache(true, $filepath);
-            error_log("File vecchio eliminato (modificato: {$old_timestamp})");
         }
 
         $json_data = array(
@@ -294,10 +251,7 @@ class Availability_Checker {
         );
 
         if ($result !== false) {
-            error_log("✅ JSON salvato: {$filepath}");
             clearstatcache(true, $filepath);
-        } else {
-            error_log("❌ Errore salvataggio JSON: {$filepath}");
         }
     }
 

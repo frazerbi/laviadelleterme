@@ -130,10 +130,6 @@ class Booking_Only_Handler {
         // - Invia email
         
         // Log per debug
-        error_log(sprintf(
-            'Booking Only - Dati ricevuti: Codice=%s, Location=%s, Data=%s, Slot=%s, Gender=%s',
-            $purchase_code, $location, $booking_date, $gender
-        ));
         
         // Risposta di successo
         wp_send_json_success([

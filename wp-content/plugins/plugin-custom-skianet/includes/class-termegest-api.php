@@ -74,7 +74,6 @@ class TermeGest_API {
                 if (!$is_pre_send_curl_error || $attempt >= $max_attempts) {
                     throw $exception;
                 }
-                error_log("⚠️ TermeGest: connessione fallita (tentativo {$attempt}/{$max_attempts}), retry: " . $exception->getMessage());
                 sleep(1);
             }
         } while ($attempt < $max_attempts);
@@ -86,7 +85,6 @@ class TermeGest_API {
     private function get_reserv_client() {
         if (null === $this->client_get_reserv) {
             $this->client_get_reserv = TermeGestGetReservClientFactory::factory(self::WSDL_GET_RESERV);
-            error_log('✅ Client SOAP GetReserv creato e cached');
         }
         return $this->client_get_reserv;
     }
@@ -97,7 +95,6 @@ class TermeGest_API {
     private function get_set_info_client() {
         if (null === $this->client_set_info) {
             $this->client_set_info = TermeGestSetInfoClientFactory::factory(self::WSDL_SET_INFO);
-            error_log('✅ Client SOAP SetInfo creato e cached');
         }
         return $this->client_set_info;
     }
@@ -118,7 +115,6 @@ class TermeGest_API {
             $encrypted_location = $encryption->encrypt($location);
             
             if (empty($encrypted_location)) {
-                error_log("ERRORE: encrypted_location è vuota per location: {$location}");
                 return [];
             }
             
@@ -130,27 +126,23 @@ class TermeGest_API {
             $disponibilita_result = $response->getGetDisponibilitaGiornoFasciaResult();
             
             if ($disponibilita_result === null) {
-                error_log("AVVISO: getGetDisponibilitaGiornoFasciaResult ha ritornato NULL per {$year}-{$month}-{$day}");
                 return [];
             }
 
             $raw_response = $disponibilita_result->getAny();
             if ($raw_response === null) {
-                error_log("AVVISO: getAny ha ritornato NULL");
                 return [];
             }
             
             $result = (new AnyXML($raw_response))->convertXmlToPhpObject();
             
             if (!is_array($result) || empty($result)) {
-                error_log("AVVISO: Risultato conversione non valido o vuoto");
                 return [];
             }
          
             return $result;
 
         } catch (Throwable $throwable) {
-            error_log("Exception get_disponibilita_by_day: " . $throwable->getMessage());
             return [];
         }
     }
@@ -173,15 +165,12 @@ class TermeGest_API {
             $any = $response->getGetDisponibilitaResult()?->getAny();
 
             if ($any === null) {
-                error_log("get_disponibilita: getAny() ha ritornato NULL per {$year}-{$month}, cat={$categoria}");
                 return [];
             }
 
-            error_log("get_disponibilita raw XML ({$year}-{$month}, cat={$categoria}): " . substr($any, 0, 500));
 
             return (new AnyXML($any))->convertXmlToPhpObject();
         } catch (Throwable $throwable) {
-            error_log("ERRORE get_disponibilita ({$year}-{$month}, cat={$categoria}): " . $throwable->getMessage());
             return [];
         }
     }
@@ -217,27 +206,17 @@ class TermeGest_API {
      */
     public function get_disponibilita_by_id(int $id, string $location, string $categoria): int {
         if ($id === 0 || empty($id)) {
-            error_log("ERROR: ID is zero or empty!");
             return 0;
         }
 
         try {
-            error_log("Calling getDisponibilitaById: ID={$id}, Location={$location}, Categoria={$categoria}");
-            
-            $startTime = microtime(true);
             $response = $this->get_reserv_client()->getDisponibilitaById(
                 new GetDisponibilitaById($id, $categoria, $location)
             );
-            $endTime = microtime(true);
-            
-            $result = $response->getGetDisponibilitaByIdResult();
-            error_log("API result: {$result} (tempo: " . round(($endTime - $startTime) * 1000, 2) . "ms)");
-            
-            return $result;
+
+            return $response->getGetDisponibilitaByIdResult();
 
         } catch (Exception $exception) {
-            $errorMessage = "Error getDisponibilitaById (ID: {$id}, Location: {$location}, Categoria: {$categoria}): " . $exception->getMessage();
-            error_log($errorMessage);
             return 0;
         }
     }

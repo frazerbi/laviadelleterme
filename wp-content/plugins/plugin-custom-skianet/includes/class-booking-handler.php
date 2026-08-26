@@ -240,15 +240,6 @@ class Booking_Handler {
         $disponibilita = isset($_POST['disponibilita']) ? intval($_POST['disponibilita']) : 0; // ✅ Recupera disponibilità
 
         // Log per debug
-        error_log('=== DATI PRENOTAZIONE ===');
-        error_log("Location: {$location}");
-        error_log("Data: {$booking_date}");
-        error_log("ID Fascia: {$fascia_id}");
-        error_log("Tipo Ingresso: {$ticket_type}");
-        error_log("Num Uomini: {$num_male}");
-        error_log("Num Donne: {$num_female}");
-        error_log("Categorie: {$categorie}");
-        error_log("Totale: " . ($num_male + $num_female));
 
         // Validazione
         $validation = $this->validate_booking_data(
@@ -282,7 +273,6 @@ class Booking_Handler {
             'created_at' => current_time('mysql')
         );
         
-        error_log('Booking data: ' . print_r($booking_data, true));
 
         // Salva la prenotazione
         $booking_id = $this->save_booking($booking_data);
@@ -440,7 +430,6 @@ class Booking_Handler {
         $posti_richiesti = $data['total_guests'];
         
         if ($posti_disponibili < $posti_richiesti) {
-            error_log("ERRORE: Posti insufficienti! Disponibili: {$posti_disponibili}, Richiesti: {$posti_richiesti}");
             return false;
         }
 
@@ -467,7 +456,6 @@ class Booking_Handler {
         // Salva nella sessione
         $_SESSION['termegest_booking'] = $booking_data;
         
-        error_log('Prenotazione salvata in sessione: ' . print_r($booking_data, true));
         
         return $booking_id;
     }

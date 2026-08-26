@@ -48,33 +48,22 @@ class Booking_Order_Status {
      */
     public function auto_complete_paid_order($order_id) {
         if (!$order_id) {
-            error_log('Auto Complete: Order ID non valido');
             return;
         }
         
         $order = wc_get_order($order_id);
         
         if (!$order || is_wp_error($order)) {
-            error_log("Auto Complete: Impossibile ottenere ordine {$order_id}");
             return;
         }
         
         try {
             // Verifica se l'ordine è stato pagato
             if ($order->is_paid()) {
-                $old_status = $order->get_status();
-                $result = $order->update_status('completed', 'Ordine completato automaticamente (pagato).');
-                
-                if (is_wp_error($result)) {
-                    error_log("Auto Complete: Errore ordine {$order_id}: " . $result->get_error_message());
-                } else {
-                    error_log("✅ Ordine {$order_id}: {$old_status} → completed");
-                }
-            } else {
-                error_log("Auto Complete: Ordine {$order_id} non pagato - skip");
+                $order->update_status('completed', 'Ordine completato automaticamente (pagato).');
             }
         } catch (Exception $e) {
-            error_log("Auto Complete: Eccezione ordine {$order_id}: " . $e->getMessage());
+            // Nessuna azione: l'ordine resta in processing e resta recuperabile a mano.
         }
     }
 
@@ -83,14 +72,12 @@ class Booking_Order_Status {
      */
     public function move_to_booked_status($order_id) {
         if (!$order_id) {
-            error_log('Move to Booked: Order ID non valido');
             return;
         }
         
         $order = wc_get_order($order_id);
         
         if (!$order || is_wp_error($order)) {
-            error_log("Move to Booked: Impossibile ottenere ordine {$order_id}");
             return;
         }
         
@@ -100,16 +87,13 @@ class Booking_Order_Status {
         $has_nonbooking = $this->order_has_nonbooking($order);
         
         if ($has_booking) {
-            error_log("✅ Ordine {$order_id} CON prenotazioni → Booked");
             $order->update_status('booked', 'Ordine con prenotazioni TermeGest.');
             
             // ✅ Se ci sono ANCHE prodotti non-booking, invia coupon per quelli
             if ($has_nonbooking) {
-                error_log("✅ Ordine {$order_id} è MISTO - invio anche coupon non-booking");
                 $this->send_nonbooking_coupons_for_mixed_order($order);
             }
         } else {
-            error_log("✅ Ordine {$order_id} SENZA prenotazioni → Not-Booked");
             $order->update_status('not-booked', 'Ordine senza prenotazioni.');
         }
 
@@ -122,7 +106,6 @@ class Booking_Order_Status {
     private function order_has_booking($order) {
         foreach ($order->get_items() as $item) {
             if ($item->get_meta('_booking_id')) {
-                error_log("Item {$item->get_id()} ha prenotazione: " . $item->get_meta('_booking_id'));
                 return true;
             }
         }
@@ -136,7 +119,6 @@ class Booking_Order_Status {
     private function order_has_nonbooking($order) {
         foreach ($order->get_items() as $item) {
             if (!$item->get_meta('_booking_id')) {
-                error_log("Item {$item->get_id()} NON ha prenotazione: " . $item->get_name());
                 return true;
             }
         }
@@ -148,7 +130,6 @@ class Booking_Order_Status {
      */
     private function send_nonbooking_coupons_for_mixed_order($order) {
         if (!class_exists('Booking_Nonbooking_Email')) {
-            error_log("⚠️ Booking_Nonbooking_Email non disponibile");
             return;
         }
         
@@ -156,7 +137,7 @@ class Booking_Order_Status {
             $nonbooking_email = Booking_Nonbooking_Email::get_instance();
             $nonbooking_email->send_mixed_order_coupons($order);
         } catch (Exception $e) {
-            error_log("❌ Errore invio coupon ordine misto: " . $e->getMessage());
+            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
         }
     }
 }
