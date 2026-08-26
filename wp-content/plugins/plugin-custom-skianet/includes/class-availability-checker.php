@@ -187,12 +187,13 @@ class Availability_Checker {
      */
     private function get_all_dates_for_two_months() {
         $dates = array();
-        
+        $wp_timezone = wp_timezone();
+
         // Primo giorno del mese corrente
-        $start = new DateTime('first day of this month');
+        $start = new DateTime('first day of this month', $wp_timezone);
         
         // Ultimo giorno del mese successivo
-        $end = new DateTime('last day of next month');
+        $end = new DateTime('last day of next month', $wp_timezone);
         
         $current = clone $start;
         
@@ -233,26 +234,33 @@ class Availability_Checker {
         $filename = $this->get_json_filename($location);
         $filepath = $this->json_path . '/' . $filename;
 
-        if (file_exists($filepath)) {
-            unlink($filepath);
-            clearstatcache(true, $filepath);
-        }
-
         $json_data = array(
             'location' => $location,
             'generated_at' => current_time('mysql'),
             'availability' => $data
         );
 
+        // Scrittura atomica: senza il file temporaneo + rename, fra l'unlink e la fine
+        // della file_put_contents il form JS riceve un 404 (o un JSON troncato) e
+        // disabilita tutte le date del calendario.
+        $tmp_path = $filepath . '.tmp';
+
         $result = file_put_contents(
-            $filepath, 
+            $tmp_path,
             json_encode($json_data, JSON_PRETTY_PRINT),
             LOCK_EX
         );
 
-        if ($result !== false) {
-            clearstatcache(true, $filepath);
+        if ($result === false) {
+            return;
         }
+
+        if (!rename($tmp_path, $filepath)) {
+            unlink($tmp_path);
+            return;
+        }
+
+        clearstatcache(true, $filepath);
     }
 
     /**

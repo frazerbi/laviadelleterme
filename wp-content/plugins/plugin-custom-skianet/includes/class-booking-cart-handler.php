@@ -233,6 +233,9 @@ class Booking_Cart_Handler {
      * Recupera dati prenotazione da order item
      */
     public static function get_booking_data_from_order_item($item) {
+        $num_male   = (int)$item->get_meta('Ingressi Uomo');
+        $num_female = (int)$item->get_meta('Ingressi Donna');
+
         return array(
             'booking_id' => $item->get_meta('_booking_id'),
             'location_name' => $item->get_meta('Location'),
@@ -240,9 +243,10 @@ class Booking_Cart_Handler {
             'fascia_id' => $item->get_meta('_booking_fascia_id'),
             'time_slot_label' => $item->get_meta('_booking_time_slot_label'),
             'ticket_type' => $item->get_meta('_booking_ticket_type'),
-            'num_male' => (int)$item->get_meta('Ingressi Uomo'), // ✅ Cast a int
-            'num_female' => (int)$item->get_meta('Ingressi Donna'), // ✅ Cast a int
-            'total_guests' => (int)$item->get_meta('Totale Ospiti'),
+            'num_male' => $num_male,
+            'num_female' => $num_female,
+            // Nessun meta 'Totale Ospiti' viene mai scritto sull'item: si ricava dai due sessi.
+            'total_guests' => $num_male + $num_female,
             'categorie' => $item->get_meta('_booking_category')
         );
     }

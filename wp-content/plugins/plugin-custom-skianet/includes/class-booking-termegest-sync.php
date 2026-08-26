@@ -104,14 +104,16 @@ class Booking_TermeGest_Sync {
         $price_per_code = $this->calculate_price_per_code($item, $item->get_quantity());
         
         // Invia codici
-        $results = array('venduto_success' => 0, 'venduto_error' => 0);
+        $results = array('venduto_success' => 0, 'venduto_error' => 0, 'venduto_messages' => array());
         
         foreach ($codes as $index => $code) {
-            
-            if ($this->send_venduto($code, $price_per_code, $customer['name'], $customer['email'])) {
+            $venduto_result = $this->send_venduto($code, $price_per_code, $customer['name'], $customer['email']);
+
+            if ($venduto_result['status']) {
                 $results['venduto_success']++;
             } else {
                 $results['venduto_error']++;
+                $results['venduto_messages'][] = $venduto_result['message'];
             }
         }
         
@@ -148,6 +150,7 @@ class Booking_TermeGest_Sync {
         $results = array(
             'venduto_success' => 0,
             'venduto_error' => 0,
+            'venduto_messages' => array(),
             'prenotazione_success' => 0,
             'prenotazione_error' => 0
         );
@@ -165,7 +168,9 @@ class Booking_TermeGest_Sync {
             
             
             // STEP 1: setVenduto
-            if ($this->send_venduto($code, $price_per_code, $customer['name'], $customer['email'])) {
+            $venduto_result = $this->send_venduto($code, $price_per_code, $customer['name'], $customer['email']);
+
+            if ($venduto_result['status']) {
                 $results['venduto_success']++;
                 
                 // STEP 2: setPrenotazione
@@ -189,6 +194,7 @@ class Booking_TermeGest_Sync {
                 
             } else {
                 $results['venduto_error']++;
+                $results['venduto_messages'][] = $venduto_result['message'];
             }
         }
         
@@ -200,21 +206,17 @@ class Booking_TermeGest_Sync {
      */
     private function send_venduto($code, $price, $customer_name, $customer_email) {
         try {
-            $response = skianet_termegest_set_venduto(
+            // set_venduto ritorna array{status, message}: in caso di eccezione SOAP
+            // status e' false e message contiene l'errore TermeGest.
+            return skianet_termegest_set_venduto(
                 $code,
                 $price,
                 $customer_name,
                 $customer_email
             );
-            
-            if ($response && !is_wp_error($response)) {
-                return true;
-            }
-            
-            return false;
-            
+
         } catch (Exception $e) {
-            return false;
+            return array('status' => false, 'message' => $e->getMessage());
         }
     }
 
@@ -294,6 +296,13 @@ class Booking_TermeGest_Sync {
      * Log risultati sync
      */
     private function log_sync_results($order, $item, $results, $is_booking) {
+        // Primi errori TermeGest (deduplicati) da allegare alla nota, se ce ne sono.
+        $error_detail = '';
+        $messages = array_filter(array_unique($results['venduto_messages'] ?? array()));
+        if (!empty($messages)) {
+            $error_detail = ' - TermeGest: ' . implode(' | ', array_slice($messages, 0, 3));
+        }
+
         if ($is_booking) {
             // Risultati con prenotazione
             $total_venduto = $results['venduto_success'] + $results['venduto_error'];
@@ -324,10 +333,11 @@ class Booking_TermeGest_Sync {
             if ($results['venduto_error'] > 0 || $results['prenotazione_error'] > 0) {
                 $order->add_order_note(
                     sprintf(
-                        'ATTENZIONE: Errori sync per %s - Venduto: %d errori, Prenotazione: %d errori',
+                        'ATTENZIONE: Errori sync per %s - Venduto: %d errori, Prenotazione: %d errori%s',
                         $item->get_name(),
                         $results['venduto_error'],
-                        $results['prenotazione_error']
+                        $results['prenotazione_error'],
+                        $error_detail
                     )
                 );
             }
@@ -350,10 +360,11 @@ class Booking_TermeGest_Sync {
             if ($results['venduto_error'] > 0) {
                 $order->add_order_note(
                     sprintf(
-                        'ATTENZIONE: %d/%d codici NON sincronizzati per %s',
+                        'ATTENZIONE: %d/%d codici NON sincronizzati per %s%s',
                         $results['venduto_error'],
                         $total,
-                        $item->get_name()
+                        $item->get_name(),
+                        $error_detail
                     )
                 );
             }

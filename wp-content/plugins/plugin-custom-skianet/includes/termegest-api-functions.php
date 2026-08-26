@@ -105,8 +105,8 @@ function skianet_termegest_set_prenotazione(
  * @param float $prezzo Prezzo
  * @param string $nome Nome cliente
  * @param string $email Email cliente
- * @return string Risultato operazione
+ * @return array{status: bool, message: string} Esito operazione
  */
-function skianet_termegest_set_venduto(string $codice, float $prezzo, string $nome, string $email): string {
+function skianet_termegest_set_venduto(string $codice, float $prezzo, string $nome, string $email): array {
     return TermeGest_API::get_instance()->set_venduto($codice, $prezzo, $nome, $email);
 }

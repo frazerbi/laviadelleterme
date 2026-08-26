@@ -280,7 +280,7 @@ class TermeGest_API {
      * @param string $email Email cliente
      * @return string Risultato operazione
      */
-    public function set_venduto(string $codice, float $prezzo, string $nome, string $email): string {
+    public function set_venduto(string $codice, float $prezzo, string $nome, string $email): array {
         $parameters = [
             'codice' => $codice,
             'prezzo' => $prezzo,
@@ -300,9 +300,12 @@ class TermeGest_API {
                 )
             ));
 
-            return $response->getSetVendutoResult();
+            return [
+                'status' => true,
+                'message' => (string) $response->getSetVendutoResult(),
+            ];
         } catch (Exception $exception) {
-            return $exception->getMessage();
+            return ['status' => false, 'message' => $exception->getMessage()];
         }
     }
 }
