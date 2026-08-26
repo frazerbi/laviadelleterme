@@ -41,7 +41,13 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
                              riusano checkout, order-pay, thank you, notice e
                              password dimenticata, così i pulsanti che WooCommerce
                              stampa fuori da Elementor restano tutti uguali.
-                             Il blocco è dichiarato su :root e su body: i colori
+                             Qui sta anche la scala --lvdt-radius-sm/md/lg dei
+                             raggi degli angoli (controlli / messaggi /
+                             contenitori): nessun foglio scrive più un valore a
+                             mano, ne giravano sette diversi. Fuori scala restano
+                             solo le forme — pillole e cerchi — che non sono una
+                             misura ma una geometria.
+                             Il blocco dei pulsanti è dichiarato su :root e su body: i colori
                              globali del kit Elementor sono definiti sul body, su
                              :root non si risolverebbero.
                              Le regole che applicano queste variabili sono scritte

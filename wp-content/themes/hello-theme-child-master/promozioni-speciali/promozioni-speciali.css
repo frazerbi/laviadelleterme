@@ -75,7 +75,7 @@
   color: #424242;
   background-color: #fff;
   border: 1px solid #c9c9c9;
-  border-radius: var( --lvdt-button-radius );
+  border-radius: var( --lvdt-radius-sm );
 }
 
 .ppw-pcp-password-form input.ppw-pcp-pf-password-input:focus {
@@ -98,7 +98,7 @@
   color: var( --lvdt-button-color );
   background-color: var( --lvdt-button-bg );
   border: 1px solid var( --lvdt-button-bg );
-  border-radius: var( --lvdt-button-radius );
+  border-radius: var( --lvdt-radius-sm );
   cursor: pointer;
 }
 

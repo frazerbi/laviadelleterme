@@ -5,7 +5,7 @@ Description: Hello Elementor Child is a child theme of Hello Elementor, created 
 Author: Elementor Team
 Author URI: https://elementor.com/
 Template: hello-elementor
-Version: 1.0.58
+Version: 1.0.59
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -66,6 +66,36 @@ header.header-main {
 }
 
 /* ============================================================
+   Raggi degli angoli — tre taglie
+   ============================================================
+   Prima ogni foglio scriveva il proprio valore a mano e ne giravano
+   sette diversi (3, 5, 6, 8, 10, 12, 14px) senza che la differenza
+   volesse dire niente. Le tre taglie qui sotto sono l'unico posto in
+   cui si decide, e corrispondono a tre pesi visivi diversi:
+
+     sm  controlli: pulsanti, campi di input, il pulsante del menu.
+         È l'unico scostamento dallo stile Elementor di riferimento,
+         che ha gli angoli vivi: appena smussati. Per tornare agli
+         angoli vivi basta portarlo a 0 qui.
+     md  messaggi e righe: notice WooCommerce, righe di tabella, voci
+         di elenco, il riquadro di errore dei termini.
+     lg  contenitori: shop_table del riepilogo, card dei dati ordine,
+         metodi di pagamento, box del CTA. Il più morbido dei tre
+         perché è quello che disegna i blocchi grandi della pagina.
+
+   Non fanno parte della scala le forme, che non sono una misura ma
+   una geometria e restano scritte per esteso dove servono: le pillole
+   (badge di stato, chip dei meta prenotazione, contatore dei codici)
+   e il cerchio del pallino di stato.
+   ============================================================ */
+
+:root {
+  --lvdt-radius-sm: 3px;
+  --lvdt-radius-md: 10px;
+  --lvdt-radius-lg: 12px;
+}
+
+/* ============================================================
    Pulsanti — aspetto condiviso
    ============================================================
    I pulsanti stampati dai template WooCommerce non passano da
@@ -77,12 +107,8 @@ header.header-main {
    (pulsante dentro ai notice), thankyou/thankyou.css e
    my-account/lost-password.css.
 
-   --lvdt-button-radius è l'unico scostamento dallo stile Elementor di
-   riferimento, che ha gli angoli vivi: 3px, appena smussati. Non segue
-   il raggio delle card di checkout e order-pay (10-12px), che resta
-   volutamente più morbido. Per tornare agli angoli vivi basta portarlo
-   a 0 qui: e' l'unico punto da toccare, tutti i pulsanti del tema
-   leggono questa variabile.
+   Il raggio non sta qui ma nella scala --lvdt-radius-* poco sopra: il
+   pulsante è il gradino piccolo di quella scala, non un valore suo.
 
    Il blocco è dichiarato su :root E su body, e i due colori del kit
    hanno un fallback esplicito. Non è ridondanza: Elementor stampa i
@@ -107,7 +133,6 @@ body {
   --lvdt-button-font-weight: 400;
   --lvdt-button-line-height: 1.3rem;
   --lvdt-button-padding: 0.9rem 2rem 1.1rem;
-  --lvdt-button-radius: 3px;
 }
 
 /* Globale di proposito: la stessa classe esce nell'area account,
@@ -143,7 +168,7 @@ button.woocommerce-Button {
   border-style: solid !important;
   border-width: 1px 1px 1px 1px !important;
   border-color: var( --lvdt-button-bg ) !important;
-  border-radius: var( --lvdt-button-radius );
+  border-radius: var( --lvdt-radius-sm );
 }
 button.woocommerce-button:hover,
 button.woocommerce-Button:hover {
@@ -210,7 +235,7 @@ button.woocommerce-Button:hover {
     padding-inline: 1rem;
     padding-block: 0.5rem;
     line-height: 1;
-    border-radius: 5px;
+    border-radius: var( --lvdt-radius-sm );
     border: 1px solid var(--e-global-color-primary);
     margin-left: 1rem;
   }

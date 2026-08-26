@@ -267,6 +267,16 @@ installs). The notice button is the one place that deviates from the shared scal
 instead of the full-page `1.3rem` / `0.9rem 2rem 1.1rem` — because a notice is a compact strip whose own text sits at
 `0.95rem`; everything else (colors, family, border, radius, uppercase) stays shared.
 
+**Corner radii come from the `--lvdt-radius-*` scale in `style.css` — never write a literal.** Three steps, one per
+visual weight: `--lvdt-radius-sm` (3px) for controls — buttons, text inputs, the nav promo button, and the Stripe
+sampler input; `--lvdt-radius-md` (10px) for messages and rows — WooCommerce notices, table rows, list items, the terms
+error box; `--lvdt-radius-lg` (12px) for containers — the order-pay `shop_table`, the order/customer detail cards, the
+payment-method items, the thank-you CTA box. Before this there were seven different literals (3, 5, 6, 8, 10, 12, 14px)
+scattered across nine files with no meaning attached to the differences. `--lvdt-button-radius` is gone: the button is
+simply the `sm` step. Deliberately **outside** the scale are shapes rather than sizes, left as literals and commented as
+such: the `20px` pills (`.booking-status`, `.product-quantity`, `.wc-item-meta li`, `.codici-count`) and the `50%`
+circle of `.booking-status__dot`.
+
 **The shared button rules are a default, not the last word — never `!important` them.** Everything the site's own
 Elementor widgets are styled with must be able to win, because the user styles the checkout button from the Elementor
 editor and that emits per-element rules like

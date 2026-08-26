@@ -62,7 +62,7 @@
   border: white solid 1px;
   background-color: #0074A0;
   color: white;
-  border-radius: 0;
+  border-radius: var( --lvdt-radius-sm );
   padding: 0.7em 2em 0.7em 2em;
 }
 .post-password-form > p:nth-child(2) > input:hover {
@@ -95,7 +95,7 @@
 }
 .ppw-ppf-field-container > .ppw-pwd-submit-btn {
   border: white solid 1px;
-  border-radius: 0 !important;
+  border-radius: var( --lvdt-radius-sm ) !important;
 }
 .ppw-ppf-headline {
   text-align: center;

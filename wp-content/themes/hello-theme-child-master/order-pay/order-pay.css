@@ -27,7 +27,7 @@ body.woocommerce-checkout form#order_review {
 body.woocommerce-checkout form#order_review > table.shop_table {
 	width: 100%;
 	border: 1px solid rgba(66, 66, 66, 0.15);
-	border-radius: 12px;
+	border-radius: var(--lvdt-radius-lg);
 	border-collapse: separate;
 	border-spacing: 0;
 	overflow: hidden;

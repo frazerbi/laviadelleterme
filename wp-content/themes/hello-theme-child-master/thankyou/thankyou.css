@@ -91,7 +91,7 @@
 	align-items: center;
 	text-align: center;
 	padding: 1rem 1.25rem !important;
-	border-radius: 10px;
+	border-radius: var(--lvdt-radius-md);
 	border: 1px solid rgba(66, 66, 66, 0.12);
 	font-size: 0.8rem !important;
 	margin-right: 0 !important;
@@ -136,7 +136,7 @@
 .woocommerce-customer-details {
 	background: var(--e-global-color-31904c4d);
 	border: 1px solid rgba(66, 66, 66, 0.12);
-	border-radius: 14px;
+	border-radius: var(--lvdt-radius-lg);
 	padding: 1.5rem;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 5%);
 }
@@ -200,7 +200,7 @@
 	grid-column: 1 / -1;
 	margin: 0 0 2rem;
 	padding: 1.25rem 1.5rem;
-	border-radius: 14px;
+	border-radius: var(--lvdt-radius-lg);
 	background: rgba(200, 30, 30, 0.06);
 	border: 1px solid rgba(200, 30, 30, 0.25);
 	text-align: center;
@@ -220,7 +220,7 @@
 	display: inline-block;
 	padding: var(--lvdt-button-padding);
 	border: 1px solid var(--lvdt-button-bg);
-	border-radius: var(--lvdt-button-radius);
+	border-radius: var(--lvdt-radius-sm);
 	background: var(--lvdt-button-bg);
 	color: var(--lvdt-button-color);
 	text-decoration: none;
@@ -245,7 +245,7 @@
 	font-size: 0.75rem;
 	font-weight: 600;
 	padding: 0.2rem 0.55rem;
-	border-radius: 20px;
+	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
 	margin-left: 0.4rem;
 	vertical-align: middle;
 }
@@ -288,7 +288,7 @@
 	display: inline-flex;
 	align-items: stretch;
 	border: 1.5px solid var(--e-global-color-50b7ea4);
-	border-radius: 8px;
+	border-radius: var(--lvdt-radius-md);
 	overflow: hidden;
 	background: rgba(0, 116, 160, 0.06);
 }
@@ -346,7 +346,7 @@
 	align-items: center;
 	gap: 0.35rem;
 	border: 1px solid rgba(66, 66, 66, 0.12);
-	border-radius: 20px;
+	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
 	padding: 0.3rem 0.85rem 0.3rem 0.7rem;
 	font-size: 0.85rem;
 }

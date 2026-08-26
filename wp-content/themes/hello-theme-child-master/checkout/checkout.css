@@ -50,7 +50,7 @@ body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method {
 	flex-wrap: wrap;
 	background: var(--e-global-color-31904c4d, #fff);
 	border: 1px solid rgba(66, 66, 66, 0.15);
-	border-radius: 12px;
+	border-radius: var(--lvdt-radius-lg);
 	padding: 0 !important;
 	transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -94,7 +94,7 @@ body.woocommerce-checkout #payment .payment_box {
 	margin: 0 !important;
 	font-family: "Muli", Sans-serif;
 	font-size: 0.9rem;
-	border-radius: 12px;
+	border-radius: var(--lvdt-radius-lg);
 }
 
 body.woocommerce-checkout #payment .payment_box::before {
@@ -147,7 +147,7 @@ body.woocommerce-checkout .form-row.validate-required label.checkbox .woocommerc
 body.order-pay-terms-error .form-row.validate-required {
 	background: rgba(200, 30, 30, 0.06);
 	border: 1px solid rgba(200, 30, 30, 0.35);
-	border-radius: 10px;
+	border-radius: var(--lvdt-radius-md);
 	padding: 0.9rem 1rem !important;
 	margin: 0 !important;
 	scroll-margin-block: 2rem;
@@ -182,7 +182,7 @@ body.order-pay-terms-error .form-row.validate-required input.input-checkbox {
 body.woocommerce-checkout #place_order {
 	width: 100%;
 	padding: var(--lvdt-button-padding);
-	border-radius: var(--lvdt-button-radius);
+	border-radius: var(--lvdt-radius-sm);
 	font-family: var(--lvdt-button-font);
 	font-size: var(--lvdt-button-font-size);
 	font-weight: var(--lvdt-button-font-weight);
@@ -281,7 +281,7 @@ body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods li {
 	padding: 0.7rem 0.9rem;
 	background: #fff;
 	border: 1px solid rgba(66, 66, 66, 0.15);
-	border-radius: 10px;
+	border-radius: var(--lvdt-radius-md);
 	transition: border-color 0.15s ease;
 }
 

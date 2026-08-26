@@ -29,7 +29,7 @@
 	list-style: none !important;
 	margin: 0 0 1.25rem !important;
 	padding: 1rem 1.25rem !important;
-	border-radius: 10px;
+	border-radius: var(--lvdt-radius-md);
 	border: 1px solid transparent;
 	/* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
 	   quello che li rende riconoscibili a colpo d'occhio. */
@@ -107,7 +107,7 @@ body .woocommerce-message a.button {
 	display: inline-block;
 	padding: 0.55rem 1.25rem 0.65rem;
 	border: 1px solid var(--lvdt-button-bg);
-	border-radius: var(--lvdt-button-radius);
+	border-radius: var(--lvdt-radius-sm);
 	background: var(--lvdt-button-bg);
 	color: var(--lvdt-button-color);
 	text-decoration: none;

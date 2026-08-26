@@ -29,7 +29,7 @@
 #wc-stripe-hidden-style-input {
 	background-color: #ffffff;
 	border: 1px solid #d0d0d0;
-	border-radius: 8px;
+	border-radius: var(--lvdt-radius-sm);
 	padding: 0.7rem 0.75rem;
 	box-shadow: none;
 	outline: none;
