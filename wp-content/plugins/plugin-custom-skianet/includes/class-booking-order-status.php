@@ -82,21 +82,19 @@ class Booking_Order_Status {
         }
         
 
-        // ✅ Verifica se l'ordine ha prenotazioni e/o prodotti non-booking
-        $has_booking = $this->order_has_booking($order);
-        $has_nonbooking = $this->order_has_nonbooking($order);
-        
-        if ($has_booking) {
+        // Qui si cambia SOLO lo status. L'invio delle email (prenotazione + coupon
+        // dei prodotti non prenotati) e' interamente a carico di
+        // Booking_Email_Notification::send_booking_details(), su
+        // woocommerce_payment_complete prio 20. Non reintrodurre qui una chiamata a
+        // send_mixed_order_coupons(): WC_Order::payment_complete() fa set_status()+save()
+        // PRIMA di lanciare woocommerce_payment_complete, quindi questo hook gira prima
+        // che Booking_Code_Assignment abbia assegnato i codici licenza - manderebbe
+        // un'email coupon doppia e senza codici.
+        if ($this->order_has_booking($order)) {
             $order->update_status('booked', 'Ordine con prenotazioni TermeGest.');
-            
-            // ✅ Se ci sono ANCHE prodotti non-booking, invia coupon per quelli
-            if ($has_nonbooking) {
-                $this->send_nonbooking_coupons_for_mixed_order($order);
-            }
         } else {
             $order->update_status('not-booked', 'Ordine senza prenotazioni.');
         }
-
     }
 
     /**
@@ -111,33 +109,5 @@ class Booking_Order_Status {
         }
         
         return false;
-    }
-
-    /**
-     * Verifica se l'ordine contiene prodotti SENZA prenotazione
-     */
-    private function order_has_nonbooking($order) {
-        foreach ($order->get_items() as $item) {
-            if (!$item->get_meta('_booking_id')) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Invia coupon per prodotti non-booking in ordini misti
-     */
-    private function send_nonbooking_coupons_for_mixed_order($order) {
-        if (!class_exists('Booking_Nonbooking_Email')) {
-            return;
-        }
-        
-        try {
-            $nonbooking_email = Booking_Nonbooking_Email::get_instance();
-            $nonbooking_email->send_mixed_order_coupons($order);
-        } catch (Exception $e) {
-            // Eccezione ignorata: l'invio email non deve interrompere il flusso chiamante.
-        }
     }
 }
