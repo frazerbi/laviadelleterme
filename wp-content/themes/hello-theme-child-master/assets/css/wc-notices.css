@@ -78,8 +78,14 @@ body .woocommerce-message.woocommerce-message {
 	margin-top: 0.5rem !important;
 }
 
-/* I link dentro al notice (es. "#terms" nell'errore dei termini)
-   restano del colore del notice, sottolineati per restare cliccabili.
+/* I link dentro al notice (es. "#terms" nell'errore dei termini) restano del
+   colore del notice, senza sottolineatura: scelta sua, la riga sottolineata
+   dentro una striscia già tinta e bordata faceva rumore.
+
+   `text-decoration: none` va dichiarato, non basta togliere la regola: senza
+   una dichiarazione esplicita torna a valere la sottolineatura di default del
+   browser sugli `<a>`.
+
    Il pulsante è escluso: la regola vale `!important` e altrimenti gli
    imporrebbe il colore del notice, costringendo il blocco del pulsante qui
    sotto a rispondere con un altro !important — che è proprio quello che
@@ -88,8 +94,7 @@ body .woocommerce-message.woocommerce-message {
 .woocommerce-info a:not(.button),
 .woocommerce-message a:not(.button) {
 	color: inherit !important;
-	text-decoration: underline;
-	text-underline-offset: 2px;
+	text-decoration: none;
 }
 
 /* Il bottone dentro ai notice di WooCommerce (es. "Continua con gli acquisti"
