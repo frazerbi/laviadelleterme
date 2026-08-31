@@ -102,6 +102,8 @@ function laviadelleterme_controllo_codici_prezzo_pieno() {
 		28749  => 'Veglione di Capodanno in Accappatoio - Saint Vincent',
 		28748  => 'Veglione di Capodanno in Accappatoio - Genova',
 		29044  => 'Hotel De La Ville 3 Notti + 2 Ingressi Terme + Veglione Di Capodanno',
+		120150 => 'GB Gold Ticket: Weekday (Lun-Ven)',
+		120140 => 'GA Gold Ticket: All-Week',
 	] );
 }
 

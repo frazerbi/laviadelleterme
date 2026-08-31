@@ -90,6 +90,16 @@ Helper functions wrapping the API class are in `includes/termegest-api-functions
 - `monterosa-spa` → `Monterosa`
 - `terme-saint-vincent` → `Saint Vincent`
 
+**`setVenduto` does not take a category — don't go looking for the mapping.** The WSDL-generated
+`TermeGestSetInfo\Type\SetVenduto` has exactly five fields (`codice`, `prezzo`, `nome`, `email`, `security`), and the
+string "categoria" appears nowhere in the whole `setinfo.asmx` client. The category lives only in `getReserv.asmx`
+(`getDisponibilita`, `getDisponibilitaById`, `setPrenotazione`) because that is where a seat in a specific time slot is
+taken and the contingent has to be chosen; it is also what feeds `$allInclusive` (the `p3`/`p4` check in
+`Booking_TermeGest_Sync::send_prenotazione()`). For `setVenduto` the category is **implicit in the code itself** —
+TermeGest issues code blocks per category, so sending them the code is enough for them to know which one it is. The
+practical consequence: the category matters when *loading* a code block into WC License Delivery against the right
+product, not in any PHP that talks to `setinfo.asmx`.
+
 ### Booking Session & Cart Flow
 
 Booking metadata is stored in `$_SESSION['termegest_booking']` (standard PHP session) during the booking form interaction. On cart add, the session data is attached to the cart item via `woocommerce_add_cart_item_data` and restored via `woocommerce_get_cart_item_from_session`. At checkout, booking fields are written to WooCommerce order item meta (`_booking_id`, `_booking_location`, `_booking_date`, `_booking_fascia_id`, `_booking_ticket_type`, `_booking_num_male`, `_booking_num_female`, `_health_certificate`).
@@ -114,6 +124,45 @@ Because they are registered outside WooCommerce's own set, they are **not** in
 "is this order paid?", the two must therefore be listed explicitly — or the check must use something
 else entirely: `laviadelleterme_order_is_confirmed()` in the theme names all four statuses, and
 `satispay/satispay.php` sidesteps the list by testing `$order->get_date_paid()` instead.
+
+### Not-booked-only products (no booking form)
+
+Some products are sold **only** as not-booked: the customer buys a code and books it later on
+`termegest.it/prenota.aspx`. The two Gold Tickets added on 2026-08-31 are the current examples —
+**120150 "Gold Ticket: Weekday (Lun-Ven)", TermeGest category GB**, and **120140 "Gold Ticket: All-Week",
+category GA**.
+
+**Adding one is configuration, not code.** The whole chain is product-agnostic: `Booking_Code_Assignment` hands the
+entire order to WC License Delivery; `Booking_TermeGest_Sync::sync_order_to_termegest()` iterates *all* line items and
+routes anything without `_booking_id` to `sync_nonbooking_item()` (only `setVenduto`, price = line total ÷ quantity);
+`Booking_Order_Status` sees no `_booking_id` and lands the order on `not-booked`; `Booking_Nonbooking_Email` builds a
+coupon PDF per non-booking item. What is actually required:
+
+1. **WC License Delivery**: the product flagged as a licence product, with a free code block (`order_id = 0`) loaded
+   against its id — the **variation** id if it is a variation, since `get_item_license_codes()` looks up
+   `variation_id ?: product_id`. The block must be the one TermeGest issued for that category, or `setVenduto` is sent
+   and rejected.
+2. **ACF `condizioni_vendita_pdf`** on the product. It feeds only the coupon PDF, not the sync — leaving it empty sends
+   TermeGest everything correctly and mails the customer a coupon with the bare codes. (`come_prenotarsi` is read at
+   `Booking_Nonbooking_Email::generate_coupon_pdf()` and never used: dead.)
+3. **`controllo-codici`**: add the id to the full-price or promo map, or the stock is invisible to staff.
+
+**What must *not* be touched**: the category stays out of `$allowed` in `Booking_Handler::validate_category()` and out
+of `Booking_Redirect`'s two maps, and the product page must not carry the `[booking_form]` shortcode. Leaving them out
+is what makes "not-booked only" structural — with no route into the booking form, the item can never acquire a
+`_booking_id` (and `Booking_Cart_Handler::add_booking_data_to_cart()` drops a stale session booking whose product id
+doesn't match the item being added).
+
+**Health declaration**: the checkout checkbox is gated on `cart_has_booking()`, so a cart of only these products never
+shows it. Deliberate for now — the customer signs on TermeGest when booking — but it is the one gap to revisit if the
+declaration must be collected at purchase.
+
+**Empty code stock is reported, not silent.** `sync_nonbooking_item()` used to `return` with no trace when the item had
+no codes, so a product that ran out of stock was simply never sent to `setVenduto` and nothing said so; it now adds the
+same order note as the booking branch. Reading a test order's notes is the check: "TermeGest: n/n codici sincronizzati
+per …" is success, "ATTENZIONE: n/n codici NON sincronizzati" carries TermeGest's own error (usually a wrong or
+unrecognised code block), and "ERRORE: Nessun codice per … - setVenduto non inviato" means WC License Delivery gave the
+item nothing.
 
 ### License Code Assignment & Per-Item Scoping
 

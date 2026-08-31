@@ -94,12 +94,17 @@ class Booking_TermeGest_Sync {
         $codes = $this->get_license_codes_for_item($item, true);
         
         if (empty($codes)) {
+            // Stessa nota del ramo con prenotazione: senza codici il setVenduto non
+            // parte, ma nulla fallisce in modo visibile - l'ordine resta pagato e
+            // sincronizzato solo a meta'. Con i codici esauriti in magazzino, e'
+            // questa nota l'unico posto in cui te ne accorgi.
+            $order->add_order_note("ERRORE: Nessun codice per " . $item->get_name() . " - setVenduto non inviato.");
             return;
         }
-        
+
         // Recupera dati cliente
         $customer = $this->get_customer_data($order);
-        
+
         // Calcola prezzo per codice
         $price_per_code = $this->calculate_price_per_code($item, $item->get_quantity());
         
