@@ -66,6 +66,11 @@ assets/css e assets/js contengono gli asset globali e quelli condivisi da più p
 * assets/css/wc-notices.css  notice WooCommerce, in tutto il sito
 * assets/css/stripe-upe-appearance.css  campi carta dentro l'iframe Stripe
 * assets/css/mobile-menu-style.css      menu mobile e off-canvas
+* assets/css/elementor-carousel.css     caroselli immagini di Elementor: slide
+                                        di altezza uniforme (clamp in vh, con i
+                                        breakpoint predefiniti di Elementor) e
+                                        frecce prev/next come dischi blu in
+                                        basso a destra
 
 Un foglio sta in assets/css, e non in una cartella di modulo, quando il markup che
 stila è stampato su più pagine oppure da contenuti Elementor / plugin di terze parti,

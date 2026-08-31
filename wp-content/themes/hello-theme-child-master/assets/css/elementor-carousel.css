@@ -1,0 +1,151 @@
+/* ============================================================
+   Caroselli immagini di Elementor — altezza uniforme delle slide
+   ============================================================
+   Il widget "Image Carousel" non impone alcuna altezza: ogni slide è
+   alta quanto la propria immagine, così con foto di proporzioni diverse
+   il carosello cambia altezza a ogni scorrimento e il contenuto sotto
+   sobbalza. Qui l'altezza è fissata sull'immagine e il ritaglio è
+   affidato a object-fit, che riempie lo spazio senza deformare la foto.
+
+   L'altezza è in vh perché il carosello è un blocco di apertura e deve
+   restare in proporzione alla finestra, ma dentro un clamp(): a viewport
+   molto basse (finestra affiancata, landscape su telefono) i soli vh
+   ridurrebbero le immagini a una striscia, a schermi molto alti le
+   farebbero debordare oltre la piega.
+
+   Le regole valgono per tutti i caroselli immagini del sito, così restano
+   coerenti fra loro. Sono scritte senza !important e con specificità
+   minima: quello che si imposta a mano dall'editor Elementor sul singolo
+   widget (regole per-elemento, almeno (0,4,0)) deve poter vincere.
+
+   I breakpoint sono quelli predefiniti di Elementor: tablet ≤1024px,
+   mobile ≤767px.
+   ============================================================ */
+
+.elementor-widget-image-carousel .swiper-slide-inner {
+	display: block;
+	margin: 0;
+}
+
+.elementor-widget-image-carousel .swiper-slide-image {
+	display: block;
+	width: 100%;
+	height: clamp(320px, 55vh, 660px);
+	object-fit: cover;
+	object-position: center;
+}
+
+@media (max-width: 1024px) {
+	.elementor-widget-image-carousel .swiper-slide-image {
+		height: clamp(240px, 38vh, 440px);
+	}
+}
+
+@media (max-width: 767px) {
+	.elementor-widget-image-carousel .swiper-slide-image {
+		height: clamp(200px, 32vh, 340px);
+	}
+}
+
+
+/* ============================================================
+   Frecce prev/next — dischi blu sotto l'immagine, a destra
+   ============================================================
+   Elementor le posiziona una per lato, centrate verticalmente
+   (`top: 50%` + `translateY(-50%)`, `left`/`right: 10px`). Qui vanno
+   entrambe fuori dall'immagine, sotto il suo bordo destro, quindi si
+   azzerano quelle tre proprietà e si rimettono da capo.
+
+   Lo spazio in cui stanno lo apre il padding-bottom del wrapper, non un
+   offset negativo: il wrapper è il contenitore Swiper e ha overflow
+   nascosto, quindi tutto ciò che finisce oltre il suo bordo sparisce. Il
+   ritaglio però avviene sul bordo del padding, non del contenuto: le
+   frecce messe dentro quel padding restano visibili. Il padding vale un
+   disco più il distacco voluto dall'immagine, e le frecce stanno a
+   `bottom: 0`, così fra la foto e la loro cima resta esattamente
+   --lvdt-carousel-arrow-gap-y.
+
+   Misure e distanze stanno in quattro custom property sul widget: la
+   posizione della freccia "precedente" è quella della "successiva" più la
+   larghezza di un disco e il divario, e con le variabili quel calcolo
+   resta in un punto solo — cambiando la misura sul mobile le due restano
+   affiancate senza rifare i conti.
+
+   Il selettore include .elementor-image-carousel-wrapper per arrivare a
+   (0,3,0): le regole di Elementor sulla posizione delle frecce valgono
+   (0,2,0) e senza quel gradino in più la nostra vincerebbe solo grazie
+   all'ordine di caricamento dei fogli, che non è garantito. Restiamo
+   comunque sotto alle regole per-elemento dell'editor (0,4,0).
+
+   Il blu è --lvdt-button-bg, lo stesso dei pulsanti del sito: bianco su
+   quel blu sta sopra il 4.5:1 richiesto da WCAG AA. L'icona è un SVG
+   inline con fill: currentColor, quindi basta impostarne il color.
+   ============================================================ */
+
+.elementor-widget-image-carousel {
+	--lvdt-carousel-arrow-size: 2.75rem;
+	/* Divario fra i due dischi. */
+	--lvdt-carousel-arrow-gap: 0.5rem;
+	/* Distacco fra il bordo inferiore dell'immagine e la cima dei dischi. */
+	--lvdt-carousel-arrow-gap-y: 2rem;
+	/* Rientro dal bordo destro dell'immagine: 0 = allineate alla foto. */
+	--lvdt-carousel-arrow-inset: 0rem;
+}
+
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper {
+	padding-bottom: calc(
+		var(--lvdt-carousel-arrow-gap-y) + var(--lvdt-carousel-arrow-size)
+	);
+}
+
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button {
+	top: auto;
+	left: auto;
+	transform: none;
+	bottom: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--lvdt-carousel-arrow-size);
+	height: var(--lvdt-carousel-arrow-size);
+	/* Cerchio: una geometria, non un passo della scala --lvdt-radius-*. */
+	border-radius: 50%;
+	background-color: var(--lvdt-button-bg);
+	color: #fff;
+	font-size: 1.25rem;
+	transition: filter 0.15s ease-in-out;
+}
+
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button-prev {
+	right: calc(
+		var(--lvdt-carousel-arrow-inset) + var(--lvdt-carousel-arrow-size) +
+			var(--lvdt-carousel-arrow-gap)
+	);
+}
+
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button-next {
+	right: var(--lvdt-carousel-arrow-inset);
+}
+
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:hover,
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:focus-visible {
+	filter: brightness(0.88);
+}
+
+/* Le frecce hanno role="button" e tabindex="0": senza un focus visibile
+   chi naviga da tastiera non sa dove si trova. */
+.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+	.elementor-widget-image-carousel {
+		--lvdt-carousel-arrow-size: 2.25rem;
+		--lvdt-carousel-arrow-gap-y: 1.25rem;
+	}
+
+	.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button {
+		font-size: 1rem;
+	}
+}

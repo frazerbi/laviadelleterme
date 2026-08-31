@@ -50,6 +50,16 @@ function hello_elementor_child_enqueue_scripts() {
 		$version
 	);
 
+	// Caroselli immagini di Elementor: il markup lo stampa il widget, quindi può
+	// comparire su qualsiasi pagina e non c'è un conditional tag su cui restringere.
+	wp_enqueue_style('elementor-carousel-style',
+		get_stylesheet_directory_uri() . '/assets/css/elementor-carousel.css',
+		[
+			'hello-elementor-child-style',
+		],
+		$version
+	);
+
 	wp_enqueue_style('promo-pages-style',
 		get_stylesheet_directory_uri() . '/assets/css/promo-pages.css',
 		[

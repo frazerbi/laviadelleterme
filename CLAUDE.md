@@ -188,13 +188,39 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
   `script.js`, plus the stylesheets that deliberately do *not* live in a feature folder because the markup they style is
   printed on many pages, or by Elementor content / third-party plugins, so there is no reliable conditional tag to
   narrow the enqueue: `wc-notices.css` (all WooCommerce notices), `stripe-upe-appearance.css` (the hidden sampler input
-  Stripe reads), `shop.css` (catalog, product page, cart) and `promo-pages.css` (PPWP password forms). A feature folder
+  Stripe reads), `shop.css` (catalog, product page, cart), `promo-pages.css` (PPWP password forms) and
+  `elementor-carousel.css` (Elementor's Image Carousel widget). A feature folder
   is the right home instead whenever the module owns both its PHP and its CSS — that is why `booking-status.css` moved
   out of here into `booking-status/`.
   `script.js` (password-protected promo pages, hamburger icon state, second header on scroll) is **vanilla JS with no
   jQuery dependency** — don't reintroduce one, it was removed so the enqueue stops pulling jQuery in for four lines
   used on a single page. Its scroll listener is registered `{ passive: true }` and writes classes only when the state
   actually changes; keep both properties if you touch it.
+- `assets/css/elementor-carousel.css` — Elementor **Image Carousel** widget, styled site-wide on
+  `.elementor-widget-image-carousel` (no per-widget class, no element id: the ids change when a widget is duplicated or
+  rebuilt and the rule would then stop applying in silence). Two things it does, both non-obvious:
+  **Equal slide heights.** The widget imposes no height at all, so each slide is as tall as its own image and the
+  carousel jumps on every scroll. The height is set on `.swiper-slide-image` with `object-fit: cover`, in `vh` (the
+  carousel is an opening block and should track the window) but inside a `clamp()`: plain `vh` collapses the images to
+  a strip in landscape-on-phone or a side-by-side window, and overflows the fold on very tall screens. Desktop
+  `clamp(320px, 55vh, 660px)`, tablet ≤1024px `clamp(240px, 38vh, 440px)`, mobile ≤767px `clamp(200px, 32vh, 340px)` —
+  the two breakpoints are Elementor's own defaults.
+  **Arrows as blue discs below the image, right-aligned.** Elementor puts them one per side, vertically centred
+  (`top: 50%` + `translateY(-50%)`, `left`/`right: 10px`); all three are reset. They are *not* moved out with a
+  negative `bottom`: `.elementor-image-carousel-wrapper` is the Swiper container and clips its overflow, so anything
+  past its edge disappears. Clipping happens at the **padding** edge, though — so the wrapper gets
+  `padding-bottom: calc(gap-y + arrow-size)` and the arrows sit at `bottom: 0`, which both opens the gap under the
+  photo and keeps them visible. Four custom properties on the widget carry the sizes (`--lvdt-carousel-arrow-size`,
+  `-gap` between the discs, `-gap-y` photo→arrows, `-inset` from the right edge), so the prev arrow's position is one
+  `calc()` on the same values and the mobile size change needs no recomputation. Colour is `--lvdt-button-bg`, the
+  site's own button blue.
+  **Specificity**: the arrow rules are written as
+  `.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button*` — (0,3,0) on purpose.
+  Elementor's own arrow-position rules (`.elementor-arrows-position-inside .elementor-swiper-button-prev`) are (0,2,0),
+  exactly what a two-class selector here would score, and at a tie the winner is stylesheet load order, which is not
+  guaranteed. (0,3,0) still sits below the editor's per-element rules (0,4,0), so hand-set Elementor values keep
+  winning — see the general rule above.
+
 - `checkout/`, `order-pay/`, `thankyou/`, `booking-status/`, `satispay/`, `my-account/`, `controllo-codici/`, `promozioni-speciali/` — one folder per feature module, each bundling its own PHP + CSS/JS, required individually from `functions.php`. `checkout/checkout.css` holds only what the normal checkout and order-pay share (notices, payment methods, Stripe wallet + UPE card fields, terms, place-order button); everything scoped to `form#order_review` lives in `order-pay/order-pay.css`, enqueued right after it inside the same `is_checkout()` branch. `my-account/my-account.css` is enqueued on `is_account_page() || is_page('login-e-registrazione')` — registration is a standalone page here, not a WC endpoint (see the `login_url`/`register_url` filters), so `is_account_page()` alone would miss it. The lost-password page has its own `my-account/lost-password.css`, enqueued nested inside that branch on `is_wc_endpoint_url('lost-password')`; its selectors keep the `body.woocommerce-lost-password` prefix even though the sheet is already page-scoped, because dropping it would lower their specificity against Elementor's and WooCommerce's own rules. Its H1 ("Il mio account", hardcoded in the account area's shared Elementor template) is rewritten to "Password dimenticata" server-side by an `elementor/widget/render_content` filter in `my-account.php` — the same pattern as `thankyou.php`. It used to be faked in CSS by hiding the real H1 and printing the string in an `::after` at a fixed `5rem !important`: that skipped the widget's responsive typography and, with no width of its own, wrapped below the form.
 - `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes. These are forks of the plugin's stock templates and the plugin itself is not in this repo, so drift can only be checked against the copy installed on the server. Values that land in an attribute (`class`) go through `esc_attr`, and sku/weight/weight-unit/quantity through `esc_html`; item **name**, **meta**, prices and total labels are deliberately left raw — the plugin hands those over as ready-made HTML and escaping them breaks the documents.
 - `woocommerce/emails/` — Custom WooCommerce email templates. Only `customer-completed-order.php` is live; four `__`-prefixed disabled copies were deleted in the 2026-08-25 cleanup (WooCommerce resolves overrides by exact filename, so they were never loaded).
