@@ -62,34 +62,22 @@ add_action( 'wp_enqueue_scripts', function () {
 	laviadelleterme_enqueue_style( 'hello-elementor-child-style', 'style.css', $parent_style );
 }, 20 );
 
-// L'ordine dei require è l'ordine dei <link> in pagina, quindi del cascade a parità di
-// specificità: i moduli agganciano tutti wp_enqueue_scripts a priorità 20 e WordPress li
-// esegue nell'ordine in cui sono stati registrati. global/ viene dopo shop/ e promo-pages/
-// perché wc-notices.css deve seguire shop.css: `.cont-prodotti a.button` e
-// `.woocommerce-message a.button` pesano entrambi (0,2,1) e deve vincere il notice.
-//
-// I moduli che usano funzioni WooCommerce nel proprio enqueue (is_checkout(),
-// is_wc_endpoint_url()…) controllano da sé class_exists( 'WooCommerce' ): chiamarle col
-// plugin spento è un fatal error, e durante i deploy via FTP può capitare per qualche istante.
-$laviadelleterme_moduli = [
-	'features/shop/shop.php',
-	'features/promo-pages/promo-pages.php',
-	'features/global/global.php',
-	'features/controllo-codici/controllo-codici.php',
-	'features/booking-status/booking-status.php',
-	'features/newsletter/newsletter.php',
-	'features/newsletter/mailup.php',
-	'features/thankyou/thankyou.php',
-	'features/my-account/my-account.php',
-	'features/checkout/checkout.php',
-	'features/order-pay/order-pay.php',
-	'features/satispay/satispay.php',
-	'inc/ga4-elementor-compat.php',
-	'inc/elementor-element-cache.php',
-	'inc/performance-optimization.php',
-];
+// Moduli. Se un foglio deve stare dopo un altro lo dichiara con $deps nel proprio
+// modulo: l'ordine di queste righe non conta.
+require_once __DIR__ . '/features/shop/shop.php';
+require_once __DIR__ . '/features/promo-pages/promo-pages.php';
+require_once __DIR__ . '/features/global/global.php';
+require_once __DIR__ . '/features/controllo-codici/controllo-codici.php';
+require_once __DIR__ . '/features/booking-status/booking-status.php';
+require_once __DIR__ . '/features/newsletter/newsletter.php';
+require_once __DIR__ . '/features/newsletter/mailup.php';
+require_once __DIR__ . '/features/thankyou/thankyou.php';
+require_once __DIR__ . '/features/my-account/my-account.php';
+require_once __DIR__ . '/features/checkout/checkout.php';
+require_once __DIR__ . '/features/order-pay/order-pay.php';
+require_once __DIR__ . '/features/satispay/satispay.php';
 
-foreach ( $laviadelleterme_moduli as $laviadelleterme_modulo ) {
-	require_once get_theme_file_path( $laviadelleterme_modulo );
-}
-unset( $laviadelleterme_moduli, $laviadelleterme_modulo );
+// Codice trasversale, non legato a una pagina.
+require_once __DIR__ . '/inc/ga4-elementor-compat.php';
+require_once __DIR__ . '/inc/elementor-element-cache.php';
+require_once __DIR__ . '/inc/performance-optimization.php';

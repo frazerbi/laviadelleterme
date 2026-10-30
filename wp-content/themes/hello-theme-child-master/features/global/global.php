@@ -29,5 +29,7 @@ add_action( 'wp_enqueue_scripts', function () {
 
 	// Notice WooCommerce (errore / info / conferma): compaiono su carrello, checkout,
 	// order-pay, my-account e pagine prodotto, quindi lo stile è caricato ovunque.
-	laviadelleterme_enqueue_style( 'wc-notices-style', 'features/global/wc-notices.css' );
+	// Dipende da shop-style per essere stampato dopo: `.cont-prodotti a.button` e
+	// `.woocommerce-message a.button` pesano entrambi (0,2,1) e deve vincere il notice.
+	laviadelleterme_enqueue_style( 'wc-notices-style', 'features/global/wc-notices.css', [ 'shop-style' ] );
 }, 20 );

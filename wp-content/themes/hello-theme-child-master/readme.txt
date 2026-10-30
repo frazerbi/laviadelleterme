@@ -12,7 +12,7 @@ Child theme di Hello Elementor per laviadelleterme.it.
 Una cartella = una funzionalità. Ogni cartella in features/ contiene il PHP, i CSS,
 i JS e il proprio hook wp_enqueue_scripts con le condizioni su cui caricarli: per
 capire o modificare una funzionalità basta aprire la sua cartella. functions.php
-carica solo style.css e l'elenco dei moduli (vedi lì il perché dell'ordine).
+carica solo style.css e l'elenco dei moduli.
 
 * features/global/          asset di tutto il sito: menu mobile e off-canvas,
                             script.js, notice WooCommerce, caroselli immagini di
@@ -86,8 +86,8 @@ non aggiungere lì cartelle di modulo, i percorsi sono riservati da WooCommerce.
    laviadelleterme_enqueue_script() (percorso relativo alla radice del tema).
 2. Se l'enqueue usa funzioni WooCommerce (is_checkout(), is_wc_endpoint_url()…),
    uscire prima con ! class_exists( 'WooCommerce' ).
-3. Aggiungere il file all'elenco in functions.php, nel punto giusto: l'ordine
-   dell'elenco è l'ordine dei fogli in pagina.
+3. Aggiungere una riga require_once in functions.php (l'ordine non conta). Se un
+   foglio deve venire dopo un altro, dichiararlo nei $deps del suo enqueue.
 
 == Versioning degli asset ==
 

@@ -235,12 +235,13 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
 
 - `functions.php` — only the child `style.css` enqueue, the helpers `laviadelleterme_enqueue_style( $handle, $file,
   $deps )` / `laviadelleterme_enqueue_script()` (path relative to the theme root, version from
-  `laviadelleterme_theme_version()`, scripts always in footer), and the **ordered list of modules** to require. Every
-  module hooks `wp_enqueue_scripts` at **priority 20** (after the parent's 10), so WordPress runs them in require order
-  and **the list order is the `<link>` order**, i.e. the cascade at equal specificity. One known tie depends on it:
-  `features/global/` comes after `shop/` and `promo-pages/` because `wc-notices.css` must follow `shop.css`
-  (`.cont-prodotti a.button` and `.woocommerce-message a.button` are both (0,2,1)). Enqueue handles are unchanged from
-  before the reorganization, so `$deps` between sheets still resolve.
+  `laviadelleterme_theme_version()`, scripts always in footer), and the list of modules to require. Every module hooks
+  `wp_enqueue_scripts` at **priority 20** (after the parent's 10). **The order of that list is not meant to matter**:
+  when one sheet must come after another (a tie at equal specificity), it says so with `$deps` in its own enqueue, so
+  the guarantee lives next to the rule that needs it. The one known tie: `wc-notices.css` depends on `shop-style`
+  because `.cont-prodotti a.button` and `.woocommerce-message a.button` are both (0,2,1) and the notice must win. Until
+  2026-10-30 this was enforced only by `global.php` being required after `shop.php`, which nothing in the code
+  protected. Enqueue handles are unchanged from before the reorganization, so `$deps` between sheets still resolve.
 - `style.css` — **only genuinely global rules** (header/scroll classes, Elementor mini-cart, the site-wide
   `button.woocommerce-Button`, the Stripe `payment_box` reset for the account's add-payment-method page). Must stay at
   theme root (WP requirement) but is *not* the theme's catch-all: it used to be, and grew to 517 lines mixing five
