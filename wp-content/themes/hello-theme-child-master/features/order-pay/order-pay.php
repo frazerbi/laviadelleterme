@@ -8,6 +8,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// Su is_checkout() e non su is_checkout_pay_page(), come checkout.css da cui dipende:
+// le regole solo-order-pay si agganciano a form#order_review (vedi features/checkout/checkout.php).
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
+	if ( is_checkout() ) {
+		laviadelleterme_enqueue_style( 'order-pay-style', 'features/order-pay/order-pay.css', [ 'checkout-style' ] );
+	}
+}, 20 );
+
 /**
  * True se questa richiesta è un tentativo di pagamento sulla pagina order-pay
  * fallito perché la checkbox dei termini non è stata spuntata.

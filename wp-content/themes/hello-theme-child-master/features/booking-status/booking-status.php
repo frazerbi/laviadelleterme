@@ -14,6 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// Il badge è stampato su woocommerce_order_item_meta_end, quindi presente sia su
+// order-received sia nella tabella riepilogo di order-pay. Stesse due condizioni del
+// gate laviadelleterme_show_booking_status_badge() qui sotto.
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
+	if ( is_wc_endpoint_url( 'order-received' ) || is_checkout() ) {
+		laviadelleterme_enqueue_style( 'booking-status-style', 'features/booking-status/booking-status.css' );
+	}
+}, 20 );
+
 // Stati ordine che indicano pagamento effettivamente concluso (dopo woocommerce_payment_complete).
 // 'booked'/'not-booked' sono raggiunti solo passando per 'completed' (vedi Booking_Order_Status),
 // quindi vanno inclusi esplicitamente: is_paid() da solo non li riconosce.
@@ -43,7 +56,7 @@ add_action( 'woocommerce_email_after_order_table', function () { laviadelleterme
 
 /**
  * True solo nei due contesti in cui il badge ha senso ed è anche stilato: pagina
- * order-received e pagina order-pay (le stesse due condizioni con cui functions.php
+ * order-received e pagina order-pay (le stesse due condizioni con cui l'enqueue in cima al file
  * accoda booking-status.css).
  *
  * Serve perché `woocommerce_order_item_meta_end` NON è un hook di pagina: WooCommerce lo

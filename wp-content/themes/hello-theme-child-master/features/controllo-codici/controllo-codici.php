@@ -45,7 +45,7 @@ function laviadelleterme_render_controllo_codici( array $prodotti ) {
 	}
 
 	// Lo stile non serve nel resto del sito: si carica solo dove lo shortcode è a video.
-	wp_enqueue_style( 'controllo-codici-style' );
+	laviadelleterme_enqueue_style( 'controllo-codici-style', 'features/controllo-codici/controllo-codici.css' );
 
 	global $wpdb;
 

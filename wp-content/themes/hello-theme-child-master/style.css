@@ -4,7 +4,7 @@ Theme URI: https://laviadelleterme.it/
 Description: Tema figlio di Hello Elementor per La Via delle Terme: personalizzazioni WooCommerce (checkout, order-pay, thank-you, account) e integrazione con il sistema di prenotazione TermeGest.
 Author: Francesco Zerbinato
 Template: hello-elementor
-Version: 2.1.5
+Version: 2.2.0
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -14,13 +14,13 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
 /* ============================================================
    Foglio principale del tema: solo regole realmente globali.
    Tutto ciò che appartiene a una pagina o a una funzionalità sta
-   nel proprio file (vedi readme.txt):
-     assets/css/promo-pages.css  pagine protette da password
-     promozioni-speciali/        pagina /promozioni-speciali/
-     assets/css/shop.css         catalogo, prodotto, carrello
-     my-account/my-account.css   account, login, password persa
-     checkout/checkout.css       checkout e order-pay
-     thankyou/thankyou.css       pagina order-received
+   nel modulo di quella funzionalità, in features/ (vedi readme.txt):
+     features/global/       menu mobile, notice, carosello Elementor
+     features/shop/         catalogo, prodotto, carrello
+     features/promo-pages/  pagine protette da password
+     features/my-account/   account, login, password persa
+     features/checkout/     checkout e order-pay
+     features/thankyou/     pagina order-received
    ============================================================ */
 
 
@@ -88,10 +88,10 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    Elementor, quindi il look dei pulsanti del sito (colori globali
    del kit, Muli maiuscolo, bordo pieno da 1px) va replicato a mano.
    Le misure stanno qui una volta sola perché questo foglio è l'unico
-   caricato su tutte le pagine: le riusano checkout/checkout.css
-   (#place_order), order-pay/order-pay.css, assets/css/wc-notices.css
-   (pulsante dentro ai notice), thankyou/thankyou.css e
-   my-account/lost-password.css.
+   caricato su tutte le pagine: le riusano features/checkout/checkout.css
+   (#place_order), features/order-pay/order-pay.css, features/global/wc-notices.css
+   (pulsante dentro ai notice), features/thankyou/thankyou.css e
+   features/my-account/lost-password.css.
 
    Il raggio non sta qui ma nella scala --lvdt-radius-* poco sopra: il
    pulsante è il gradino piccolo di quella scala, non un valore suo.
@@ -127,8 +127,8 @@ body {
    del template.
 
    Questo è l'unico blocco pulsanti rimasto con !important, ed è
-   un'eccezione consapevole: altrove (checkout/checkout.css su
-   #place_order, thankyou/thankyou.css sul CTA, assets/css/wc-notices.css
+   un'eccezione consapevole: altrove (features/checkout/checkout.css su
+   #place_order, features/thankyou/thankyou.css sul CTA, features/global/wc-notices.css
    sul pulsante dei notice) le regole sono state ripulite proprio perché
    uno stile impostato dall'editor Elementor potesse vincere. Qui non si
    può fare lo stesso a costo zero: la regola da battere è
@@ -165,7 +165,7 @@ button.woocommerce-Button:hover {
 
 /* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
    account: su checkout e order-pay le stesse proprietà sono ridichiarate, più
-   specifiche, in checkout/checkout.css (che lì è l'unico file caricato). */
+   specifiche, in features/checkout/checkout.css (che lì è l'unico file caricato). */
 .payment_box.payment_method_stripe {
   padding: 0 !important;
 }

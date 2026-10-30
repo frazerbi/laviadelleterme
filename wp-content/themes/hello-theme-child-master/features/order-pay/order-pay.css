@@ -1,6 +1,6 @@
 /* ============================================================
    Pagina order-pay (/checkout/order-pay/…) — stile
-   Caricato da functions.php insieme a checkout/checkout.css:
+   Caricato da order-pay.php insieme a checkout/checkout.css:
    is_checkout() è vero anche qui, WooCommerce usa lo stesso
    template. Le regole condivise con la checkout normale (wallet
    Stripe, metodi di pagamento, campi carta UPE) restano in

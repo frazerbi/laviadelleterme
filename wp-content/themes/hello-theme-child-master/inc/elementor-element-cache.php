@@ -5,7 +5,7 @@
  * Con quella funzionalità attiva Elementor salva l'HTML già renderizzato dei widget
  * nei post meta del documento e lo ristampa senza rieseguire Widget_Base::render_content():
  * i filtri su 'elementor/widget/render_content' non girano più. Il tema ne usa due, in
- * my-account/my-account.php e in thankyou/thankyou.php, e in entrambi i casi il testo
+ * features/my-account/my-account.php e in features/thankyou/thankyou.php, e in entrambi i casi il testo
  * dipende dalla richiesta (l'endpoint WooCommerce, lo stato dell'ordine) mentre la cache
  * è per elemento e vale per tutto il documento: il primo render vince e resta congelato.
  * Verificato in produzione su staging2 — dopo aver aperto /my-account/lost-password/

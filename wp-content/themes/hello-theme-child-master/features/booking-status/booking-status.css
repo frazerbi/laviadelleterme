@@ -2,7 +2,7 @@
    Badge stato prenotazione / pagamento per riga ordine.
    Stampato da booking-status.php su woocommerce_order_item_meta_end,
    quindi compare sia sulla pagina order-received sia nella tabella
-   riepilogo della pagina order-pay: functions.php lo accoda con le
+   riepilogo della pagina order-pay: booking-status.php lo accoda con le
    stesse due condizioni del gate laviadelleterme_show_booking_status_badge().
    ============================================================ */
 
@@ -18,7 +18,7 @@
 	letter-spacing: 0.02em;
 }
 
-/* I colori del testo sono la stessa terna scura di assets/css/wc-notices.css: la
+/* I colori del testo sono la stessa terna scura di features/global/wc-notices.css: la
    precedente (#a51616 / #a05800 / #1a7a4a) su questi sfondi tinti stava sotto il 4.5:1
    richiesto da WCAG AA per il testo normale, e a 0.78rem si leggeva slavata.
    I colori di bordo e pallino restano quelli pieni, non sono testo. */

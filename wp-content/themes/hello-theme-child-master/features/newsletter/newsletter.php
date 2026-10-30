@@ -25,6 +25,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// Riquadro consenso: stesso markup al checkout e in Dettagli account.
+// is_wc_endpoint_url() lavora sulla chiave dell'endpoint, quindi vale anche con lo
+// slug tradotto /modifica-account/.
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
+	if ( is_checkout() || is_wc_endpoint_url( 'edit-account' ) ) {
+		laviadelleterme_enqueue_style( 'newsletter-style', 'features/newsletter/newsletter.css' );
+	}
+}, 20 );
+
 // ID del campo Acceptance nel Form Elementor (Avanzate → ID): il POST arriva come form_fields[newsletter].
 const LAVIADELLETERME_NEWSLETTER_CAMPO_FORM = 'newsletter';
 

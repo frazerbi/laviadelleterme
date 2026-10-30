@@ -1,6 +1,6 @@
 /* ============================================================
    Area account e login/registrazione
-   Caricato da functions.php su is_account_page() e sulla pagina
+   Caricato da my-account.php su is_account_page() e sulla pagina
    /login-e-registrazione/ (URL impostato dai filtri login_url e
    register_url in my-account.php): la registrazione NON è un
    endpoint WooCommerce, è una pagina a sé, quindi entrambe le

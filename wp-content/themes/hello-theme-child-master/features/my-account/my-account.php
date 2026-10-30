@@ -4,6 +4,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
+	// is_account_page() copre dashboard e password dimenticata, ma NON la
+	// registrazione, che qui è una pagina a sé (vedi i filtri login_url /
+	// register_url qui sotto).
+	if ( ! is_account_page() && ! is_page( 'login-e-registrazione' ) ) {
+		return;
+	}
+
+	laviadelleterme_enqueue_style( 'my-account-style', 'features/my-account/my-account.css' );
+
+	// Password dimenticata: markup e impaginazione a sé rispetto al resto
+	// dell'area account, quindi foglio dedicato e caricato solo qui.
+	if ( is_wc_endpoint_url( 'lost-password' ) ) {
+		laviadelleterme_enqueue_style( 'lost-password-style', 'features/my-account/lost-password.css', [ 'my-account-style' ] );
+	}
+}, 20 );
+
 
 // Personalizza l'URL di registrazione
 function laviadelleterme_custom_register_url( $url ) {

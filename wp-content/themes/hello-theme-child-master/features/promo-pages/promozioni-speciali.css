@@ -6,13 +6,13 @@
    markup non modificabile, qui viene solo ristilato.
 
    Questo foglio è caricato SOLO su questa pagina
-   (is_page( 'promozioni-speciali' ) in functions.php) e dipende
+   (is_page( 'promozioni-speciali' ) in promo-pages.php) e dipende
    da promo-pages-style, che resta la base condivisa da tutte le
    pagine protette da password: qui stanno solo gli scostamenti
    di questa pagina, non le regole comuni.
 
    Il campo password è mostrato in chiaro e normalizzato in
-   minuscolo da assets/js/script.js: la password è unica e
+   minuscolo da features/global/script.js: la password è unica e
    condivisa, non è un dato personale.
 
    Struttura del markup (classi PPWP):

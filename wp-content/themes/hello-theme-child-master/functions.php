@@ -2,21 +2,56 @@
 /**
  * Theme functions and definitions
  *
- * @package HelloElementorChild
- */
-/**
- * Load child theme css and optional scripts
+ * Qui stanno solo il foglio di stile del tema, i due helper di enqueue e l'elenco dei
+ * moduli. Ogni cartella in features/ è una funzionalità completa: PHP, CSS, JS e il
+ * proprio hook wp_enqueue_scripts con le condizioni su cui caricarli. In inc/ c'è il
+ * codice trasversale che non appartiene a nessuna pagina.
  *
- * @return void
+ * @package HelloElementorChild
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-function hello_elementor_child_enqueue_scripts() {
-	$version = wp_get_theme()->get( 'Version' );
+/**
+ * Versione unica per tutti gli asset del tema: l'header Version di style.css.
+ * Va alzata a ogni modifica di un CSS/JS, altrimenti i browser tengono la copia in cache.
+ *
+ * @return string
+ */
+function laviadelleterme_theme_version() {
+	static $version = null;
 
+	if ( null === $version ) {
+		$version = wp_get_theme()->get( 'Version' );
+	}
+
+	return $version;
+}
+
+/**
+ * @param string   $handle
+ * @param string   $file   Percorso relativo alla cartella del tema, es. 'features/checkout/checkout.css'.
+ * @param string[] $deps
+ */
+function laviadelleterme_enqueue_style( $handle, $file, $deps = [] ) {
+	wp_enqueue_style( $handle, get_theme_file_uri( $file ), $deps, laviadelleterme_theme_version() );
+}
+
+/**
+ * Sempre in footer: nessuno script del tema serve prima del contenuto.
+ *
+ * @param string   $handle
+ * @param string   $file   Percorso relativo alla cartella del tema.
+ * @param string[] $deps
+ */
+function laviadelleterme_enqueue_script( $handle, $file, $deps = [] ) {
+	wp_enqueue_script( $handle, get_theme_file_uri( $file ), $deps, laviadelleterme_theme_version(), true );
+}
+
+// Priorità 20, come gli enqueue dei moduli: dopo quello del parent (10), da cui dipende.
+add_action( 'wp_enqueue_scripts', function () {
 	// La dipendenza dal parent va dichiarata solo se quell'handle esiste davvero:
 	// disattivando "Theme Style" nelle impostazioni di Hello Elementor l'handle non
 	// viene registrato e WordPress salterebbe in silenzio tutto il foglio del child.
@@ -24,191 +59,37 @@ function hello_elementor_child_enqueue_scripts() {
 		? [ 'hello-elementor-theme-style' ]
 		: [];
 
-	wp_enqueue_style('hello-elementor-child-style',
-		get_stylesheet_directory_uri() . '/style.css',
-		$parent_style,
-		$version
-	);
+	laviadelleterme_enqueue_style( 'hello-elementor-child-style', 'style.css', $parent_style );
+}, 20 );
 
-	// Carica un secondo foglio di stile personalizzato
-	wp_enqueue_style('custom-style-menu',
-		get_stylesheet_directory_uri() . '/assets/css/mobile-menu-style.css',
-		[
-			'hello-elementor-child-style',
-		],
-		$version
-	);
+// L'ordine dei require è l'ordine dei <link> in pagina, quindi del cascade a parità di
+// specificità: i moduli agganciano tutti wp_enqueue_scripts a priorità 20 e WordPress li
+// esegue nell'ordine in cui sono stati registrati. global/ viene dopo shop/ e promo-pages/
+// perché wc-notices.css deve seguire shop.css: `.cont-prodotti a.button` e
+// `.woocommerce-message a.button` pesano entrambi (0,2,1) e deve vincere il notice.
+//
+// I moduli che usano funzioni WooCommerce nel proprio enqueue (is_checkout(),
+// is_wc_endpoint_url()…) controllano da sé class_exists( 'WooCommerce' ): chiamarle col
+// plugin spento è un fatal error, e durante i deploy via FTP può capitare per qualche istante.
+$laviadelleterme_moduli = [
+	'features/shop/shop.php',
+	'features/promo-pages/promo-pages.php',
+	'features/global/global.php',
+	'features/controllo-codici/controllo-codici.php',
+	'features/booking-status/booking-status.php',
+	'features/newsletter/newsletter.php',
+	'features/newsletter/mailup.php',
+	'features/thankyou/thankyou.php',
+	'features/my-account/my-account.php',
+	'features/checkout/checkout.php',
+	'features/order-pay/order-pay.php',
+	'features/satispay/satispay.php',
+	'inc/ga4-elementor-compat.php',
+	'inc/elementor-element-cache.php',
+	'inc/performance-optimization.php',
+];
 
-	// Catalogo/prodotto/carrello e pagine protette da password: le classi che
-	// stilano arrivano dai contenuti Elementor e da plugin di terze parti, non
-	// c'è un conditional tag affidabile su cui restringere l'enqueue.
-	wp_enqueue_style('shop-style',
-		get_stylesheet_directory_uri() . '/assets/css/shop.css',
-		[
-			'hello-elementor-child-style',
-		],
-		$version
-	);
-
-	// Caroselli immagini di Elementor: il markup lo stampa il widget, quindi può
-	// comparire su qualsiasi pagina e non c'è un conditional tag su cui restringere.
-	wp_enqueue_style('elementor-carousel-style',
-		get_stylesheet_directory_uri() . '/assets/css/elementor-carousel.css',
-		[
-			'hello-elementor-child-style',
-		],
-		$version
-	);
-
-	wp_enqueue_style('promo-pages-style',
-		get_stylesheet_directory_uri() . '/assets/css/promo-pages.css',
-		[
-			'hello-elementor-child-style',
-		],
-		$version
-	);
-
-	// Promozioni speciali: qui il conditional tag c'è (la pagina è una sola),
-	// quindi le personalizzazioni di questa pagina stanno in un foglio a parte
-	// caricato solo qui, dipendente dalla base condivisa dei form PPWP.
-	if ( is_page( 'promozioni-speciali' ) ) {
-		wp_enqueue_style('promozioni-speciali-style',
-			get_stylesheet_directory_uri() . '/promozioni-speciali/promozioni-speciali.css',
-			[
-				'promo-pages-style',
-			],
-			$version
-		);
-	}
-
-	wp_enqueue_script('custom-js',
-		get_stylesheet_directory_uri() . '/assets/js/script.js',
-		[],
-		$version,
-		true
-	);
-
-	// Solo registrato: lo carica laviadelleterme_render_controllo_codici() quando lo
-	// shortcode è effettivamente a video, invece di pesare su ogni pagina del sito.
-	wp_register_style('controllo-codici-style',
-		get_stylesheet_directory_uri() . '/controllo-codici/controllo-codici.css',
-		[],
-		$version
-	);
-
-	// Da qui in poi tutto dipende da WooCommerce: is_wc_endpoint_url() e is_checkout()
-	// sono funzioni sue, chiamarle senza il plugin attivo è un fatal error.
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		return;
-	}
-
-	// Notice WooCommerce (errore / info / conferma): compaiono su carrello, checkout,
-	// order-pay, my-account e pagine prodotto, quindi lo stile è caricato ovunque.
-	wp_enqueue_style('wc-notices-style',
-		get_stylesheet_directory_uri() . '/assets/css/wc-notices.css',
-		[],
-		$version
-	);
-
-	// Aspetto dei campi carta dentro l'iframe Stripe: il plugin lo ricava dal
-	// computed style di #wc-stripe-hidden-style-input, stampato su checkout,
-	// order-pay e "aggiungi metodo di pagamento" nell'area account.
-	wp_enqueue_style('stripe-upe-appearance-style',
-		get_stylesheet_directory_uri() . '/assets/css/stripe-upe-appearance.css',
-		[],
-		$version
-	);
-
-	// Badge stato prenotazione: stampato su woocommerce_order_item_meta_end, quindi
-	// presente sia su order-received sia nella tabella riepilogo di order-pay.
-	// Stesse due condizioni del gate laviadelleterme_show_booking_status_badge().
-	if ( is_wc_endpoint_url( 'order-received' ) || is_checkout() ) {
-		wp_enqueue_style('booking-status-style',
-			get_stylesheet_directory_uri() . '/booking-status/booking-status.css',
-			[],
-			$version
-		);
-	}
-
-	// Riquadro consenso newsletter: stesso markup al checkout e in Dettagli account.
-	// is_wc_endpoint_url() lavora sulla chiave dell'endpoint, quindi vale anche con lo
-	// slug tradotto /modifica-account/.
-	if ( is_checkout() || is_wc_endpoint_url( 'edit-account' ) ) {
-		wp_enqueue_style('newsletter-style',
-			get_stylesheet_directory_uri() . '/newsletter/newsletter.css',
-			[],
-			$version
-		);
-	}
-
-	if ( is_wc_endpoint_url( 'order-received' ) ) {
-		wp_enqueue_style('thankyou-style',
-			get_stylesheet_directory_uri() . '/thankyou/thankyou.css',
-			[],
-			$version
-		);
-
-		wp_enqueue_script('thankyou-js',
-			get_stylesheet_directory_uri() . '/thankyou/thankyou.js',
-			[],
-			$version,
-			true
-		);
-	}
-
-	// Area account: is_account_page() copre dashboard e password dimenticata,
-	// ma NON la registrazione, che qui è una pagina a sé (vedi i filtri
-	// login_url / register_url in my-account/my-account.php).
-	if ( is_account_page() || is_page( 'login-e-registrazione' ) ) {
-		wp_enqueue_style('my-account-style',
-			get_stylesheet_directory_uri() . '/my-account/my-account.css',
-			[],
-			$version
-		);
-
-		// Password dimenticata: markup e impaginazione a sé rispetto al resto
-		// dell'area account, quindi foglio dedicato e caricato solo qui.
-		if ( is_wc_endpoint_url( 'lost-password' ) ) {
-			wp_enqueue_style('lost-password-style',
-				get_stylesheet_directory_uri() . '/my-account/lost-password.css',
-				[
-					'my-account-style',
-				],
-				$version
-			);
-		}
-	}
-
-	// is_checkout() è vero sia sulla checkout normale sia su order-pay: è lo stesso
-	// template WooCommerce e non esiste una body class che le distingua (per questo
-	// order-pay.css si aggancia a form#order_review). is_checkout_pay_page() era
-	// stato provato per un enqueue più stretto ma il <link> non veniva stampato.
-	if ( is_checkout() ) {
-		wp_enqueue_style('checkout-style',
-			get_stylesheet_directory_uri() . '/checkout/checkout.css',
-			[],
-			$version
-		);
-
-		wp_enqueue_style('order-pay-style',
-			get_stylesheet_directory_uri() . '/order-pay/order-pay.css',
-			[
-				'checkout-style',
-			],
-			$version
-		);
-	}
+foreach ( $laviadelleterme_moduli as $laviadelleterme_modulo ) {
+	require_once get_theme_file_path( $laviadelleterme_modulo );
 }
-add_action( 'wp_enqueue_scripts', 'hello_elementor_child_enqueue_scripts', 20 );
-
-require_once get_stylesheet_directory() . '/booking-status/booking-status.php';
-require_once get_stylesheet_directory() . '/thankyou/thankyou.php';
-require_once get_stylesheet_directory() . '/order-pay/order-pay.php';
-require_once get_stylesheet_directory() . '/satispay/satispay.php';
-require_once get_stylesheet_directory() . '/my-account/my-account.php';
-require_once get_stylesheet_directory() . '/newsletter/newsletter.php';
-require_once get_stylesheet_directory() . '/newsletter/mailup.php';
-require_once get_stylesheet_directory() . '/controllo-codici/controllo-codici.php';
-require_once get_stylesheet_directory() . '/ga4-elementor-compat.php';
-require_once get_stylesheet_directory() . '/elementor-element-cache.php';
-require_once get_stylesheet_directory() . '/performance-optimization.php';
+unset( $laviadelleterme_moduli, $laviadelleterme_modulo );

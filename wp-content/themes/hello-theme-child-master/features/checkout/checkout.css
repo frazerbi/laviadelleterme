@@ -1,5 +1,5 @@
 /* ---- Larghezza/allineamento dei notice sulla checkout ----
-   L'aspetto (colori, bordi, spaziature) è in assets/css/wc-notices.css,
+   L'aspetto (colori, bordi, spaziature) è in features/global/wc-notices.css,
    condiviso con tutto il sito: qui resta solo il posizionamento. */
 
 body.woocommerce-checkout .woocommerce-notices-wrapper,

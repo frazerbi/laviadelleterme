@@ -14,6 +14,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
+	if ( is_wc_endpoint_url( 'order-received' ) ) {
+		laviadelleterme_enqueue_style( 'thankyou-style', 'features/thankyou/thankyou.css' );
+		laviadelleterme_enqueue_script( 'thankyou-js', 'features/thankyou/thankyou.js' );
+	}
+}, 20 );
+
 // Cambia il titolo H1 Elementor hardcoded "Pagamento" → "Ordine ricevuto!" lato server,
 // solo se l'ordine risulta davvero pagato (altrimenti resterebbe "successo" anche per ordini in attesa di pagamento)
 add_filter( 'elementor/widget/render_content', function ( $content, $widget ) {
