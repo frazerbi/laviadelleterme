@@ -303,7 +303,7 @@ The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` i
 ### Newsletter: consenso in registrazione e area account
 
 `wp-content/themes/hello-theme-child-master/newsletter/newsletter.php` (required from `functions.php`) records the
-consent on the user — nothing is sent to a newsletter platform yet (MailUp sync is in progress). State lives in three user meta:
+consent on the user; `newsletter/mailup.php` sends it to MailUp (see below). State lives in three user meta:
 `laviadelleterme_newsletter` (`si`/`no`), `laviadelleterme_newsletter_data` (last change, site time) and
 `laviadelleterme_newsletter_fonte` (`registrazione`/`account`/`admin`/`mailup` — short codes kept for queries and
 export; `laviadelleterme_newsletter_fonte_label()` turns them into the readable text the admin sees, e.g. "Form di
@@ -364,6 +364,39 @@ opt in from My Account → Dettagli account, where `woocommerce_edit_account_for
 ```bash
 wp user list --meta_key=laviadelleterme_newsletter --meta_value=si --fields=user_email,first_name,last_name --format=csv
 ```
+
+**MailUp sync (`newsletter/mailup.php`)** uses MailUp's **HTTPS "Frontend" API** (`/frontend/xmlSubscribe.aspx`,
+`/frontend/Xmlunsubscribe.aspx` on the console host), deliberately *not* the REST API: no OAuth tokens to refresh and no
+MailUp user password to store. The price is an **IP allow-list** — MailUp refuses calls from IPs not registered under
+Settings → Account settings → Developer's corner → Web services → **Frontend** (return code `-1011`), so the server's
+outbound IP must be there, for staging2 and production alike. Return codes treated as success: `0`, and `3`
+(already subscribed / already unsubscribed), which makes every call idempotent.
+- **Site → MailUp**: `laviadelleterme_newsletter_cambiato` enqueues an **Action Scheduler** async job (bundled with
+  WooCommerce, group `laviadelleterme`), so registration never waits on MailUp nor fails when it's down. The job reads
+  the user's *current* consent, not the one at enqueue time, so the last choice wins. Name/surname go as
+  `campo1`/`campo2` (MailUp's default fields), omitted when empty so they don't wipe existing values. Action Scheduler
+  doesn't retry on its own: a failure reschedules the job in 1h, up to 3 attempts. Outcome is in user meta
+  `laviadelleterme_mailup_stato`/`_esito`/`_data`, shown in a "MailUp" column in Utenti, and logged under source
+  **`mailup-lvdt`** (WooCommerce → Status → Logs). Jobs are visible in Tools → Scheduled Actions.
+- **No double opt-in** (`confirm=0`, hardcoded — decided 2026-10-30): with it, a contact who never clicked the
+  confirmation stayed "pending" in MailUp while the site said "Iscritto". The proof of consent is the site's history.
+- **User deletion**: `delete_user` (fires before the row is gone) enqueues a separate job,
+  `laviadelleterme_mailup_disiscrivi_email`, keyed on the **email** because the job runs after the user no longer
+  exists; its outcome is only in the log. The consent history is deleted with the user's meta.
+- **MailUp → site**: the list's **Unsubscribe** webhook calls
+  `/wp-json/laviadelleterme/v1/mailup-disiscrizione?token=<TOKEN>&email=[Email]` (GET or POST, token compared with
+  `hash_equals`), which sets the consent to `no` with source `mailup`. That source is skipped by the sync, so nothing
+  is sent back. Unknown emails get a 200 too (the list may hold contacts from elsewhere; an error would only make
+  MailUp retry).
+- **Configuration is per environment, in `wp-config.php`** (not in the repo — staging2 must point at a *test* list):
+  `LAVIADELLETERME_MAILUP_HOST`, `_LIST`, `_LIST_GUID` (required for unsubscribe; all three needed or the sync is
+  off and nothing is enqueued), optional `_GROUP`, `_WEBHOOK_TOKEN`.
+- **Consents given while the sync was off** (constants missing) are not sent retroactively. To align them once:
+  ```bash
+  wp eval 'foreach ( get_users( array( "meta_key" => "laviadelleterme_newsletter", "fields" => "ID" ) ) as $id ) laviadelleterme_mailup_accoda( $id );'
+  ```
+- **Known gaps (deliberately postponed)**: changing the email in Dettagli account doesn't move the MailUp contact, and
+  consent/history are not in WordPress's Tools → Export/Erase Personal Data.
 
 ### GA4 / Elementor Compatibility
 
