@@ -360,8 +360,15 @@ checked by `user-edit.php`) with source `admin` and the operator recorded.
 
 **The registration form is an Elementor Pro Form widget**, not WooCommerce's and not the User Registration plugin's,
 even though `my-account.css` styles a `user-registration-Button`: on `/login-e-registrazione/` it is
-`form#registrazione_utente` (fields `nome`, `cognome`, `email`, `password`, `privacy` acceptance, hidden
-`registrazione_utente`), and the user is created by a form action from a plugin outside this repo. The consent checkbox is
+`form#registrazione_utente` (fields `email`, `password`, `privacy` acceptance, hidden `registrazione_utente`, plus first
+and last name), and the user is created by the **Save** action of **Dynamic Content for Elementor** ("Save fields as:
+User", `includes/extensions/form/save.php`; the plugin is not in this repo). That action has **no field mapping — it
+goes by field ID**: IDs that are WordPress user data (`first_name`, `last_name`, `nickname`, … — the list is in DCE's
+`class/trait/meta.php`, `is_user_data()`) go into `wp_insert_user()`, every other field becomes user meta with its ID as
+key. The name fields were originally `nome`/`cognome`, so names landed in meta `nome`/`cognome` and `first_name` /
+`last_name` stayed empty — nothing reached MailUp, the checkout prefill or WooCommerce emails. Fixed on 2026-10-30 by
+renaming the IDs to `first_name`/`last_name` in the editor (form content lives in the DB: production needs the same
+rename by hand) and copying existing values once with `wp eval`, only into empty fields. The consent checkbox is
 an **Acceptance** field added in the Elementor editor with **ID `newsletter`**, not required, *not* checked by default.
 The module hooks **`user_register`** and reads `$_POST['form_fields']['newsletter']` from the same
 `elementor_pro_forms_send_form` request — so it doesn't depend on which plugin creates the user or on the order of its
@@ -383,7 +390,12 @@ wp user list --meta_key=laviadelleterme_newsletter --meta_value=si --fields=user
 MailUp user password to store. The price is an **IP allow-list** — MailUp refuses calls from IPs not registered under
 Settings → Account settings → Developer's corner → Web services → **Frontend** (return code `-1011`), so the server's
 outbound IP must be there, for staging2 and production alike. Return codes treated as success: `0`, and `3`
-(already subscribed / already unsubscribed), which makes every call idempotent.
+(already subscribed / already unsubscribed), which makes every call idempotent; for `Xmlunsubscribe` also `1`, which
+MailUp returns for an address that was **never in the list** (verified on staging2 with a made-up address, 2026-10-30 —
+not the "generic error" the code means elsewhere; the same parameters returned 0 for a real contact).
+Staging2's outbound IP is `35.214.206.101` (IPv4 only); MailUp also **re-subscribes via API a contact who had
+unsubscribed**, so the unsubscribe webhook must be live before any bulk alignment, or it resubscribes people who left
+from the newsletter link.
 - **Site → MailUp**: `laviadelleterme_newsletter_cambiato` enqueues an **Action Scheduler** async job (bundled with
   WooCommerce, group `laviadelleterme`), so registration never waits on MailUp nor fails when it's down. The job reads
   the user's *current* consent, not the one at enqueue time, so the last choice wins. Name/surname go as
@@ -391,11 +403,27 @@ outbound IP must be there, for staging2 and production alike. Return codes treat
   doesn't retry on its own: a failure reschedules the job in 1h, up to 3 attempts. Outcome is in user meta
   `laviadelleterme_mailup_stato`/`_esito`/`_data`, shown in a "MailUp" column in Utenti, and logged under source
   **`mailup-lvdt`** (WooCommerce → Status → Logs). Jobs are visible in Tools → Scheduled Actions.
+- **Email / name changes**: `profile_update` (fires for Dettagli account, the wp-admin profile and any plugin calling
+  `wp_update_user()`) re-enqueues the same job when the user is subscribed and the profile no longer matches user meta
+  `laviadelleterme_mailup_contatto` — email/nome/cognome as sent on the last *successful* subscribe, deleted on a
+  successful unsubscribe. It compares against that snapshot, not against `$old_user_data`, because first/last name are
+  user meta and are already overwritten when `profile_update` fires (and `WP_User` reads meta lazily). WooCommerce calls
+  `wp_update_user()` on every checkout, so without a real change nothing is sent. On an email change the job
+  unsubscribes the snapshot's address first, then subscribes the new one; on a revocation it unsubscribes the
+  snapshot's address, not the profile's, so changing email and revoking in the same save still removes the right
+  contact. `xmlSubscribe` on an *already subscribed* contact returns 3 but **does** update `campo1`/`campo2` (verified
+  on staging2, 2026-10-30), so no separate update call is needed. One Dettagli account save fires `profile_update`
+  several times in the same request, and the snapshot is only written when the job runs, so each fire saw a mismatch
+  and enqueued again (5 jobs per save): `laviadelleterme_mailup_accoda_job()` now skips the enqueue when an identical
+  job is still **pending** — not when one is running, which may already have read the old data.
 - **No double opt-in** (`confirm=0`, hardcoded — decided 2026-10-30): with it, a contact who never clicked the
   confirmation stayed "pending" in MailUp while the site said "Iscritto". The proof of consent is the site's history.
 - **User deletion**: `delete_user` (fires before the row is gone) enqueues a separate job,
   `laviadelleterme_mailup_disiscrivi_email`, keyed on the **email** because the job runs after the user no longer
-  exists; its outcome is only in the log. The consent history is deleted with the user's meta.
+  exists; its outcome is only in the log. It uses the snapshot's address, and also fires for a user without consent who
+  still has a snapshot (a revocation whose unsubscribe failed). The job does nothing if a user with that email exists
+  again when it runs — retries come an hour apart, and on staging2 deleting a test user and re-registering with the same
+  address is the normal flow; without the check the retry unsubscribed the new registration. The consent history is deleted with the user's meta.
 - **MailUp → site**: the list's **Unsubscribe** webhook calls
   `/wp-json/laviadelleterme/v1/mailup-disiscrizione?token=<TOKEN>&email=[Email]` (GET or POST, token compared with
   `hash_equals`), which sets the consent to `no` with source `mailup`. That source is skipped by the sync, so nothing
@@ -408,8 +436,11 @@ outbound IP must be there, for staging2 and production alike. Return codes treat
   ```bash
   wp eval 'foreach ( get_users( array( "meta_key" => "laviadelleterme_newsletter", "fields" => "ID" ) ) as $id ) laviadelleterme_mailup_accoda( $id );'
   ```
-- **Known gaps (deliberately postponed)**: changing the email in Dettagli account doesn't move the MailUp contact, and
-  consent/history are not in WordPress's Tools → Export/Erase Personal Data.
+- **Known gap (deliberately postponed)**: consent/history are not in WordPress's Tools → Export/Erase Personal Data.
+- **Users without consent are never sent to MailUp**, not even to a separate list (discussed 2026-10-30): marketing
+  email needs consent, and an email *asking* for consent counts as marketing for the Garante. The only exception would
+  be "soft spam" (art. 130 c.4 Codice Privacy: buyers only, similar products, opt-out in the privacy notice at
+  purchase) — if ever wanted, after a legal check of the checkout privacy notice, and in its own MailUp list.
 
 ### GA4 / Elementor Compatibility
 

@@ -10,6 +10,7 @@
  * Due versi:
  *  - sito → MailUp: ogni cambio di consenso accoda un job Action Scheduler (incluso in
  *    WooCommerce), così la registrazione non aspetta MailUp e non fallisce se è giù;
+ *    lo stesso job allinea email, nome e cognome quando cambiano sul profilo;
  *  - MailUp → sito: il webhook "Unsubscribe" della lista chiama la rotta REST qui sotto
  *    quando qualcuno si disiscrive dal link nell'email.
  *
@@ -40,6 +41,8 @@ const LAVIADELLETERME_MAILUP_TENTATIVI        = 3;
 const LAVIADELLETERME_MAILUP_META_STATO       = 'laviadelleterme_mailup_stato'; // 'in coda' | 'ok' | 'errore'
 const LAVIADELLETERME_MAILUP_META_DATA        = 'laviadelleterme_mailup_data';
 const LAVIADELLETERME_MAILUP_META_ESITO       = 'laviadelleterme_mailup_esito';
+// Email, nome e cognome inviati all'ultima iscrizione riuscita: ciò che MailUp ha in lista.
+const LAVIADELLETERME_MAILUP_META_CONTATTO    = 'laviadelleterme_mailup_contatto';
 
 function laviadelleterme_mailup_configurato() {
 	return defined( 'LAVIADELLETERME_MAILUP_HOST' ) && LAVIADELLETERME_MAILUP_HOST
@@ -49,7 +52,9 @@ function laviadelleterme_mailup_configurato() {
 
 function laviadelleterme_mailup_log( $livello, $messaggio ) {
 	if ( function_exists( 'wc_get_logger' ) ) {
-		wc_get_logger()->log( $livello, $messaggio, array( 'source' => 'mailup-lvdt' ) );
+		// La lista in testa: staging e produzione puntano a liste diverse.
+		$lista = defined( 'LAVIADELLETERME_MAILUP_LIST' ) ? '[lista ' . LAVIADELLETERME_MAILUP_LIST . '] ' : '';
+		wc_get_logger()->log( $livello, $lista . $messaggio, array( 'source' => 'mailup-lvdt' ) );
 	}
 }
 
@@ -116,7 +121,9 @@ function laviadelleterme_mailup_iscrivi( WP_User $user ) {
 
 /**
  * Per email e non per utente: serve anche quando l'utente sta per essere cancellato.
- * Codici: 0 disiscritto, 3 sconosciuto o già disiscritto → entrambi ok.
+ * Codici: 0 disiscritto, 3 già disiscritto, 1 mai stato in lista (verificato su staging2
+ * con un indirizzo inventato: non è l'errore generico che dice la documentazione) →
+ * tutti ok, l'indirizzo non è in lista.
  */
 function laviadelleterme_mailup_disiscrivi( $email ) {
 	$codice = laviadelleterme_mailup_chiama( 'Xmlunsubscribe.aspx', array(
@@ -125,7 +132,7 @@ function laviadelleterme_mailup_disiscrivi( $email ) {
 		'Email'    => $email,
 	) );
 
-	return is_wp_error( $codice ) || in_array( $codice, array( 0, 3 ), true ) ? $codice : new WP_Error( 'mailup_codice', 'Xmlunsubscribe codice ' . $codice );
+	return is_wp_error( $codice ) || in_array( $codice, array( 0, 1, 3 ), true ) ? $codice : new WP_Error( 'mailup_codice', 'Xmlunsubscribe codice ' . $codice );
 }
 
 /**
@@ -144,11 +151,44 @@ function laviadelleterme_mailup_accoda_job( $job, $chiave, $tentativo = 1, $rita
 	}
 
 	$argomenti = array( $chiave, (int) $tentativo );
+
+	// Un salvataggio di Dettagli account fa scattare profile_update più volte nella stessa
+	// richiesta. Se un job uguale è ancora in attesa basta quello: leggerà i dati di quando
+	// parte. Solo "pending": uno già in esecuzione può aver letto i dati vecchi.
+	if ( ! $ritardo && as_get_scheduled_actions( array(
+		'hook'     => $job,
+		'args'     => $argomenti,
+		'group'    => 'laviadelleterme',
+		'status'   => ActionScheduler_Store::STATUS_PENDING,
+		'per_page' => 1,
+	), 'ids' ) ) {
+		return;
+	}
+
 	if ( $ritardo ) {
 		as_schedule_single_action( time() + $ritardo, $job, $argomenti, 'laviadelleterme' );
 	} else {
 		as_enqueue_async_action( $job, $argomenti, 'laviadelleterme' );
 	}
+}
+
+function laviadelleterme_mailup_contatto( WP_User $user ) {
+	return array(
+		'email'   => $user->user_email,
+		'nome'    => $user->first_name,
+		'cognome' => $user->last_name,
+	);
+}
+
+/**
+ * L'indirizzo con cui l'utente sta nella lista: quello dell'ultima iscrizione riuscita,
+ * che dopo un cambio email non è più quello del profilo. Senza iscrizioni registrate, il
+ * suo indirizzo attuale.
+ */
+function laviadelleterme_mailup_email_in_lista( WP_User $user ) {
+	$contatto = get_user_meta( $user->ID, LAVIADELLETERME_MAILUP_META_CONTATTO, true );
+
+	return ! empty( $contatto['email'] ) ? $contatto['email'] : $user->user_email;
 }
 
 function laviadelleterme_mailup_accoda( $user_id ) {
@@ -166,20 +206,43 @@ add_action( 'laviadelleterme_newsletter_cambiato', function ( $user_id, $consens
 }, 10, 3 );
 
 /**
+ * Email, nome o cognome cambiati, da qualunque parte (Dettagli account, profilo in
+ * wp-admin, plugin): se l'utente è iscritto e MailUp ha dati diversi, si risincronizza.
+ * Il confronto è con quanto inviato all'ultima iscrizione e non con i dati di prima del
+ * salvataggio, perché nome e cognome sono user meta e qui sono già stati sovrascritti.
+ * WooCommerce chiama wp_update_user() a ogni checkout: senza cambi non parte niente.
+ */
+add_action( 'profile_update', function ( $user_id ) {
+	if ( ! laviadelleterme_mailup_configurato() || ! laviadelleterme_newsletter_ha_consenso( $user_id ) ) {
+		return;
+	}
+
+	$user = get_userdata( $user_id );
+	if ( $user && get_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO, true ) !== laviadelleterme_mailup_contatto( $user ) ) {
+		laviadelleterme_mailup_accoda( $user_id );
+	}
+} );
+
+/**
  * Utente cancellato: l'email esce da MailUp. delete_user scatta prima della
  * cancellazione, quando email e meta sono ancora leggibili; il job però girerà dopo,
- * quindi riceve l'email e non l'id.
+ * quindi riceve l'email e non l'id. Anche senza consenso, se in lista è rimasto un
+ * contatto (una revoca la cui disiscrizione non è andata a buon fine).
  */
 add_action( 'delete_user', function ( $user_id ) {
 	$user = get_userdata( $user_id );
-	if ( $user && laviadelleterme_newsletter_ha_consenso( $user_id ) ) {
-		laviadelleterme_mailup_accoda_job( LAVIADELLETERME_MAILUP_JOB_DISISCRIVI, $user->user_email );
+	if ( $user && ( laviadelleterme_newsletter_ha_consenso( $user_id ) || get_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO, true ) ) ) {
+		laviadelleterme_mailup_accoda_job( LAVIADELLETERME_MAILUP_JOB_DISISCRIVI, laviadelleterme_mailup_email_in_lista( $user ) );
 	}
 } );
 
 /**
  * Il job legge lo stato *attuale* del consenso, non quello del momento in cui è stato
  * accodato: se l'utente cambia idea due volte di fila, vince l'ultima scelta.
+ *
+ * Se l'email è cambiata dall'ultima iscrizione, il vecchio indirizzo esce dalla lista
+ * prima che entri il nuovo; con una revoca esce quello che MailUp conosce, non quello
+ * del profilo.
  */
 add_action( LAVIADELLETERME_MAILUP_JOB, function ( $user_id, $tentativo = 1 ) {
 	$user = get_userdata( $user_id );
@@ -187,15 +250,34 @@ add_action( LAVIADELLETERME_MAILUP_JOB, function ( $user_id, $tentativo = 1 ) {
 		return;
 	}
 
-	$iscritto = laviadelleterme_newsletter_ha_consenso( $user_id );
-	$esito    = $iscritto ? laviadelleterme_mailup_iscrivi( $user ) : laviadelleterme_mailup_disiscrivi( $user->user_email );
-	$azione   = $iscritto ? 'iscrizione' : 'disiscrizione';
+	$iscritto     = laviadelleterme_newsletter_ha_consenso( $user_id );
+	$email_lista  = laviadelleterme_mailup_email_in_lista( $user );
+	$cambio_email = $iscritto && 0 !== strcasecmp( $email_lista, $user->user_email );
+
+	if ( $iscritto ) {
+		$esito = $cambio_email ? laviadelleterme_mailup_disiscrivi( $email_lista ) : 0;
+		if ( ! is_wp_error( $esito ) ) {
+			$esito = laviadelleterme_mailup_iscrivi( $user );
+		}
+	} else {
+		$esito = laviadelleterme_mailup_disiscrivi( $email_lista );
+	}
+
+	$azione = $iscritto ? ( $cambio_email ? "cambio email da <$email_lista>" : 'iscrizione' ) : 'disiscrizione';
 
 	update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_DATA, current_time( 'mysql' ) );
 
 	if ( ! is_wp_error( $esito ) ) {
+		if ( $iscritto ) {
+			update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO, laviadelleterme_mailup_contatto( $user ) );
+		} else {
+			delete_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO );
+		}
+
 		update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_STATO, 'ok' );
-		update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_ESITO, $azione . ( 3 === $esito ? ' (già allineato)' : '' ) );
+		// 1 arriva solo dalla disiscrizione: per l'iscrizione è un errore.
+		$nota = array( 1 => ' (non era in lista)', 3 => ' (già allineato)' );
+		update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_ESITO, $azione . ( $nota[ $esito ] ?? '' ) );
 		laviadelleterme_mailup_log( 'info', "Utente $user_id <{$user->user_email}>: $azione ok, codice $esito." );
 		return;
 	}
@@ -210,9 +292,19 @@ add_action( LAVIADELLETERME_MAILUP_JOB, function ( $user_id, $tentativo = 1 ) {
 	}
 }, 10, 2 );
 
-// L'utente non esiste più: niente meta da aggiornare, l'esito resta solo nel log.
+/**
+ * L'utente non esiste più: niente meta da aggiornare, l'esito resta solo nel log.
+ * Se nel frattempo qualcuno si è registrato con la stessa email (i nuovi tentativi
+ * partono anche un'ora dopo), il contatto è suo e decide il suo consenso.
+ */
 add_action( LAVIADELLETERME_MAILUP_JOB_DISISCRIVI, function ( $email, $tentativo = 1 ) {
 	if ( ! laviadelleterme_mailup_configurato() ) {
+		return;
+	}
+
+	$nuovo = get_user_by( 'email', $email );
+	if ( $nuovo ) {
+		laviadelleterme_mailup_log( 'info', "Utente cancellato <$email>: disiscrizione saltata, l'email ora è dell'utente {$nuovo->ID}." );
 		return;
 	}
 
