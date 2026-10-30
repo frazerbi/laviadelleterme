@@ -305,7 +305,9 @@ The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` i
 `wp-content/themes/hello-theme-child-master/newsletter/newsletter.php` (required from `functions.php`) records the
 consent on the user — nothing is sent to a newsletter platform yet (MailUp sync is in progress). State lives in three user meta:
 `laviadelleterme_newsletter` (`si`/`no`), `laviadelleterme_newsletter_data` (last change, site time) and
-`laviadelleterme_newsletter_fonte` (`registrazione`/`account`/`admin`). **No meta = never consented.** Every
+`laviadelleterme_newsletter_fonte` (`registrazione`/`account`/`admin`/`mailup` — short codes kept for queries and
+export; `laviadelleterme_newsletter_fonte_label()` turns them into the readable text the admin sees, e.g. "Form di
+registrazione"). **No meta = never consented.** Every
 write goes through `laviadelleterme_newsletter_imposta()`, which does nothing when the state doesn't change, so re-saving
 the account details (e.g. to change password) doesn't move the consent date — and fires
 `laviadelleterme_newsletter_cambiato( $user_id, $consenso, $fonte )` when it does.
@@ -317,6 +319,26 @@ itself — the form POSTs `post_id` (the document holding the widget, a template
 and `laviadelleterme_newsletter_testo_form()` finds the field with `custom_id` `newsletter` in `_elementor_data` and takes
 its `acceptance_text`; when not found it stores `''`, shown as "(non rilevato)" rather than guessing. For Dettagli account
 it is the `LAVIADELLETERME_NEWSLETTER_TESTO` constant, which also prints that checkbox.
+
+**Checkout** also shows the checkbox to every logged-in user, **pre-ticked according to their current consent** — same
+semantics as Dettagli account, so unticking there is a revocation (pre-ticking for someone already subscribed reflects
+their own choice; it isn't consent given on their behalf). The point is mainly social-login users, who never saw the
+registration form. A hidden `laviadelleterme_newsletter_mostrato=1` is printed next to it and **saving happens only when
+that marker is in the POST**: an unticked checkbox isn't submitted at all, so without the marker a checkout where the
+field wasn't rendered would look like a revocation. When subscribed, a customer-facing note under it says when and how
+consent was given (`laviadelleterme_newsletter_nota_consenso()`, its own wording — the admin labels are written for
+staff); field, note and marker share a `.laviadelleterme-newsletter-box` wrapper that carries the highlighted box,
+because WooCommerce's own field `description` is hidden at checkout until the field gets focus. **Checkout and Dettagli
+account print the very same markup** through `laviadelleterme_newsletter_campo()` (and save through
+`laviadelleterme_newsletter_salva_da_form()`, marker check included), so one stylesheet covers both:
+`newsletter/newsletter.css`, enqueued on `is_checkout() || is_wc_endpoint_url( 'edit-account' )` — the endpoint *key*,
+so it matches the translated `/modifica-account/` slug too. Its field rules sit at (0,4,1), just above woocommerce.css's
+`.woocommerce form .form-row label.checkbox` (0,3,2), the strongest rival shared by the two pages. It is printed on `woocommerce_after_checkout_billing_form`, **not** next to the terms
+where it would belong logically: `#payment` is re-rendered by AJAX on every `update_checkout`, so a tick placed there is
+silently lost (the plugin's health declaration needs a session round-trip for exactly this reason), while the billing
+section is never re-rendered. Saved on `woocommerce_checkout_update_user_meta` — after validation, regardless of how the
+payment then goes — with source `checkout`; `imposta()` skips unchanged states, so a subscriber who leaves the tick
+alone adds no history row.
 
 **wp-admin can only revoke, never grant**: a consent set by staff proves nothing. The user profile page shows a
 "Newsletter" box (state + history, read-only) with a single "Revoca il consenso" checkbox when the user is subscribed —

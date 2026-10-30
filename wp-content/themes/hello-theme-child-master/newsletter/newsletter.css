@@ -1,0 +1,71 @@
+/* ============================================================
+   Riquadro consenso newsletter
+   Stampato da laviadelleterme_newsletter_campo() (newsletter.php) con lo
+   stesso markup al checkout, in fondo ai dati di fatturazione, e in My
+   Account → Dettagli account. Caricato da functions.php solo su quelle due
+   pagine.
+
+   Il blu dei pulsanti del sito su una sua tinta chiara, con la forma dei
+   notice (bordo pieno + barra d'accento a sinistra). Il testo resta scuro: il
+   blu su quella tinta starebbe al limite del contrasto AA. Il riquadro sta sul
+   contenitore e non sul .form-row perché la nota è un <p> fratello del campo.
+
+   Specificità: il rivale più forte comune alle due pagine è
+   `.woocommerce form .form-row label.checkbox` di woocommerce.css, (0,3,2);
+   le regole sul campo stanno a (0,4,1), appena sopra. Niente !important, così
+   le regole per elemento di Elementor vincono ancora.
+   ============================================================ */
+
+.laviadelleterme-newsletter-box {
+	margin: 1.5rem 0 0;
+	padding: 1rem 1.25rem;
+	background: #e6f1f6;
+	background: color-mix(in srgb, var(--lvdt-button-bg) 10%, #fff);
+	border: 1px solid var(--lvdt-button-bg);
+	border-left-width: 4px;
+	border-radius: var(--lvdt-radius-md);
+}
+
+/* Dentro il fieldset dell'account la legenda fa già da stacco. */
+.laviadelleterme-newsletter-fieldset .laviadelleterme-newsletter-box {
+	margin-top: 0.5rem;
+}
+
+.laviadelleterme-newsletter-box .form-row.laviadelleterme-newsletter {
+	margin: 0;
+	padding: 0;
+}
+
+.laviadelleterme-newsletter-box .form-row.laviadelleterme-newsletter label.checkbox {
+	display: block;
+	margin: 0;
+	font-family: "Muli", Sans-serif;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.5;
+	cursor: pointer;
+}
+
+.laviadelleterme-newsletter-box .form-row.laviadelleterme-newsletter input.input-checkbox {
+	width: 1.25rem;
+	height: 1.25rem;
+	margin: 0 0.6rem 0 0;
+	vertical-align: -0.3em;
+	accent-color: var(--lvdt-button-bg);
+	cursor: pointer;
+}
+
+.laviadelleterme-newsletter-box .form-row.laviadelleterme-newsletter .optional {
+	font-size: 0.85em;
+	font-weight: 400;
+	color: #555;
+}
+
+/* Rientro pari a casella + margine, così la nota si allinea al testo. */
+.laviadelleterme-newsletter-box p.laviadelleterme-newsletter-box__nota {
+	margin: 0.4rem 0 0 1.85rem;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.85rem;
+	line-height: 1.4;
+	color: #555;
+}

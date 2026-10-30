@@ -81,6 +81,27 @@ function laviadelleterme_reindirizza_utenti_non_loggati_myaccount() {
 // Aggiungi l'azione all'hook template_redirect
 add_action('template_redirect', 'laviadelleterme_reindirizza_utenti_non_loggati_myaccount');
 
+/**
+ * Dettagli account: ignora la password attuale quando non se ne sceglie una nuova.
+ *
+ * Browser e gestori di password riempiono da soli "Password attuale" (l'autocomplete="off"
+ * del template non li ferma), e WooCommerce, trovandola piena con le due nuove vuote,
+ * blocca il salvataggio con "Compila tutti i campi password": cambiare nome o la spunta
+ * newsletter diventava impossibile. Senza nuova password quel campo non serve a nulla,
+ * quindi toglierlo dal POST non indebolisce niente. Priorità 5: prima di
+ * WC_Form_Handler::save_account_details, agganciato a template_redirect con la 10.
+ */
+function laviadelleterme_ignora_password_attuale_senza_nuova() {
+    if ( ! isset( $_POST['action'] ) || 'save_account_details' !== $_POST['action'] ) {
+        return;
+    }
+
+    if ( empty( $_POST['password_1'] ) && empty( $_POST['password_2'] ) ) {
+        unset( $_POST['password_current'], $_REQUEST['password_current'] );
+    }
+}
+add_action( 'template_redirect', 'laviadelleterme_ignora_password_attuale_senza_nuova', 5 );
+
 // Disabilita la richiesta di conferma email admin (causa pagine bianche su login custom)
 add_filter( 'admin_email_check_interval', '__return_false' );
 

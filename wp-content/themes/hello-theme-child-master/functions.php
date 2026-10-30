@@ -130,6 +130,17 @@ function hello_elementor_child_enqueue_scripts() {
 		);
 	}
 
+	// Riquadro consenso newsletter: stesso markup al checkout e in Dettagli account.
+	// is_wc_endpoint_url() lavora sulla chiave dell'endpoint, quindi vale anche con lo
+	// slug tradotto /modifica-account/.
+	if ( is_checkout() || is_wc_endpoint_url( 'edit-account' ) ) {
+		wp_enqueue_style('newsletter-style',
+			get_stylesheet_directory_uri() . '/newsletter/newsletter.css',
+			[],
+			$version
+		);
+	}
+
 	if ( is_wc_endpoint_url( 'order-received' ) ) {
 		wp_enqueue_style('thankyou-style',
 			get_stylesheet_directory_uri() . '/thankyou/thankyou.css',
