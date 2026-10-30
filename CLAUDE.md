@@ -270,7 +270,7 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
   guaranteed. (0,3,0) still sits below the editor's per-element rules (0,4,0), so hand-set Elementor values keep
   winning — see the general rule above.
 
-- `checkout/`, `order-pay/`, `thankyou/`, `booking-status/`, `satispay/`, `my-account/`, `controllo-codici/`, `promozioni-speciali/` — one folder per feature module, each bundling its own PHP + CSS/JS, required individually from `functions.php`. `checkout/checkout.css` holds only what the normal checkout and order-pay share (notices, payment methods, Stripe wallet + UPE card fields, terms, place-order button); everything scoped to `form#order_review` lives in `order-pay/order-pay.css`, enqueued right after it inside the same `is_checkout()` branch. `my-account/my-account.css` is enqueued on `is_account_page() || is_page('login-e-registrazione')` — registration is a standalone page here, not a WC endpoint (see the `login_url`/`register_url` filters), so `is_account_page()` alone would miss it. The lost-password page has its own `my-account/lost-password.css`, enqueued nested inside that branch on `is_wc_endpoint_url('lost-password')`; its selectors keep the `body.woocommerce-lost-password` prefix even though the sheet is already page-scoped, because dropping it would lower their specificity against Elementor's and WooCommerce's own rules. Its H1 ("Il mio account", hardcoded in the account area's shared Elementor template) is rewritten to "Password dimenticata" server-side by an `elementor/widget/render_content` filter in `my-account.php` — the same pattern as `thankyou.php`. It used to be faked in CSS by hiding the real H1 and printing the string in an `::after` at a fixed `5rem !important`: that skipped the widget's responsive typography and, with no width of its own, wrapped below the form.
+- `checkout/`, `order-pay/`, `thankyou/`, `booking-status/`, `satispay/`, `my-account/`, `newsletter/`, `controllo-codici/`, `promozioni-speciali/` — one folder per feature module, each bundling its own PHP + CSS/JS, required individually from `functions.php`. `checkout/checkout.css` holds only what the normal checkout and order-pay share (notices, payment methods, Stripe wallet + UPE card fields, terms, place-order button); everything scoped to `form#order_review` lives in `order-pay/order-pay.css`, enqueued right after it inside the same `is_checkout()` branch. `my-account/my-account.css` is enqueued on `is_account_page() || is_page('login-e-registrazione')` — registration is a standalone page here, not a WC endpoint (see the `login_url`/`register_url` filters), so `is_account_page()` alone would miss it. The lost-password page has its own `my-account/lost-password.css`, enqueued nested inside that branch on `is_wc_endpoint_url('lost-password')`; its selectors keep the `body.woocommerce-lost-password` prefix even though the sheet is already page-scoped, because dropping it would lower their specificity against Elementor's and WooCommerce's own rules. Its H1 ("Il mio account", hardcoded in the account area's shared Elementor template) is rewritten to "Password dimenticata" server-side by an `elementor/widget/render_content` filter in `my-account.php` — the same pattern as `thankyou.php`. It used to be faked in CSS by hiding the real H1 and printing the string in an `::after` at a fixed `5rem !important`: that skipped the widget's responsive typography and, with no width of its own, wrapped below the form.
 - `woocommerce/pdf/Templates/` — PDF templates for invoices, packing slips, credit notes. These are forks of the plugin's stock templates and the plugin itself is not in this repo, so drift can only be checked against the copy installed on the server. Values that land in an attribute (`class`) go through `esc_attr`, and sku/weight/weight-unit/quantity through `esc_html`; item **name**, **meta**, prices and total labels are deliberately left raw — the plugin hands those over as ready-made HTML and escaping them breaks the documents.
 - `woocommerce/emails/` — Custom WooCommerce email templates. Only `customer-completed-order.php` is live; four `__`-prefixed disabled copies were deleted in the 2026-08-25 cleanup (WooCommerce resolves overrides by exact filename, so they were never loaded).
 - `promozioni-speciali/promozioni-speciali.css` — the PPWP unlock form on `/promozioni-speciali/`, enqueued on
@@ -299,6 +299,35 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 **`my-account/my-account.php`**: custom login/registration URLs and post-login/registration redirect logic. Redirect targets (explicit `redirect`/`redirect_to` params and the `Referer` fallback) are validated via `laviadelleterme_is_local_url()`, which compares hosts with `wp_parse_url(...,  PHP_URL_HOST)` — do not go back to a plain `strpos($url, home_url())` substring check, it's bypassable (`https://evil.tld/?x=` + `home_url()` passes it) and was an open-redirect vector here until fixed.
 
 The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` is the single implementation, and the `woocommerce_login_redirect` / `woocommerce_registration_redirect` callbacks are thin wrappers around it (they used to be two line-for-line identical copies). The logged-out gate on the account pages uses **`is_account_page()`**, not a `strpos` on `REQUEST_URI` — the string check fired on any URL that merely contained `/my-account/` and ignored whichever page WooCommerce is actually configured with. It exits early on `lost-password`, guards against a redirect loop if the account page were ever set to the login page itself, uses `wp_safe_redirect()`, and carries the requested URL over in `redirect_to` (rebuilt on `home_url()` so a manipulated `REQUEST_URI` cannot move the destination off-host) so that opening e.g. `/my-account/view-order/123` while logged out lands back there after login instead of on the dashboard.
+
+### Newsletter: consenso in registrazione e area account
+
+`wp-content/themes/hello-theme-child-master/newsletter/newsletter.php` (required from `functions.php`) **only records**
+the consent on the user — nothing is sent to a newsletter platform yet. State lives in three user meta:
+`laviadelleterme_newsletter` (`si`/`no`), `laviadelleterme_newsletter_data` (last change, site time) and
+`laviadelleterme_newsletter_fonte` (`registrazione`/`account`). **No meta = never consented.** Every write goes through
+`laviadelleterme_newsletter_imposta()`, which does nothing when the state doesn't change, so re-saving the account
+details (e.g. to change password) doesn't move the consent date.
+
+**The registration form is an Elementor Pro Form widget**, not WooCommerce's and not the User Registration plugin's,
+even though `my-account.css` styles a `user-registration-Button`: on `/login-e-registrazione/` it is
+`form#registrazione_utente` (fields `nome`, `cognome`, `email`, `password`, `privacy` acceptance, hidden
+`registrazione_utente`), and the user is created by a form action from a plugin outside this repo. The consent checkbox is
+an **Acceptance** field added in the Elementor editor with **ID `newsletter`**, not required, *not* checked by default.
+The module hooks **`user_register`** and reads `$_POST['form_fields']['newsletter']` from the same
+`elementor_pro_forms_send_form` request — so it doesn't depend on which plugin creates the user or on the order of its
+actions. Do **not** switch to `elementor_pro/forms/new_record` + a lookup by email: the record arrives even when
+registration fails because the email already exists, so anyone could subscribe someone else's account. An unticked
+Acceptance field isn't submitted at all, and nothing is written.
+
+**Social login** (Nextend, Google/Facebook) creates the user without the form, so those users have no consent; they can
+opt in from My Account → Dettagli account, where `woocommerce_edit_account_form` prints the checkbox and
+`woocommerce_save_account_details` (after WC's nonce and field checks) saves it.
+
+**Admin**: a "Newsletter" column in Utenti shows Iscritto/Revocato, date and source. Export for a manual upload:
+```bash
+wp user list --meta_key=laviadelleterme_newsletter --meta_value=si --fields=user_email,first_name,last_name --format=csv
+```
 
 ### GA4 / Elementor Compatibility
 
