@@ -302,12 +302,26 @@ The destination logic is shared: `laviadelleterme_destinazione_dopo_accesso()` i
 
 ### Newsletter: consenso in registrazione e area account
 
-`wp-content/themes/hello-theme-child-master/newsletter/newsletter.php` (required from `functions.php`) **only records**
-the consent on the user — nothing is sent to a newsletter platform yet. State lives in three user meta:
+`wp-content/themes/hello-theme-child-master/newsletter/newsletter.php` (required from `functions.php`) records the
+consent on the user — nothing is sent to a newsletter platform yet (MailUp sync is in progress). State lives in three user meta:
 `laviadelleterme_newsletter` (`si`/`no`), `laviadelleterme_newsletter_data` (last change, site time) and
-`laviadelleterme_newsletter_fonte` (`registrazione`/`account`). **No meta = never consented.** Every write goes through
-`laviadelleterme_newsletter_imposta()`, which does nothing when the state doesn't change, so re-saving the account
-details (e.g. to change password) doesn't move the consent date.
+`laviadelleterme_newsletter_fonte` (`registrazione`/`account`/`admin`). **No meta = never consented.** Every
+write goes through `laviadelleterme_newsletter_imposta()`, which does nothing when the state doesn't change, so re-saving
+the account details (e.g. to change password) doesn't move the consent date — and fires
+`laviadelleterme_newsletter_cambiato( $user_id, $consenso, $fonte )` when it does.
+
+**Proof of consent is the history, not the current state.** Each change also appends one row to the *non-unique* user
+meta `laviadelleterme_newsletter_storico` (`add_user_meta`, never updated): date, `si`/`no`, source, operator id (only for
+`admin`) and **the checkbox text the user actually saw**. For registration that text is read from the Elementor widget
+itself — the form POSTs `post_id` (the document holding the widget, a template included) and `form_id` (the element id),
+and `laviadelleterme_newsletter_testo_form()` finds the field with `custom_id` `newsletter` in `_elementor_data` and takes
+its `acceptance_text`; when not found it stores `''`, shown as "(non rilevato)" rather than guessing. For Dettagli account
+it is the `LAVIADELLETERME_NEWSLETTER_TESTO` constant, which also prints that checkbox.
+
+**wp-admin can only revoke, never grant**: a consent set by staff proves nothing. The user profile page shows a
+"Newsletter" box (state + history, read-only) with a single "Revoca il consenso" checkbox when the user is subscribed —
+for customers who ask by email or phone. Saved on `personal_options_update`/`edit_user_profile_update` (nonce already
+checked by `user-edit.php`) with source `admin` and the operator recorded.
 
 **The registration form is an Elementor Pro Form widget**, not WooCommerce's and not the User Registration plugin's,
 even though `my-account.css` styles a `user-registration-Button`: on `/login-e-registrazione/` it is
