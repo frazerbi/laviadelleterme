@@ -334,8 +334,20 @@ add_action( 'rest_api_init', function () {
 	register_rest_route( 'laviadelleterme/v1', '/mailup-disiscrizione', array(
 		'methods'             => array( 'GET', 'POST' ),
 		'permission_callback' => function ( WP_REST_Request $request ) {
-			return defined( 'LAVIADELLETERME_MAILUP_WEBHOOK_TOKEN' ) && '' !== (string) LAVIADELLETERME_MAILUP_WEBHOOK_TOKEN
+			$ok = defined( 'LAVIADELLETERME_MAILUP_WEBHOOK_TOKEN' ) && '' !== (string) LAVIADELLETERME_MAILUP_WEBHOOK_TOKEN
 				&& hash_equals( (string) LAVIADELLETERME_MAILUP_WEBHOOK_TOKEN, (string) $request->get_param( 'token' ) );
+
+			// Senza questa riga un webhook configurato male in MailUp non lascia traccia. Il
+			// token ricevuto non si scrive, solo i nomi dei parametri: un '?' di troppo
+			// nell'URL si vede da lì.
+			if ( ! $ok ) {
+				laviadelleterme_mailup_log( 'warning', sprintf(
+					'Webhook disiscrizione respinto (token mancante o errato). Parametri ricevuti: %s',
+					implode( ', ', array_keys( $request->get_params() ) ) ?: 'nessuno'
+				) );
+			}
+
+			return $ok;
 		},
 		'callback'            => function ( WP_REST_Request $request ) {
 			$email = sanitize_email( (string) $request->get_param( 'email' ) );
