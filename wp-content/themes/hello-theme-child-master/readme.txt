@@ -32,7 +32,13 @@ carica solo style.css e l'elenco dei moduli.
 * features/my-account/      URL di login/registrazione, redirect post accesso e relativo stile
                             (lost-password.css: stile della sola pagina password dimenticata)
 * features/newsletter/      consenso newsletter (registrazione, account, checkout) e
-                            sincronizzazione con MailUp
+                            sincronizzazione con MailUp. Le disiscrizioni dal link nelle
+                            email tornano al sito con il webhook della lista MailUp, che
+                            passa da un Cloudflare Worker: SiteGround chiude la connessione
+                            allo user-agent di MailUp (un Firefox 27) e non ammette
+                            eccezioni. Il Worker, uno per ambiente, non è in questo repo:
+                            sta nell'account Cloudflare, inoltra la chiamata con un altro
+                            user-agent e il token lo controlla comunque WordPress
 * features/controllo-codici/ shortcode con le giacenze dei codici licenza (solo staff)
 
 Un modulo può essere caricato su tutto il sito (global, shop, promo-pages): quando il

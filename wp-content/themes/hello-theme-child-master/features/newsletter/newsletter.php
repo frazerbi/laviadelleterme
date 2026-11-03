@@ -46,7 +46,7 @@ const LAVIADELLETERME_NEWSLETTER_TESTO = 'Desidero ricevere la newsletter de La 
 
 const LAVIADELLETERME_NEWSLETTER_META         = 'laviadelleterme_newsletter';         // 'si' | 'no'
 const LAVIADELLETERME_NEWSLETTER_META_DATA    = 'laviadelleterme_newsletter_data';    // ultima modifica, ora del sito
-const LAVIADELLETERME_NEWSLETTER_META_FONTE   = 'laviadelleterme_newsletter_fonte';   // 'registrazione' | 'account' | 'checkout' | 'admin' | 'mailup'
+const LAVIADELLETERME_NEWSLETTER_META_FONTE   = 'laviadelleterme_newsletter_fonte';   // 'registrazione' | 'account' | 'checkout' | 'admin' | 'mailup' | 'importazione-mailup'
 const LAVIADELLETERME_NEWSLETTER_META_STORICO = 'laviadelleterme_newsletter_storico'; // una riga per cambio (meta non unico)
 
 /**
@@ -60,6 +60,8 @@ function laviadelleterme_newsletter_fonte_label( $fonte ) {
 		'checkout'      => __( 'Checkout, all\'acquisto', 'hello-elementor-child' ),
 		'admin'         => __( 'Amministrazione, su richiesta del cliente', 'hello-elementor-child' ),
 		'mailup'        => __( 'Disiscrizione dal link nella newsletter (MailUp)', 'hello-elementor-child' ),
+		// Importazione una tantum: l'export di MailUp dà lo stato ma non il motivo né la data della disiscrizione.
+		'importazione-mailup' => __( 'Importazione da MailUp: risultava disiscritto', 'hello-elementor-child' ),
 	);
 
 	return $etichette[ $fonte ] ?? $fonte;

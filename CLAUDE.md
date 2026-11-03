@@ -424,17 +424,34 @@ from the newsletter link.
   still has a snapshot (a revocation whose unsubscribe failed). The job does nothing if a user with that email exists
   again when it runs — retries come an hour apart, and on staging2 deleting a test user and re-registering with the same
   address is the normal flow; without the check the retry unsubscribed the new registration. The consent history is deleted with the user's meta.
-- **MailUp → site**: the list's **Unsubscribe** webhook calls
-  `/wp-json/laviadelleterme/v1/mailup-disiscrizione?token=<TOKEN>&email=[Email]` (GET or POST, token compared with
+- **MailUp → site**: the list's **Unsubscribe** webhook ends up calling
+  `/wp-json/laviadelleterme/v1/mailup-disiscrizione?token=<TOKEN>&email=<address>` (GET or POST, token compared with
   `hash_equals`), which sets the consent to `no` with source `mailup`. That source is skipped by the sync, so nothing
   is sent back. Unknown emails get a 200 too (the list may hold contacts from elsewhere; an error would only make
-  MailUp retry).
+  MailUp retry). In MailUp the token goes in the URL and `email` is a webhook parameter (source Recipient, field
+  Email); webhooks are per list, arrive about a minute after the unsubscribe and don't fire for API operations.
+- **The webhook reaches the site through a Cloudflare Worker, not directly.** MailUp sends
+  `User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0`, and SiteGround's security
+  layer closes the connection on that user-agent before WordPress and without a line in the access log — so a webhook
+  that "does nothing" here shows no trace anywhere on the server. SiteGround confirmed the block and refused a whitelist
+  by both IP and URL (2026-11-03). The Worker (one per environment, in the Cloudflare account, not in this repo) has a
+  fixed destination, forwards the query string with its own user-agent and returns the status; WordPress still checks
+  the token. Staging2's is `sparkling-brook-6216.francesco-zerbinato.workers.dev` (webhook on list 4), production's is
+  `dark-shadow-9261.francesco-zerbinato.workers.dev` (webhook on list 2). If MailUp ever changes its user-agent, put the
+  direct URL back and delete the Worker. Weak spot: if the Worker or the site is down, that unsubscribe may be lost in
+  silence, so align periodically against MailUp's export.
+- **Importing MailUp's unsubscribed contacts**: `importa-disiscritti-mailup.php` in the repo root (WP-CLI only, excluded
+  from the deploy) marks as `no`, with source `importazione-mailup`, the users with no newsletter state found as
+  `UNSUBSCRIBED` in a MailUp CSV. Without an argument it is a dry run; `esegui` writes. It never touches users who are
+  subscribed on the site, only lists them, because the export has no unsubscribe date to tell which choice came last.
+  It writes the meta directly, so nothing is sent to MailUp, and re-running it is safe. Delete the CSV from the server
+  afterwards: it holds the whole list.
 - **Configuration is per environment, in `wp-config.php`** (not in the repo — staging2 must point at a *test* list):
   `LAVIADELLETERME_MAILUP_HOST`, `_LIST`, `_LIST_GUID` (required for unsubscribe; all three needed or the sync is
   off and nothing is enqueued), optional `_GROUP`, `_WEBHOOK_TOKEN`.
 - **Consents given while the sync was off** (constants missing) are not sent retroactively. To align them once:
   ```bash
-  wp eval 'foreach ( get_users( array( "meta_key" => "laviadelleterme_newsletter", "fields" => "ID" ) ) as $id ) laviadelleterme_mailup_accoda( $id );'
+  wp eval 'foreach ( get_users( array( "meta_key" => "laviadelleterme_newsletter", "meta_value" => "si", "fields" => "ID" ) ) as $id ) laviadelleterme_mailup_accoda( $id );'
   ```
 - **Known gap (deliberately postponed)**: consent/history are not in WordPress's Tools → Export/Erase Personal Data.
 - **Users without consent are never sent to MailUp**, not even to a separate list (discussed 2026-10-30): marketing
