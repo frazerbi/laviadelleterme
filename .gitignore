@@ -14,10 +14,11 @@ package-lock.json
 # NB: che non finiscano sul server non dipende da questo file ma dall'--exclude
 # in .github/workflows/deploy.yml (rsync carica anche i file ignorati da git).
 **/plugin-custom-skianet/assets/data/
-woocommerce-google-analytics-pro/
-woo-satispay/
-woocommerce-gateway-stripe/
-mollie-payments-for-woocommerce/
+
+# dei plugin si traccia solo il nostro: gli altri sono di terze parti, in locale
+# servono al massimo da consultare.
+wp-content/plugins/*
+!wp-content/plugins/plugin-custom-skianet/
 
 # ignore node dependency directories
 */node_modules/
