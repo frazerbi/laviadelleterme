@@ -39,6 +39,9 @@ class Booking_Code_Assignment {
     private function __construct() {
         add_action('woocommerce_payment_complete', array($this, 'assign_codes_on_payment'), 10, 1);
 
+        // Prima del pagamento: un articolo senza codici liberi blocca il checkout.
+        add_action('woocommerce_check_cart_items', array($this, 'check_cart_codes_stock'));
+
         // WC License Delivery registra il proprio hook su plugins_loaded (priorita' 10),
         // dopo questo plugin che si carica prima in ordine alfabetico: lo si sostituisce
         // su init, quando c'e' gia'.
@@ -85,6 +88,47 @@ class Booking_Code_Assignment {
                     add_action($hook, array($this, 'assign_codes_safely'), $priority, 1);
                 }
             }
+        }
+    }
+
+    /**
+     * Ferma il checkout se un articolo a codici non ne ha abbastanza di liberi.
+     *
+     * woocommerce_check_cart_items gira sulla pagina carrello, sul checkout e dentro
+     * WC_Checkout::process_checkout() prima che l'ordine venga creato - anche per i
+     * pagamenti express di Stripe, che passano da li'. Un errore qui significa
+     * nessun ordine e nessun addebito. La rete di sicurezza dopo il pagamento
+     * (assign_license_codes) resta per l'unico caso che questo controllo non copre:
+     * due clienti che pagano insieme l'ultimo codice.
+     */
+    public function check_cart_codes_stock() {
+        if (!function_exists('WC') || !WC()->cart || !class_exists('WC_LD_Code_Assignment')) {
+            return;
+        }
+
+        // Piu' righe dello stesso prodotto (stesso biglietto per due date diverse)
+        // pescano dallo stesso blocco di codici: si somma per prodotto.
+        $needed = array();
+        $names  = array();
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            $is_license_code = get_post_meta($cart_item['product_id'], '_wc_ld_license_code', true);
+            if (empty($is_license_code) || 'no' === $is_license_code) {
+                continue;
+            }
+            $product_id = !empty($cart_item['variation_id']) ? $cart_item['variation_id'] : $cart_item['product_id'];
+            $needed[$product_id] = ($needed[$product_id] ?? 0) + (int) $cart_item['quantity'];
+            $names[$product_id]  = $cart_item['data']->get_name();
+        }
+
+        foreach ($needed as $product_id => $qty) {
+            $free = $this->count_free_codes($product_id);
+            if ($free >= $qty) {
+                continue;
+            }
+            $message = 0 === $free
+                ? sprintf('«%s» al momento non è disponibile: rimuovilo dal carrello per completare l\'ordine.', $names[$product_id])
+                : sprintf('«%s»: ne restano solo %d disponibili, riduci la quantità per completare l\'ordine.', $names[$product_id], $free);
+            wc_add_notice($message, 'error');
         }
     }
 

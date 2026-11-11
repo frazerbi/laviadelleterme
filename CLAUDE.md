@@ -188,7 +188,14 @@ codes and no TermeGest sync. `Booking_Order_Status` has already moved it to a gr
 admin it looks fine. This was reproduced on staging2 on 2026-11-11, with codes left at `order_id = 0` but
 `license_status = 1`.
 
-`Booking_Code_Assignment` therefore **replaces that hook on `init`**: WC_LD registers it on `plugins_loaded`, after this
+**First line: no order without codes.** `Booking_Code_Assignment::check_cart_codes_stock()` runs on
+`woocommerce_check_cart_items`. It sums the quantity per code product across cart lines, since two lines of the same
+ticket draw from one block, and adds an error notice when the free codes (the same `license_status = '0'` query WC_LD
+uses) are fewer. That hook runs on the cart page, the checkout page, inside `WC_Checkout::validate_checkout()` before
+`create_order()`, and in the Store API that Stripe's express buttons use. So the customer is stopped before paying and
+no order exists.
+
+**Second line, for the race on the last code:** `Booking_Code_Assignment` **replaces WC_LD's hook on `init`**: WC_LD registers it on `plugins_loaded`, after this
 plugin. The replacement, `assign_codes_safely()`, runs the same item loop with a free-code count first and a
 `catch (\Throwable)` around each item. A short item is skipped and reported once per order, with an order note
 ("ERRORE: codici esauriti…"), a `skianet-codici` log entry and an email to `admin_email`. The rest of the order — other
