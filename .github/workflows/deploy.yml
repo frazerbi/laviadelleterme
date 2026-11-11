@@ -33,6 +33,7 @@ jobs:
           --exclude=.gitignore
           --exclude=CLAUDE.md
           --exclude=importa-disiscritti-mailup.php
+          --exclude=design/
           --exclude=.DS_Store
           --exclude=wp-content/plugins/plugin-custom-skianet/assets/data/
           --exclude=wp-content/plugins/plugin-custom-skianet/build.js

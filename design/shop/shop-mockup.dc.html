@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Shop – Regala un coupon</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=Mulish:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#fff}
+a{color:#0074A0}a:hover{color:#005678}
+</style>
+</helmet>
+<div style="font-family: 'Mulish', sans-serif; color: #424242; background: #ffffff; font-size: 17px; line-height: 1.45;">
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 48px 24px 36px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;">
+<h1 style="margin: 0; font-family: 'Amiri', serif; font-weight: 400; font-size: 3.2rem; line-height: 1.1; color: #424242;">Regala un coupon</h1>
+<p style="margin: 0; max-width: 720px; font-size: 1.1rem; color: #5c5c5c;">Acquisti l'ingresso oggi, data e centro si scelgono dopo. Il regalo perfetto per chi ami.</p>
+
+</section>
+
+<div style="background: #EEF5F8;">
+<section style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 64px; display: flex; flex-direction: column; gap: 28px;">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+
+<h2 style="margin: 0; font-family: 'Amiri', serif; font-weight: 400; font-size: 3rem; line-height: 1.1;">Ingressi SPA</h2>
+<p style="margin: 0; color: #4f4f4f; font-size: 1.05rem;">Per 1 persona · prenotazione online obbligatoria</p>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+<span style="font-size: 1.15rem; font-weight: 800; color: #424242;">Quando vuoi andare?</span>
+<div role="group" aria-label="Giorni di validità" style="display: inline-flex; flex-wrap: wrap; justify-content: center; padding: 6px; background: #ffffff; border: 2px solid #0074A0; border-radius: 999px; gap: 6px; box-shadow: 0 4px 14px rgba(0, 87, 122, 0.15);">
+<button type="button" aria-pressed="{{feriali.pressed}}" onClick="{{pickFeriali}}" style="{{feriali.style}}">Lunedì – venerdì</button>
+<button type="button" aria-pressed="{{tutti.pressed}}" onClick="{{pickTutti}}" style="{{tutti.style}}">Tutti i giorni</button>
+</div>
+<span style="font-size: 0.95rem; font-weight: 600; color: #4f4f4f;">{{daysHint}}</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; align-items: stretch;">
+<sc-for list="{{tickets}}" as="t" hint-placeholder-count="4">
+<article style="{{t.cardStyle}}">
+<sc-if value="{{t.hasBadge}}" hint-placeholder-val="{{false}}">
+<span style="{{t.badgeStyle}}">{{t.badge}}</span>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<h3 style="margin: 0; font-family: 'Amiri', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.1; color: #424242;">{{t.name}}</h3>
+<span style="font-size: 0.95rem; color: #5c5c5c;">{{t.tagline}}</span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 10px;">
+<span style="font-family: 'Mulish', sans-serif; font-weight: 800; font-size: 2.3rem; line-height: 1; color: #0074A0;">€ {{t.price}}</span>
+<span style="font-size: 0.85rem; color: #5c5c5c;">{{t.priceNote}}</span>
+</div>
+<div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #E6F1F6; color: #00577A; font-weight: 700; font-size: 0.95rem;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+{{t.duration}}
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; flex-grow: 1;">
+<sc-for list="{{t.features}}" as="f" hint-placeholder-count="3">
+<li style="{{f.style}}">
+<sc-if value="{{f.ok}}" hint-placeholder-val="{{true}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14663d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Incluso" style="flex-shrink: 0; margin-top: 2px;"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>
+</sc-if>
+<sc-if value="{{f.no}}" hint-placeholder-val="{{false}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2.2" stroke-linecap="round" role="img" aria-label="Non incluso" style="flex-shrink: 0; margin-top: 2px;"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</sc-if>
+<span>{{f.text}}</span>
+</li>
+</sc-for>
+</ul>
+<p style="margin: 0; font-size: 0.8rem; color: #5c5c5c; border-top: 1px solid #E5E5E5; padding-top: 12px;">{{t.excluded}}</p>
+<a href="#" style="display: block; text-align: center; padding: 14px 20px 15px; border-radius: 3px; background: #0074A0; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase;">Aggiungi al carrello</a>
+</article>
+</sc-for>
+</div>
+</section>
+</div>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 16px;">
+<div style="display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: center; padding: 44px 40px; border-radius: 12px; background: #0074A0; color: #ffffff;">
+<div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px;">
+<span style="font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #CFE6EF;">Non è un regalo?</span>
+<h2 style="margin: 0; font-family: 'Amiri', serif; font-weight: 400; font-size: 2.4rem; line-height: 1.1; color: #ffffff;">Sai già quando venire? Prenota direttamente</h2>
+<p style="margin: 0; font-size: 1.05rem; color: #E6F1F6;">Scegli struttura, giorno e orario e paghi online: ricevi subito la conferma della prenotazione, senza codici da inserire dopo.</p>
+<a href="https://laviadelleterme.it/prenota/" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; padding: 15px 26px 16px; border-radius: 3px; background: #ffffff; color: #0074A0; text-decoration: none; font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase;">Vai alla prenotazione<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<ol style="flex: 1 1 320px; list-style: none; margin: 0; padding: 24px 26px; display: flex; flex-direction: column; gap: 16px; border-radius: 10px; background: #ffffff; color: #424242;">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+<li style="display: flex; align-items: center; gap: 14px;">
+<span style="flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: #E6F1F6; color: #00577A; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;">{{s.n}}</span>
+<div style="display: flex; flex-direction: column; gap: 1px;">
+<strong style="font-size: 1rem;">{{s.title}}</strong>
+<span style="font-size: 0.88rem; color: #5c5c5c;">{{s.detail}}</span>
+</div>
+</li>
+</sc-for>
+</ol>
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 16px; display: flex; flex-direction: column; gap: 28px;">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
+<h2 style="margin: 0; font-family: 'Amiri', serif; font-weight: 400; font-size: 2.4rem; line-height: 1.15;">SPA private &amp; massaggi</h2>
+<p style="margin: 0; color: #5c5c5c; font-size: 1rem;">Esperienze su prenotazione, da regalare in coppia</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+<sc-for list="{{spa}}" as="p" hint-placeholder-count="3">
+<article style="display: flex; flex-direction: column; border: 1px solid #E5E5E5; border-radius: 12px; overflow: hidden; background: #fff;">
+<div style="height: 200px; background: #E9EEF0; display: flex; align-items: center; justify-content: center; color: #5c5c5c; font-size: 0.85rem;">Foto prodotto (come oggi)</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 22px 22px; flex-grow: 1;">
+<span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #F1F1F1; font-size: 0.8rem; font-weight: 700; color: #424242;">{{p.chip}}</span>
+<h3 style="margin: 0; font-family: 'Amiri', serif; font-weight: 700; font-size: 1.5rem; line-height: 1.15;">{{p.name}}</h3>
+<p style="margin: 0; font-size: 0.95rem; color: #5c5c5c; flex-grow: 1;">{{p.desc}}</p>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px;">
+<span style="font-weight: 800; font-size: 1.4rem; color: #0074A0;">{{p.price}}</span>
+<a href="#" style="padding: 10px 16px 11px; border: 1px solid #0074A0; border-radius: 3px; text-decoration: none; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;">{{p.cta}}</a>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 16px; display: flex; flex-direction: column; gap: 28px;">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
+<h2 style="margin: 0; font-family: 'Amiri', serif; font-weight: 400; font-size: 2.4rem; line-height: 1.15;">Pacchetti e buoni valore</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+<sc-for list="{{packs}}" as="p" hint-placeholder-count="2">
+<article style="display: flex; flex-wrap: wrap; border: 1px solid #E5E5E5; border-radius: 12px; overflow: hidden; background: #fff;">
+<div style="flex: 1 1 200px; min-height: 180px; background: #E9EEF0; display: flex; align-items: center; justify-content: center; color: #5c5c5c; font-size: 0.85rem;">Foto prodotto</div>
+<div style="flex: 999 1 240px; display: flex; flex-direction: column; gap: 10px; padding: 22px;">
+<span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #F1F1F1; font-size: 0.8rem; font-weight: 700;">{{p.chip}}</span>
+<h3 style="margin: 0; font-family: 'Amiri', serif; font-weight: 700; font-size: 1.5rem; line-height: 1.15;">{{p.name}}</h3>
+<p style="margin: 0; font-size: 0.95rem; color: #5c5c5c; flex-grow: 1;">{{p.desc}}</p>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+<span style="font-weight: 800; font-size: 1.4rem; color: #0074A0;">{{p.price}}</span>
+<a href="#" style="padding: 10px 16px 11px; border: 1px solid #0074A0; border-radius: 3px; text-decoration: none; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;">{{p.cta}}</a>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px;">
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 24px 28px; background: #F1F1F1; border-radius: 10px;">
+<strong style="font-size: 1.05rem;">Hai già un coupon?</strong>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 32px;">
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 0.95rem;">Scegli data e struttura su TermeGest.</span>
+<a href="https://www.termegest.it/prenota.aspx" style="font-weight: 700; text-decoration: underline; text-underline-offset: 3px;">Prenota l'ingresso</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<span style="font-size: 0.95rem;">Sta per scadere? Prorogalo di 90 giorni, da € 10.</span>
+<a href="#" style="font-weight: 700; text-decoration: underline; text-underline-offset: 3px;">Acquista una proroga</a>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { days: 'feriali' };
+  }
+  renderVals() {
+    var fer = this.state.days === 'feriali';
+    var pill = function (on) {
+      return 'border: 0; cursor: pointer; min-height: 52px; padding: 12px 30px; border-radius: 999px; font-family: inherit; font-size: 1.1rem; font-weight: 800; ' +
+        (on ? 'background: #0074A0; color: #ffffff;' : 'background: transparent; color: #0074A0; text-decoration: underline; text-underline-offset: 4px;');
+    };
+    var feat = function (text, ok) {
+      return { text: text, ok: ok, no: !ok, style: 'display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem; ' + (ok ? 'color: #424242;' : 'color: #6b6b6b;') };
+    };
+    var card = function (highlight) {
+      return 'position: relative; display: flex; flex-direction: column; gap: 16px; padding: 28px 24px 24px; border-radius: 12px; background: #ffffff; ' +
+        (highlight === 'gold' ? 'border: 2px solid #B8912E; background: #FFFCF4;' : highlight === 'blue' ? 'border: 2px solid #0074A0;' : 'border: 1px solid #E5E5E5;');
+    };
+    var badge = function (kind) {
+      return 'position: absolute; top: -13px; left: 24px; padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; ' +
+        (kind === 'gold' ? 'background: #B8912E; color: #2b2000;' : 'background: #0074A0; color: #ffffff;');
+    };
+    var excl = fer ? 'Solo feriali: esclusi prefestivi e festivi. ' : '';
+    var tickets = [
+      { name: 'Serale', tagline: 'Le ultime 3 ore di apertura', duration: '3 ore', price: '39', priceNote: fer ? 'valido tutti i giorni' : '',
+        hasBadge: false, badge: '', badgeStyle: '', cardStyle: card(''),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', false)],
+        excluded: 'Non valido dal 24 dicembre al 6 gennaio.' },
+      { name: 'Mezza giornata', tagline: 'Il classico ingresso SPA', duration: '4 ore', price: fer ? '49' : '59', priceNote: '',
+        hasBadge: false, badge: '', badgeStyle: '', cardStyle: card(''),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', false)],
+        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' },
+      { name: 'Gold Ticket', tagline: 'Mezza giornata, anche in Svizzera', duration: '4 ore', price: fer ? '49' : '59', priceNote: '',
+        hasBadge: true, badge: '4 destinazioni', badgeStyle: badge('gold'), cardStyle: card('gold'),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', true)],
+        excluded: excl + 'Non valido dal 21 dicembre all’ 11 gennaio.' },
+      { name: 'Giornata intera', tagline: 'Tutto il giorno, tutto incluso', duration: 'Tutto il giorno', price: fer ? '79' : '89', priceNote: '',
+        hasBadge: true, badge: 'Il più completo', badgeStyle: badge('blue'), cardStyle: card('blue'),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', true), feat('Piatto light al ristorante', true), feat('Anche Splash & Spa Tamaro (CH)', false)],
+        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' }
+    ];
+    var steps = [
+      { n: '1', title: 'Struttura', detail: 'Genova, Saint-Vincent o Monterosa SPA' },
+      { n: '2', title: 'Giorno', detail: 'Vedi subito le date disponibili' },
+      { n: '3', title: 'Ingresso e orario', detail: '4 ore, giornaliero o serale' },
+      { n: '4', title: 'Persone e pagamento', detail: 'Conferma immediata via email' }
+    ];
+    var spa = [
+      { chip: '50 minuti', name: 'Massaggio Standard', desc: '[1 riga: tipo di massaggio e dove si prenota]', price: '€ 75', cta: 'Acquista' },
+      { chip: 'Per 2 persone', name: 'Private SPA', desc: '[1 riga: cosa include e cosa cambia tra le opzioni]', price: 'da € 180', cta: 'Scegli' },
+      { chip: 'Per 2 persone', name: 'Private SPA con massaggio di coppia', desc: '[1 riga: cosa include]', price: '€ 250', cta: 'Acquista' }
+    ];
+    var packs = [
+      { chip: 'Per 2 persone', name: 'Hotel + ingresso alle terme', desc: 'Pernottamento e ingresso SPA per due. [1 riga: strutture e cosa cambia tra le opzioni]', price: 'da € 189', cta: 'Scegli' },
+      { chip: 'Vale € 500', name: 'Mega Bonus Special Edition', desc: 'Credito da € 500 per ingressi SPA, massaggi e pacchetti SPA + pernottamento. Utilizzabile anche dai tuoi ospiti.', price: '€ 300', cta: 'Acquista' }
+    ];
+    var self = this;
+    return {
+      feriali: { pressed: fer ? 'true' : 'false', style: pill(fer) },
+      tutti: { pressed: fer ? 'false' : 'true', style: pill(!fer) },
+      pickFeriali: function () { self.setState({ days: 'feriali' }); },
+      pickTutti: function () { self.setState({ days: 'tutti' }); },
+      daysHint: fer ? 'Esclusi prefestivi e festivi' : 'Anche weekend e festivi',
+      // Ordine di visualizzazione: mezza giornata, serale, giornaliero, gold
+      tickets: [tickets[1], tickets[0], tickets[3], tickets[2]], steps: steps, spa: spa, packs: packs
+    };
+  }
+}
+</script>
+</body>
+</html>
