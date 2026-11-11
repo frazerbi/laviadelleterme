@@ -640,13 +640,24 @@ percio' la mappa e' duplicata per intero invece di avere una base con override. 
 - Build output: `assets/js/dist/booking-form.min.js` + `booking-form.min.css` with sourcemaps
 - Build tool: esbuild (`build.js`) + PostCSS with prefix-selector; `vanilla-calendar-pro` is bundled at build time
 - `booking-only-form.js` is a hand-written IIFE served directly — it is **not** processed by esbuild
-- `woocommerce-variation-preselect.js` (product page, enqueued by `Booking_Redirect`) is also served directly. It reads
-  the booking parameters from the URL and gets only the location/ticket-type **labels** from PHP (`bookingLabels`,
-  built from `Booking_Handler::$locations` / `$ticket_types`): those two tables are the single source of the labels,
-  also for the order item meta and the confirmation email. Don't re-add a local copy in JS or PHP.
+- **The product page after the booking form has no JS of its own** (since 2026-11-11). `Booking_Redirect` reads the
+  URL parameters set by `redirect_to_product()` and prints everything in the HTML: the booking sentence in place of the
+  product title (`elementor/widget/render_content` on the `woocommerce-product-title` widget) with total price and
+  original name below it (`.secondary-info`), the summary list (`.custom-data-ui`, on
+  `woocommerce_before_add_to_cart_button`), the variation already selected
+  (`woocommerce_dropdown_variation_attribute_options_args` — `add-to-cart-variation.js` then shows it on init, as for
+  default attributes), quantity = guests (`woocommerce_quantity_input_args`), the location photo as inline CSS on
+  `#colonna-img-prodotto`, and the `booking-prefilled` class on the `.product` wrapper (`post_class`). It used to be
+  `woocommerce-variation-preselect.js`, which rewrote the page after `DOMContentLoaded` + polling the select +
+  `show_variation` + a 500ms wait, so the customer watched the stock page turn into the booking one. The variation and
+  the price come from the **category → ID map** (the same one written to the session), not from the ticket type: that is
+  the id `Booking_Cart_Handler::add_booking_data_to_cart()` checks, so it is the only right one. If the category maps to
+  another product or a parameter is invalid, `get_pdp_booking()` returns null and the page stays the stock one. Labels
+  still come only from `Booking_Handler::$locations` / `$ticket_types`, the single source also for the order item meta
+  and the confirmation email — don't add a local copy.
 
 **Enqueue gates**: `Booking_Handler::enqueue_assets()` loads `pdp.css` only on `is_product()` (it styles
-`.product.customDataLoaded`, a class set by `woocommerce-variation-preselect.js`) and the form's CSS/JS only where
+`.product.booking-prefilled`, a class printed by `Booking_Redirect`) and the form's CSS/JS only where
 `page_has_booking_form()` says the shortcode is present. That check reads `post_content` **and** the `_elementor_data`
 meta — pages here are built with Elementor, which keeps the content in a JSON meta, so `has_shortcode($post->post_content, …)`
 alone (what `Booking_Only_Handler` does) would miss it. It would also miss a form placed in an Elementor *template*

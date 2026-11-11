@@ -1,4 +1,8 @@
-.product.customDataLoaded .secondary-info {
+/*
+ * Pagina prodotto aperta dal form di prenotazione. La classe .booking-prefilled e il
+ * markup (.secondary-info, .custom-data-ui) sono stampati lato server da Booking_Redirect.
+ */
+.product.booking-prefilled .secondary-info {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -6,26 +10,26 @@
 	margin-top: 16px;
 }
 
-.product.customDataLoaded .secondary-info .price {
+.product.booking-prefilled .secondary-info .price {
 	color: inherit;
     font-weight: 700;
     font-size: 36px;
 	display: flex;
     flex-direction: column;
 }
-.product.customDataLoaded .secondary-info .note {
+.product.booking-prefilled .secondary-info .note {
 	font-size: 14px;
 	color: #666;
 }
 
-.product.customDataLoaded .custom-data-ui {
+.product.booking-prefilled .custom-data-ui {
 	background-color: #f3f3f3;
 	padding: 16px;
 	border-radius: 4px;
 	margin-bottom: 24px;
 }
 
-.product.customDataLoaded .custom-data-ui ul {
+.product.booking-prefilled .custom-data-ui ul {
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -34,14 +38,14 @@
 	font-size: 16px;
 }
 
-.product.loadingData .section-condizioni-vendita,
-.product.customDataLoaded .section-condizioni-vendita {
+.product.booking-prefilled .section-condizioni-vendita,
+.product.booking-prefilled .elementor-widget-woocommerce-product-price {
 	display: none;
 }
 
-.product.customDataLoaded .variations,
-.product.customDataLoaded .quantity,
-.product.customDataLoaded .woocommerce-variation-price {
+.product.booking-prefilled .variations,
+.product.booking-prefilled .quantity,
+.product.booking-prefilled .woocommerce-variation-price {
 	position: absolute;
     clip: rect(0 0 0 0);
     width: 1px;
