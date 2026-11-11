@@ -26,16 +26,24 @@
    diverso da qui.
    ============================================================ */
 
+/* Stessa forma dei campi di fatturazione del widget Checkout di Elementor
+   (pagina 960): senza bordo, angoli vivi, padding 16px, Muli 1rem, testo nero.
+   Il riempimento invece è invertito: quei campi sono #F1F1F1 su pagina bianca,
+   ma il .payment_box che contiene la carta è a sua volta #F1F1F1 (la regola del
+   widget batte quella di checkout.css), quindi qui il campo è bianco su grigio.
+   Con lo stesso grigio i campi carta sparirebbero nello sfondo.
+   Se in Elementor cambiano i campi del checkout, va riallineato a mano: il
+   campione non può leggere i valori del widget. */
 #wc-stripe-hidden-style-input {
 	background-color: #ffffff;
-	border: 1px solid #d0d0d0;
-	border-radius: var(--lvdt-radius-sm);
-	padding: 0.7rem 0.75rem;
+	border: 0 none #ffffff;
+	border-radius: 0;
+	padding: 16px;
 	box-shadow: none;
 	outline: none;
 	font-family: "Muli", Sans-serif;
-	font-size: 0.95rem;
+	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.4;
-	color: #424242;
+	color: #000000;
 }

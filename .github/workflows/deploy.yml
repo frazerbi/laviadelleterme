@@ -32,7 +32,15 @@ jobs:
           --exclude=.claude/
           --exclude=.gitignore
           --exclude=CLAUDE.md
-          --exclude=TEST-TEMA.md
           --exclude=importa-disiscritti-mailup.php
           --exclude=.DS_Store
           --exclude=wp-content/plugins/plugin-custom-skianet/assets/data/
+          --exclude=wp-content/plugins/plugin-custom-skianet/build.js
+          --exclude=wp-content/plugins/plugin-custom-skianet/composer.json
+          --exclude=wp-content/plugins/plugin-custom-skianet/composer.lock
+          --exclude=wp-content/plugins/plugin-custom-skianet/package.json
+          --exclude=wp-content/plugins/plugin-custom-skianet/package-lock.json
+          --exclude=wp-content/plugins/plugin-custom-skianet/pint.json
+          --exclude=wp-content/plugins/plugin-custom-skianet/rector.php
+          --exclude=wp-content/plugins/plugin-custom-skianet/utils/
+          --exclude=wp-content/plugins/plugin-custom-skianet/node_modules/

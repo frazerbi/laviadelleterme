@@ -73,16 +73,20 @@ add_action( 'wp_enqueue_scripts', function () {
 
 
 /* ----------------------------------------------------------
- * 9. HEARTBEAT API — 1 richiesta al minuto, solo nell'editor
- * ---------------------------------------------------------- */
+ * 9. HEARTBEAT API — 1 richiesta al minuto, solo in wp-admin
+ * ----------------------------------------------------------
+ * In admin non serve solo all'editor: tiene aggiornata la lista ordini di
+ * WooCommerce, avvisa quando un ordine è aperto da un altro utente e mostra il
+ * login quando la sessione scade. Fino al 2026-11-11 era tolto ovunque tranne
+ * post.php/post-new.php, e quelle funzioni sparivano. Sul front-end resta spento:
+ * lì non lo usa nessuno. */
 add_filter( 'heartbeat_settings', function ( $settings ) {
     $settings['interval'] = 60;
     return $settings;
 } );
 
 add_action( 'init', function () {
-    global $pagenow;
-    if ( $pagenow !== 'post.php' && $pagenow !== 'post-new.php' ) {
+    if ( ! is_admin() ) {
         wp_deregister_script( 'heartbeat' );
     }
 } );
