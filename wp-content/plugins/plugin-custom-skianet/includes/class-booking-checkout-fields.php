@@ -161,8 +161,12 @@ class Booking_Checkout_Fields {
         (function() {
             'use strict';
 
-            // Selettori dei contenitori express payment (Stripe, WC Payments, generici)
+            // Selettori dei contenitori express payment (Stripe, WC Payments, generici).
+            // Il primo e' quello di Stripe 10.x (Express Checkout Element): fino al
+            // 2026-11-11 mancava, nessun altro corrispondeva al markup attuale e
+            // Apple Pay / Google Pay restavano cliccabili senza dichiarazione.
             var expressSelectors = [
+                '#wc-stripe-express-checkout-element',
                 '#wc-stripe-payment-request-wrapper',
                 '.wcpay-payment-request-wrapper',
                 '#wcpay-express-checkout-wrapper',
@@ -207,12 +211,32 @@ class Booking_Checkout_Fields {
                 });
             }
 
+            // Il pagamento express non passa dal form: il server sa dell'accettazione
+            // solo dalla sessione WC. Per questo i pulsanti si riattivano solo quando
+            // il salvataggio e' confermato (sessionAccepted), non al click sulla
+            // checkbox: un tocco rapido su Apple Pay batteva la fetch e l'ordine
+            // finiva in on-hold dalla rete di sicurezza.
+            var sessionAccepted = false;
+
             function saveToSession(accepted) {
                 var formData = new FormData();
                 formData.append('action', 'save_health_certificate_session');
                 formData.append('accepted', accepted ? '1' : '0');
                 formData.append('nonce', '<?php echo wp_create_nonce('health_cert_session'); ?>');
-                fetch('<?php echo admin_url('admin-ajax.php'); ?>', { method: 'POST', body: formData });
+                return fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', { method: 'POST', body: formData, credentials: 'same-origin' })
+                    .then(function(response) { return response.ok ? response.json() : null; })
+                    .then(function(data) { return !!(data && data.success); })
+                    .catch(function() { return false; });
+            }
+
+            function acceptAndEnable(checkbox) {
+                saveToSession(true).then(function(saved) {
+                    // La spunta puo' essere stata tolta mentre la richiesta era in volo.
+                    if (saved && checkbox.checked) {
+                        sessionAccepted = true;
+                        toggleExpressPayments(true);
+                    }
+                });
             }
 
             // Evidenzia il box e scrolla ad esso quando manca l'accettazione della dichiarazione
@@ -269,16 +293,25 @@ class Booking_Checkout_Fields {
                 toggleExpressPayments(false);
 
                 checkbox.addEventListener('change', function() {
-                    toggleExpressPayments(this.checked);
-                    saveToSession(this.checked);
                     if (this.checked) {
                         clearHealthCertHighlight();
+                        acceptAndEnable(this);
+                    } else {
+                        sessionAccepted = false;
+                        toggleExpressPayments(false);
+                        saveToSession(false);
                     }
                 });
 
+                // Spunta gia' presente al caricamento (il browser ripristina i campi
+                // tornando indietro): la sessione potrebbe non saperlo, si risalva.
+                if (checkbox.checked) {
+                    acceptAndEnable(checkbox);
+                }
+
                 // Osserva DOM per express buttons caricati dopo (lazy loaded)
                 var observer = new MutationObserver(function() {
-                    if (!checkbox.checked) {
+                    if (!sessionAccepted) {
                         toggleExpressPayments(false);
                     }
                 });
