@@ -5,6 +5,11 @@ Mockup della nuova `/shop/`, non implementato. Esclusa dal deploy (`--exclude=de
 - **Canvas vivo**: https://claude.ai/artifact/8H6PMdGdjHEaEbyNUYtSCW (privato)
 - **`shop-mockup.dc.html`**: copia del canvas a questa data. È un file del formato Design di claude.ai, non si
   apre da solo nel browser: serve come riferimento per il markup e i testi.
+- **Pagina per il cliente**: https://claude.ai/artifact/TzV4qZ6uFiUofwxdCXf8u2 (privata finché non la si condivide
+  dal menu Share). Copia in **`proposta-shop.html`**: HTML semplice e navigabile, con le foto incorporate in base64;
+  l'interruttore funziona e si apre già su un'opzione con `#lun-ven`, `#tutti-i-giorni` o `#festivita-natalizie`;
+  i pulsanti aprono le schede prodotto reali del sito. Le descrizioni brevi di Massaggio, Private SPA e Hotel lì
+  sono già scritte (ricavate dai nomi prodotto), al posto dei segnaposto del canvas: da far confermare al cliente.
 
 ## Problema di partenza
 
