@@ -31,10 +31,10 @@ if ( ! defined( 'LOGO_TERME_FOOTER_PATH' ) ) {
     define( 'LOGO_TERME_FOOTER_PATH', PLUGIN_SKIANET_PATH . '/assets/img/footer-coupon.JPG' );
 }
 
-// Ambiente: decide quale mappa product ID usa Booking_Redirect. Vale 'staging'
-// perche' il deploy automatico va su staging2; in produzione, che si aggiorna a
-// mano file per file, questo file va caricato con 'production'.
-// Il guard lascia comunque l'ultima parola a un define nel wp-config.
+// Ambiente: decide quale mappa product ID usa Booking_Redirect. Il default e'
+// 'staging' (staging2 non lo definisce altrove); la produzione dichiara
+// 'production' nel proprio wp-config, caricato prima, che qui vince grazie al guard.
+// Il file si carica quindi uguale in entrambi gli ambienti.
 if (! \defined('WP_ENVIRONMENT_TYPE')) {
     \define('WP_ENVIRONMENT_TYPE', 'staging');
 }

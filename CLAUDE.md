@@ -320,6 +320,17 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
 
 **Asset versioning**: every theme asset goes through the `functions.php` helpers, which use a single version — `laviadelleterme_theme_version()`, i.e. the `Version:` header in `style.css`. Bump that header whenever a theme CSS/JS file changes, otherwise browsers keep serving the cached copy after a deploy (relevant since deploys here are sometimes manual FTP, not just `git push` — see "Manual uploads" below).
 
+**SiteGround Optimizer minifies CSS in production**, and the page then loads `<handle>.min.css`, a copy written *next
+to* the source (`checkout-style.min.css` beside `checkout.css`, and so on). It regenerates the copy only when the
+source's mtime differs from the copy's, and after writing it sets the copy's mtime equal to the source's. If a request
+arrives while an FTP upload is still writing the source, the copy is made from a partial or empty file and gets the
+same mtime, so SG treats it as current and keeps serving it. On 2026-11-11 that left
+`stripe-upe-appearance-style.min.css` at 0 bytes. **After an FTP upload, look for empty copies**
+(`find wp-content/themes/hello-theme-child-master -name '*-style.min.css' -size 0`) and delete any you find: SG
+recreates them on the next request. A copy that is wrong but not empty is caught by running SiteGround's own `minify
+<source>` binary over SSH and comparing its output with the copy. These `.min.css` files are not in the repo, and a
+full folder replacement deletes them without harm.
+
 **`controllo-codici/`**: two shortcodes (`controllo_codici_prezzo_pieno`, `controllo_codici_promo`) that print remaining unassigned license-code counts per product. Both are thin wrappers around `laviadelleterme_render_controllo_codici( $prodotti )` in `controllo-codici.php` — only the product map differs, so keep the shared renderer as the single place that touches the DB or the markup. It is gated by `laviadelleterme_puo_vedere_controllo_codici()` (`manage_woocommerce`); everyone else gets a "Contenuto riservato allo staff." line rather than silence, so a wrong capability is visible instead of looking like an empty page. One query (`WHERE order_id = 0 AND product_id IN (…) GROUP BY product_id`) covers the whole list — it used to be one query per product, 33 in total. Products with no rows are simply absent from the result and render as 0. `controllo-codici.css` is enqueued by the renderer itself (no `wp_enqueue_scripts` hook in this module), so it costs nothing on the rest of the site; it therefore prints in the footer, which is fine for an internal page.
 
 **`features/my-account/my-account.php`**: custom login/registration URLs and post-login/registration redirect logic. Redirect targets (explicit `redirect`/`redirect_to` params and the `Referer` fallback) are validated via `laviadelleterme_is_local_url()`, which compares hosts with `wp_parse_url(...,  PHP_URL_HOST)` — do not go back to a plain `strpos($url, home_url())` substring check, it's bypassable (`https://evil.tld/?x=` + `home_url()` passes it) and was an open-redirect vector here until fixed.
@@ -606,12 +617,13 @@ on the three colours. Do not add per-page notice color or font-size overrides �
 
 ### Ambiente (staging vs produzione)
 
-`plugin-custom-skianet.php` definisce **`WP_ENVIRONMENT_TYPE`** (`'staging'`, dietro un
-`if ( ! defined() )` che lascia l'ultima parola a un define nel `wp-config.php`). Sta li' e non nel wp-config del
-server perche' il deploy automatico va solo su staging2, mentre la produzione si aggiorna a mano file per file: **se
-carichi `plugin-custom-skianet.php` via FTP su `laviadelleterme.it`, il valore va cambiato in `'production'`**,
-altrimenti `Booking_Redirect` usa i product ID di staging (e WordPress mostra "Staging" nella barra admin, che e' la
-spia piu' rapida per accorgersene).
+**La produzione dichiara `define( 'WP_ENVIRONMENT_TYPE', 'production' );` nel proprio `wp-config.php`** (dal
+2026-11-11). `plugin-custom-skianet.php` definisce lo stesso `'staging'`, ma dietro un `if ( ! defined() )`: il
+wp-config viene caricato prima, quindi in produzione vince lui e su staging2 (che nel wp-config non lo definisce) vale
+il default del plugin. Il file del plugin e' cosi' identico nei due ambienti e si carica via FTP cosi' com'e'. Fino a
+quella data il valore stava solo nel file del plugin e andava cambiato a mano a ogni upload in produzione. Se un giorno
+la riga sparisse dal wp-config (es. un wp-config rigenerato), `Booking_Redirect` userebbe i product ID di staging:
+la spia piu' rapida e' la barra admin, dove WordPress mostra "Staging".
 
 Chi legge l'ambiente usa la **costante**, non `wp_get_environment_type()`: quella funzione memorizza il valore in una
 static alla prima chiamata, che puo' capitare prima del caricamento dei plugin.
@@ -657,8 +669,7 @@ Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (
 Both servers still carry the dev packages today, and the Composer part of `vendor/` is **not in git**: it got there by a
 manual upload, and the CI does not run `composer install`. **FPDF is not part of it**: it lives in `lib/fpdf/` (only
 `fpdf.php` + `font/`), tracked, and is `require`d lazily by `Booking_Nonbooking_Email::create_pdf()`, so regenerating
-`vendor/` can't delete it. (It sat in `vendor/fpdf/` until 2026-11-11; the servers still have that copy, which the old
-`plugin-custom-skianet.php` loads — harmless, the class is only loaded once.)
+`vendor/` can't delete it. (It sat in `vendor/fpdf/` until 2026-11-11, when it was also removed from both servers.)
 
 **Pending: a real dependency update.** `composer.lock` pins `guzzlehttp/guzzle` 7.9.2, which `roave/security-advisories`
 now rejects (needs ≥7.15.2), and the same package rejects PHP < 8.2.35 as `config.platform.php` — so any
