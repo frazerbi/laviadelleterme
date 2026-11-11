@@ -3,11 +3,11 @@
     "type": "library",
     "description": "termegest/plugin-custom-skianet",
     "require": {
-        "php": "8.2.24",
+        "php": "^8.2",
         "ext-soap": "*",
-        "laminas/laminas-code": "*",
-        "guzzlehttp/guzzle": "*",
-        "phpro/soap-client": "*"
+        "laminas/laminas-code": "^4.16",
+        "guzzlehttp/guzzle": "^7.15.2",
+        "phpro/soap-client": "^3.4"
     },
     "require-dev": {
         "driftingly/rector-laravel": "*",
@@ -38,7 +38,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.24"
+            "php": "8.2.35"
         },
         "optimize-autoloader": true,
         "preferred-install": "dist",

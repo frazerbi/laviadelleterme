@@ -675,19 +675,27 @@ The `vendor/` directory must be generated with `--no-dev` for production to excl
 composer install --no-dev --optimize-autoloader
 ```
 
-Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (pint), `phpstan/`, `veewee/`.
+Dev-only packages (must NOT be deployed): `rector/`, `driftingly/`, `laravel/` (pint), `phpstan/`, `roave/`.
+(`veewee/` is **not** one of them: it is a runtime dependency of `php-soap/*`.)
 
-Both servers still carry the dev packages today, and the Composer part of `vendor/` is **not in git**: it got there by a
-manual upload, and the CI does not run `composer install`. **FPDF is not part of it**: it lives in `lib/fpdf/` (only
-`fpdf.php` + `font/`), tracked, and is `require`d lazily by `Booking_Nonbooking_Email::create_pdf()`, so regenerating
-`vendor/` can't delete it. (It sat in `vendor/fpdf/` until 2026-11-11, when it was also removed from both servers.)
+The Composer part of `vendor/` is **not in git**: it is built locally and uploaded by hand, and the CI does not run
+`composer install`. **FPDF is not part of it**: it lives in `lib/fpdf/` (only `fpdf.php` + `font/`), tracked, and is
+`require`d lazily by `Booking_Nonbooking_Email::create_pdf()`, so regenerating `vendor/` can't delete it. (It sat in
+`vendor/fpdf/` until 2026-11-11, when it was also removed from both servers.)
 
-**Pending: a real dependency update.** `composer.lock` pins `guzzlehttp/guzzle` 7.9.2, which `roave/security-advisories`
-now rejects (needs ≥7.15.2), and the same package rejects PHP < 8.2.35 as `config.platform.php` — so any
-`composer update`, even `--lock`, fails until both move. Not urgent: no code here uses Guzzle (the SOAP clients go
-through `ExtSoapEngine`, i.e. PHP's own `SoapClient`). Doing it means `composer update` with `--no-scripts` (the
-post-update hooks run pint and rector over the code), `composer install --no-dev`, and re-uploading `vendor/` to both
-servers — which also gets rid of the dev packages.
+**Version constraints are pinned to the current major on purpose** (since 2026-11-11): `phpro/soap-client ^3.4`,
+`guzzlehttp/guzzle ^7.15.2`, `laminas/laminas-code ^4.16`. They used to be `"*"`, and a plain `composer update` then
+moved `phpro/soap-client` to 4.x, which **drops `php-soap/ext-soap-engine`** — the generated factories in `src/`
+import `Soap\ExtSoapEngine\ExtSoapOptions`, so every TermeGest call would have been a fatal. Moving to soap-client 4
+means regenerating `src/` with its code generator, not just bumping the constraint. `config.platform.php` is `8.2.35`,
+the version both servers run, and `roave/security-advisories` refuses anything older. Guzzle is required but no code
+uses it (the SOAP clients go through `ExtSoapEngine`, i.e. PHP's own `SoapClient`).
+
+**Updating the dependencies**: `composer update --no-scripts` (the post-update hooks run pint and rector over the
+code), then build the deployable copy with `composer install --no-dev --optimize-autoloader --no-scripts` and upload
+that `vendor/`. A quick check before uploading: autoload every class in `src/` and call both
+`*ClientFactory::factory()` with the real WSDL URLs — that is where an incompatible library version breaks. Then, on
+staging2, `wp cron event run termegest_check_availability` makes real `getDisponibilita` calls.
 
 ### Deployment
 
