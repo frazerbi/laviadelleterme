@@ -177,6 +177,25 @@ per …" is success, "ATTENZIONE: n/n codici NON sincronizzati" carries TermeGes
 unrecognised code block), and "ERRORE: Nessun codice per … - setVenduto non inviato" means WC License Delivery gave the
 item nothing.
 
+### Out-of-stock codes must not crash the checkout
+
+WC License Delivery 2.1 assigns codes from its own `woocommerce_order_status_{wc_ld_delivery_order_status}` hook
+(`processing` here), which fires *inside* `WC_Order::payment_complete()`. When a product has no free code
+(`license_status = '0'`), `assign_license_to_item()` calls `count()` on an array its empty `foreach` never created —
+a `TypeError` on PHP 8. It escapes up to the checkout. The customer has already paid but sees WooCommerce's generic
+"Si è verificato un errore durante l'elaborazione dell'ordine…", and probably pays again. The order is left with no
+codes and no TermeGest sync. `Booking_Order_Status` has already moved it to a green `booked`/`not-booked`, so in the
+admin it looks fine. This was reproduced on staging2 on 2026-11-11, with codes left at `order_id = 0` but
+`license_status = 1`.
+
+`Booking_Code_Assignment` therefore **replaces that hook on `init`**: WC_LD registers it on `plugins_loaded`, after this
+plugin. The replacement, `assign_codes_safely()`, runs the same item loop with a free-code count first and a
+`catch (\Throwable)` around each item. A short item is skipped and reported once per order, with an order note
+("ERRORE: codici esauriti…"), a `skianet-codici` log entry and an email to `admin_email`. The rest of the order — other
+items, the TermeGest sync, the emails — goes on. The `woocommerce_payment_complete` path uses the same loop. If WC_LD
+changes and the callback isn't found, its original stays in place and only the payment path is protected. Watch the
+stock in `controllo-codici` all the same: a skipped item still needs codes loaded and assigned by hand.
+
 ### License Code Assignment & Per-Item Scoping
 
 WooCommerce License Delivery's `wc_ld_license_codes` DB table associates codes with `order_id` + `product_id` only — it has **no `order_item_id` column**. This matters because an order can contain two separate line items for the *same product* with different booking details (e.g. same ticket type booked for two different dates/times/locations). A naive `WHERE order_id = %d AND product_id = %d` query returns **all** codes for that product in the order to every matching item, not just the ones belonging to that specific item.
