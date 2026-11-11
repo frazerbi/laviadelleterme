@@ -513,28 +513,6 @@ class Booking_Handler {
     }
 
     /**
-     * Recupera la prenotazione dalla sessione
-     */
-    private function get_booking_from_session() {
-        if (!session_id()) {
-            session_start();
-        }
-        
-        return $_SESSION['termegest_booking'] ?? null;
-    }
-
-    /**
-     * Cancella la prenotazione dalla sessione
-     */
-    private function clear_booking_session() {
-        if (!session_id()) {
-            session_start();
-        }
-        
-        unset($_SESSION['termegest_booking']);
-    }
-    
-    /**
      * Verifica se la location è valida
      */
     public function is_valid_location($location) {

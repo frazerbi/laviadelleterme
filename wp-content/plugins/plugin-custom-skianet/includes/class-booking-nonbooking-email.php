@@ -183,7 +183,6 @@ class Booking_Nonbooking_Email {
 
         // Recupera ACF fields
         $condizioni_vendita = get_field('condizioni_vendita_pdf', $product_id);
-        $come_prenotarsi = get_field('come_prenotarsi', $product_id);
 
         // Formatta codici
         $formatted_codes = implode("\n", $codes);
@@ -217,8 +216,10 @@ class Booking_Nonbooking_Email {
      * Crea file PDF
      */
     private function create_pdf($product_name, $body_pdf, $order_id, $product_id, $variation_id = null) {
+        // FPDF sta in lib/ e non in vendor/: un composer install rigenera vendor/ da zero.
+        // Si carica solo qui, l'unico punto che genera PDF.
         if (!class_exists('FPDF')) {
-            return false;
+            require_once PLUGIN_SKIANET_PATH . '/lib/fpdf/fpdf.php';
         }
 
         try {
@@ -336,7 +337,6 @@ class Booking_Nonbooking_Email {
         $html_message = $wc_email->style_inline($wrapped_message);
         
         $admin = 'biglietti@laviadelleterme.it';
-        $super_admin = 'francesco.zerbinato@gmail.com';
 
         $recipients = $send_to_admin ?  array($admin) : array($to_email);
         $success = true;

@@ -205,22 +205,16 @@ class Booking_Redirect {
             'woocommerce-variation-preselect',
             plugin_dir_url(PLUGIN_SKIANET_FILE) . 'assets/js/woocommerce-variation-preselect.js',
             array('jquery'),
-            '1.0.0',
+            PLUGIN_SKIANET_VERSION,
             true
         );
 
-        $url_params = array();
-        if (isset($_GET['variation_id'])) {
-            $url_params['variation_id'] = sanitize_text_field($_GET['variation_id']);
-        }
-        if (isset($_GET['ticket_type'])) {
-            $url_params['ticket_type'] = sanitize_text_field($_GET['ticket_type']);
-        }
-        if (isset($_GET['total_guests'])) {
-            $url_params['total_guests'] = intval($_GET['total_guests']);
-        }
-        
-        wp_localize_script('woocommerce-variation-preselect', 'bookingParams', $url_params);
+        // Il JS legge i parametri direttamente dall'URL; da qui riceve solo le etichette,
+        // cosi' restano scritte in un posto solo (Booking_Handler).
+        wp_localize_script('woocommerce-variation-preselect', 'bookingLabels', array(
+            'tickets'   => Booking_Handler::get_ticket_types(),
+            'locations' => Booking_Handler::get_available_locations(),
+        ));
     }
 
 }

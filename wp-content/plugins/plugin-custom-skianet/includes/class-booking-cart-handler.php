@@ -187,7 +187,7 @@ class Booking_Cart_Handler {
                 $item->add_meta_data('_booking_time_slot_label', $values['booking_time_slot_label'], true);
             }
 
-            $ticket_labels = array('4h' => '4 Ore', 'giornaliero' => 'Giornaliero', 'serale' => 'Serale');
+            $ticket_labels = Booking_Handler::get_ticket_types();
             $item->add_meta_data('Tipo Ingresso', $ticket_labels[$values['booking_ticket_type']] ?? $values['booking_ticket_type'], true);
             $item->add_meta_data('_booking_ticket_type', $values['booking_ticket_type'], true);
             

@@ -13,7 +13,6 @@ use TermeGestGetReserv\TermeGestGetReservClientFactory;
 use TermeGestGetReserv\Type\GetDisponibilita;
 use TermeGestGetReserv\Type\GetDisponibilitaGiornoFascia;
 use TermeGestGetReserv\Type\GetDisponibilitaById;
-use TermeGestGetReserv\Type\GetFascia;
 use TermeGestGetReserv\Type\SetPrenotazione;
 use TermeGestSetInfo\TermeGestSetInfoClientFactory;
 use TermeGestSetInfo\Type\SetVenduto;
@@ -174,27 +173,6 @@ class TermeGest_API {
 
             return (new AnyXML($any))->convertXmlToPhpObject();
         } catch (Throwable $throwable) {
-            return [];
-        }
-    }
-
-    /**
-     * Ottieni fasce orarie per un giorno
-     * 
-     * @param int $day Giorno
-     * @param int $month Mese
-     * @param int $year Anno
-     * @param string $location Codice location
-     * @return array Array di oggetti Fascia
-     */
-    public function get_fascia(int $day, int $month, int $year, string $location): array {
-        try {
-            $response = $this->get_reserv_client()->getFascia(
-                new GetFascia(new DateTime($year.'-'.$month.'-'.$day.' 00:00:00'), $location)
-            );
-
-            return (new AnyXML($response->getGetFasciaResult()?->getAny()))->convertXmlToPhpObject();
-        } catch (Exception $exception) {
             return [];
         }
     }

@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Author: Francesco Zerbinato
  * Version: 2.0
  * Requires at least: 6.0
- * Requires PHP: 8.1
+ * Requires PHP: 8.2
  * Text Domain: skianet-custom
  * Domain Path: /languages
  */
@@ -55,8 +55,6 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-email-notification.p
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-nonbooking-email.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-checkout-fields.php';
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-only-handler.php';
-
-require_once PLUGIN_SKIANET_PATH . '/vendor/fpdf/fpdf.php';
 
 
 // Hook activation - registra il cron

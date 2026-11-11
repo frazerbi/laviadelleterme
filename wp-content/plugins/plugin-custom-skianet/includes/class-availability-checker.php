@@ -11,11 +11,6 @@ if (!defined('ABSPATH')) {
 class Availability_Checker {
 
     /**
-     * Directory per i file JSON
-     */
-    private const JSON_DIR = 'termegest-availability';
-
-    /**
      * Istanza singleton
      */
     private static $instance = null;
@@ -280,15 +275,6 @@ class Availability_Checker {
     private function get_json_filename($location) {
         $slug = sanitize_title($location);
         return "availability-{$slug}.json";
-    }
-
-    /**
-     * Ottieni path pubblico del file JSON
-     */
-    public function get_json_url($location) {
-        $upload_dir = wp_upload_dir();
-        $filename = $this->get_json_filename($location);
-        return $upload_dir['baseurl'] . '/' . self::JSON_DIR . '/' . $filename;
     }
 
     /**

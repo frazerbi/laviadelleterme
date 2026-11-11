@@ -69,7 +69,7 @@ class Booking_TermeGest_Sync {
         // La lettura da order item meta (_license_code_ids) fallisce perché WC License
         // Delivery scrive su wc_ld_license_codes bypassando la WP object cache,
         // quindi l'oggetto WC_Order_Item in memoria risulta ancora vuoto nella stessa request.
-        $codes = $this->get_license_codes_for_item($item, true);
+        $codes = Booking_Cart_Handler::get_item_license_codes($item);
 
         if (empty($codes)) {
             $order->add_order_note("ERRORE: Nessun codice per " . $item->get_name());
@@ -91,7 +91,7 @@ class Booking_TermeGest_Sync {
      */
     private function sync_nonbooking_item($order, $item) {
         // Recupera codici
-        $codes = $this->get_license_codes_for_item($item, true);
+        $codes = Booking_Cart_Handler::get_item_license_codes($item);
         
         if (empty($codes)) {
             // Stessa nota del ramo con prenotazione: senza codici il setVenduto non
@@ -374,34 +374,6 @@ class Booking_TermeGest_Sync {
                 );
             }
         }
-    }
-
-    /**
-     * Recupera codici licenza per item
-     */
-    private function get_license_codes_for_item($item, $use_db_query = false) {
-        if ($use_db_query) {
-            // ✅ Usa metodo condiviso (già scoped al singolo order item, non solo al prodotto)
-            return Booking_Cart_Handler::get_item_license_codes($item);
-        }
-        
-        $item_id = $item->get_id();
-        $code_ids = wc_get_order_item_meta($item_id, '_license_code_ids');
-        
-        if (empty($code_ids) || !is_array($code_ids)) {
-            return array();
-        }
-        
-        $codes = array();
-        foreach ($code_ids as $code_id) {
-            $code_data = WC_LD_Model::get_codes_by_id($code_id);
-            
-            if (!empty($code_data[0]['license_code1'])) {
-                $codes[] = $code_data[0]['license_code1'];
-            }
-        }
-
-        return $codes;
     }
 
 }

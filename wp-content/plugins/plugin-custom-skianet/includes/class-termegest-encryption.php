@@ -102,18 +102,4 @@ class TermeGest_Encryption {
     public function is_available(): bool {
         return function_exists('openssl_encrypt');
     }
-
-    /**
-     * Ottieni informazioni sulla configurazione
-     * 
-     * @return array
-     */
-    public function get_info(): array {
-        return array(
-            'cipher_method' => self::CIPHER_METHOD,
-            'iv_length' => self::IV_LENGTH,
-            'openssl_available' => $this->is_available(),
-            'key_length' => strlen(self::ENCRYPTION_KEY)
-        );
-    }
 }

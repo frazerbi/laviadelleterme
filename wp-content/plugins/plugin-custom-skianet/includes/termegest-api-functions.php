@@ -37,31 +37,6 @@ function skianet_termegest_get_disponibilita(int $month, int $year, string $cate
 }
 
 /**
- * Ottieni fasce orarie
- * 
- * @param int $day Giorno
- * @param int $month Mese
- * @param int $year Anno
- * @param string $location Codice location
- * @return array Array di oggetti Fascia
- */
-function skianet_termegest_get_fascia(int $day, int $month, int $year, string $location): array {
-    return TermeGest_API::get_instance()->get_fascia($day, $month, $year, $location);
-}
-
-/**
- * Ottieni disponibilità per ID
- * 
- * @param int $id ID disponibilità
- * @param string $location Codice location
- * @param string $categoria Categoria
- * @return int Numero posti disponibili
- */
-function skianet_termegest_get_disponibilitaById(int $id, string $location, string $categoria): int {
-    return TermeGest_API::get_instance()->get_disponibilita_by_id($id, $location, $categoria);
-}
-
-/**
  * Crea prenotazione
  * 
  * @return array{status: bool, message: string}

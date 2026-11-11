@@ -1,14 +1,8 @@
 function getVars() {
-    const TICKET_TYPE_LABELS = {
-        '4h': '4 ore',
-        'giornaliero': 'Giornaliero',
-        'serale': 'Serale'
-    };
-    const LOCATION_LABELS = {
-        'terme-saint-vincent': 'Terme di Saint-Vincent',
-        'terme-genova': 'Terme di Genova',
-        'monterosa-spa': 'Monterosa SPA'
-    };
+    // Etichette da Booking_Handler, passate da Booking_Redirect::enqueue_variation_script().
+    const labels = window.bookingLabels || {};
+    const TICKET_TYPE_LABELS = labels.tickets || {};
+    const LOCATION_LABELS = labels.locations || {};
 
     // location e ticket_type passano dalle lookup table qui sopra, quindi qualsiasi
     // valore non previsto diventa null. date e time_slot_label non hanno una tabella

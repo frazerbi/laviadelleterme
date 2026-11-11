@@ -202,7 +202,7 @@ class Booking_Email_Notification {
                 $detail .= "<strong>Orario prenotazione:</strong> <span style='color: #0074A0;'>" . esc_html($booking_data['time_slot_label']) . "</span><br>";
             }
 
-            $ticket_labels = array('4h' => '4 Ore', 'giornaliero' => 'Giornaliero', 'serale' => 'Serale');
+            $ticket_labels = Booking_Handler::get_ticket_types();
             $detail .= "<strong>Tipo Ingresso:</strong> <span style='color: #0074A0;'>" . ($ticket_labels[$booking_data['ticket_type']] ?? $booking_data['ticket_type']) . "</span><br>";
 
             // Ospiti
