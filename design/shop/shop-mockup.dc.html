@@ -36,11 +36,12 @@ a{color:#0074A0}a:hover{color:#005678}
 <div role="group" aria-label="Giorni di validità" style="display: inline-flex; flex-wrap: wrap; justify-content: center; padding: 6px; background: #ffffff; border: 2px solid #0074A0; border-radius: 999px; gap: 6px; box-shadow: 0 4px 14px rgba(0, 87, 122, 0.15);">
 <button type="button" aria-pressed="{{feriali.pressed}}" onClick="{{pickFeriali}}" style="{{feriali.style}}">Lunedì – venerdì</button>
 <button type="button" aria-pressed="{{tutti.pressed}}" onClick="{{pickTutti}}" style="{{tutti.style}}">Tutti i giorni</button>
+<button type="button" aria-pressed="{{natale.pressed}}" onClick="{{pickNatale}}" style="{{natale.style}}">Festività natalizie</button>
 </div>
 <span style="font-size: 0.95rem; font-weight: 600; color: #4f4f4f;">{{daysHint}}</span>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; align-items: stretch;">
+<div style="{{gridStyle}}">
 <sc-for list="{{tickets}}" as="t" hint-placeholder-count="4">
 <article style="{{t.cardStyle}}">
 <sc-if value="{{t.hasBadge}}" hint-placeholder-val="{{false}}">
@@ -172,6 +173,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     var fer = this.state.days === 'feriali';
+    var nat = this.state.days === 'natale';
     var pill = function (on) {
       return 'border: 0; cursor: pointer; min-height: 52px; padding: 12px 30px; border-radius: 999px; font-family: inherit; font-size: 1.1rem; font-weight: 800; ' +
         (on ? 'background: #0074A0; color: #ffffff;' : 'background: transparent; color: #0074A0; text-decoration: underline; text-underline-offset: 4px;');
@@ -181,22 +183,33 @@ class Component extends DCLogic {
     };
     var card = function (highlight) {
       return 'position: relative; display: flex; flex-direction: column; gap: 16px; padding: 28px 24px 24px; border-radius: 12px; background: #ffffff; ' +
-        (highlight === 'gold' ? 'border: 2px solid #B8912E; background: #FFFCF4;' : highlight === 'blue' ? 'border: 2px solid #0074A0;' : 'border: 1px solid #E5E5E5;');
+        (highlight === 'gold' ? 'border: 2px solid #B8912E; background: #FFFCF4;' : highlight === 'blue' ? 'border: 2px solid #0074A0;' : highlight === 'natale' ? 'border: 2px solid #9B1C1C; background: #FFF8F7;' : 'border: 1px solid #E5E5E5;');
     };
     var badge = function (kind) {
       return 'position: absolute; top: -13px; left: 24px; padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; ' +
-        (kind === 'gold' ? 'background: #B8912E; color: #2b2000;' : 'background: #0074A0; color: #ffffff;');
+        (kind === 'gold' ? 'background: #B8912E; color: #2b2000;' : kind === 'natale' ? 'background: #9B1C1C; color: #ffffff;' : 'background: #0074A0; color: #ffffff;');
     };
     var excl = fer ? 'Solo feriali: esclusi prefestivi e festivi. ' : '';
+    var xmasHint = ' Per queste date scegli “Festività natalizie”.';
+    var natTickets = [
+      { name: 'Mezza giornata', tagline: 'Il classico ingresso SPA, anche a Natale', duration: '4 ore', price: '65', priceNote: '',
+        hasBadge: true, badge: 'Festività natalizie', badgeStyle: badge('natale'), cardStyle: card('natale'),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Valido dal lunedì alla domenica', true)],
+        excluded: 'Valido anche dal 24 dicembre al 6 gennaio. Il 25 dicembre le SPA sono chiuse.' },
+      { name: 'Serale', tagline: 'Le ultime 3 ore di apertura, anche a Natale', duration: '3 ore', price: '45', priceNote: '',
+        hasBadge: true, badge: 'Festività natalizie', badgeStyle: badge('natale'), cardStyle: card('natale'),
+        features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Valido dal lunedì alla domenica', true)],
+        excluded: 'Valido anche dal 24 dicembre al 6 gennaio. Il 25 dicembre le SPA sono chiuse.' }
+    ];
     var tickets = [
       { name: 'Serale', tagline: 'Le ultime 3 ore di apertura', duration: '3 ore', price: '39', priceNote: fer ? 'valido tutti i giorni' : '',
         hasBadge: false, badge: '', badgeStyle: '', cardStyle: card(''),
         features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', false)],
-        excluded: 'Non valido dal 24 dicembre al 6 gennaio.' },
+        excluded: 'Non valido dal 24 dicembre al 6 gennaio.' + xmasHint },
       { name: 'Mezza giornata', tagline: 'Il classico ingresso SPA', duration: '4 ore', price: fer ? '49' : '59', priceNote: '',
         hasBadge: false, badge: '', badgeStyle: '', cardStyle: card(''),
         features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', false)],
-        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' },
+        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' + xmasHint },
       { name: 'Gold Ticket', tagline: 'Mezza giornata, anche in Svizzera', duration: '4 ore', price: fer ? '49' : '59', priceNote: '',
         hasBadge: true, badge: '4 destinazioni', badgeStyle: badge('gold'), cardStyle: card('gold'),
         features: [feat('Kit accappatoio, ciabatte e asciugamano', false), feat('Piatto light al ristorante', false), feat('Anche Splash & Spa Tamaro (CH)', true)],
@@ -204,7 +217,7 @@ class Component extends DCLogic {
       { name: 'Giornata intera', tagline: 'Tutto il giorno, tutto incluso', duration: 'Tutto il giorno', price: fer ? '79' : '89', priceNote: '',
         hasBadge: true, badge: 'Il più completo', badgeStyle: badge('blue'), cardStyle: card('blue'),
         features: [feat('Kit accappatoio, ciabatte e asciugamano', true), feat('Piatto light al ristorante', true), feat('Anche Splash & Spa Tamaro (CH)', false)],
-        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' }
+        excluded: excl + 'Non valido dal 24 dicembre al 6 gennaio.' + xmasHint }
     ];
     var steps = [
       { n: '1', title: 'Struttura', detail: 'Genova, Saint-Vincent o Monterosa SPA' },
@@ -224,12 +237,15 @@ class Component extends DCLogic {
     var self = this;
     return {
       feriali: { pressed: fer ? 'true' : 'false', style: pill(fer) },
-      tutti: { pressed: fer ? 'false' : 'true', style: pill(!fer) },
+      tutti: { pressed: this.state.days === 'tutti' ? 'true' : 'false', style: pill(this.state.days === 'tutti') },
+      natale: { pressed: nat ? 'true' : 'false', style: pill(nat) },
       pickFeriali: function () { self.setState({ days: 'feriali' }); },
       pickTutti: function () { self.setState({ days: 'tutti' }); },
-      daysHint: fer ? 'Esclusi prefestivi e festivi' : 'Anche weekend e festivi',
+      pickNatale: function () { self.setState({ days: 'natale' }); },
+      daysHint: nat ? 'Dal 24 dicembre al 6 gennaio valgono solo questi biglietti' : fer ? 'Esclusi prefestivi e festivi' : 'Anche weekend e festivi',
+      gridStyle: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; align-items: stretch;' + (nat ? ' width: 100%; max-width: 640px; margin: 0 auto;' : ''),
       // Ordine di visualizzazione: mezza giornata, serale, giornaliero, gold
-      tickets: [tickets[1], tickets[0], tickets[3], tickets[2]], steps: steps, spa: spa, packs: packs
+      tickets: nat ? natTickets : [tickets[1], tickets[0], tickets[3], tickets[2]], steps: steps, spa: spa, packs: packs
     };
   }
 }

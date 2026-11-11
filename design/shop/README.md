@@ -16,8 +16,12 @@ durata, kit, piatto light, giorni, Splash & Spa Tamaro — sta solo nelle condiz
 
 1. Titolo "Regala un coupon" + intro.
 2. **Ingressi SPA** (sezione principale, fascia azzurra a tutta larghezza): interruttore "Lunedì – venerdì / Tutti
-   i giorni" che cambia i prezzi, poi 4 card per durata in quest'ordine: Mezza giornata, Serale, Giornata intera,
-   Gold Ticket. Ogni card: durata, ✓/✗ per kit, piatto light e Tamaro, periodo escluso.
+   i giorni / Festività natalizie" che cambia i prezzi, poi 4 card per durata in quest'ordine: Mezza giornata,
+   Serale, Giornata intera, Gold Ticket. Ogni card: durata, ✓/✗ per kit, piatto light e Tamaro, periodo escluso
+   (con il rimando a "Festività natalizie" per 24 dic–6 gen). La terza opzione mostra solo i due biglietti
+   natalizi, gli unici validi dal 24 dicembre al 6 gennaio (il 25 le SPA sono chiuse): **27370** Mezza giornata
+   4 ore Festività Natalizie, € 65, e **124174** Serale da 3 ore Festività Natalizie, € 45. Da decidere se
+   l'opzione si vede tutto l'anno o solo nel periodo di vendita.
 3. Fascia blu "Sai già quando venire? Prenota direttamente" → `/prenota/` (form di prenotazione, 4 passi).
 4. SPA private & massaggi.
 5. Pacchetti e buoni valore (Hotel + ingresso, Mega Bonus).
@@ -33,3 +37,12 @@ durata, kit, piatto light, giorni, Splash & Spa Tamaro — sta solo nelle condiz
 - **Implementazione**: l'interruttore dei giorni non si fa con il widget prodotti di Elementor. Ipotesi: shortcode in
   un nuovo modulo del tema (`features/shop-ingressi/`) che legge prezzi da prodotti/variazioni WooCommerce (228,
   14, 109134, 120150, 120140), così i prezzi non si duplicano a mano; il resto della pagina resta Elementor.
+- **Biglietti natalizi nel codice** (visti cercando i due prodotti, non toccati):
+  - `Booking_Handler::validate_category()` gestisce il serale (`v3`) *prima* del controllo sul periodo natalizio,
+    quindi un serale prenotato dal form per il 26 dicembre finisce sul serale normale (109134), che a Natale non
+    vale. Il serale natalizio 124174 non è in nessuna mappa di `Booking_Redirect`: serve la sua categoria
+    TermeGest.
+  - `Booking_Redirect::is_christmas_period()` e `get_christmas_dates()` partono dal **25** dicembre, mentre le
+    condizioni di vendita escludono i biglietti normali dal **24**: dal form, il 24 dicembre porta a un biglietto
+    normale.
+  - 124174 non è nella mappa di `controllo-codici`, quindi le sue scorte di codici non si vedono.
