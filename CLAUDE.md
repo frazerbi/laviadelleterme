@@ -393,6 +393,12 @@ outbound IP must be there, for staging2 and production alike. Return codes treat
 (already subscribed / already unsubscribed), which makes every call idempotent; for `Xmlunsubscribe` also `1`, which
 MailUp returns for an address that was **never in the list** (verified on staging2 with a made-up address, 2026-10-30 —
 not the "generic error" the code means elsewhere; the same parameters returned 0 for a real contact).
+That `1` is only trusted for an address the site never subscribed: on a revocation for a user who still has the
+`laviadelleterme_mailup_contatto` snapshot (i.e. the site did subscribe that address) it is a contradiction, most
+likely a wrong `_LIST_GUID` — which only `Xmlunsubscribe` uses, so subscribes keep working and nothing else shows it.
+That case gets the state **`attenzione`** in the Utenti column and a `warning` in the log, with no retry (it would
+return the same code); the user-deletion job, which runs almost only for subscribed addresses, logs `1` as a warning
+too.
 Staging2's outbound IP is `35.214.206.101` (IPv4 only); MailUp also **re-subscribes via API a contact who had
 unsubscribed**, so the unsubscribe webhook must be live before any bulk alignment, or it resubscribes people who left
 from the newsletter link.
@@ -428,8 +434,15 @@ from the newsletter link.
   `/wp-json/laviadelleterme/v1/mailup-disiscrizione?token=<TOKEN>&email=<address>` (GET or POST, token compared with
   `hash_equals`), which sets the consent to `no` with source `mailup`. That source is skipped by the sync, so nothing
   is sent back. Unknown emails get a 200 too (the list may hold contacts from elsewhere; an error would only make
-  MailUp retry). In MailUp the token goes in the URL and `email` is a webhook parameter (source Recipient, field
-  Email); webhooks are per list, arrive about a minute after the unsubscribe and don't fire for API operations.
+  MailUp retry). In MailUp the token goes in the URL and `email` is a webhook parameter (field Email); webhooks are per
+  list and arrive about a minute after the unsubscribe. **Each webhook takes one event source, so production has two
+  identical Unsubscribe webhooks, `Recipient` (the contact's own action) and `Console` (done by hand in MailUp)**, both
+  tested 2026-11-03. Without `Console`, a contact unsubscribed by hand stays subscribed on the site and the next
+  name/email change re-subscribes them. **Don't add the `Api` source**: MailUp's docs say HTTP API calls can fire
+  webhooks, and those are the calls this module makes, so a revocation could come back a minute later and undo a
+  re-subscription made in the meantime. **Don't point a Subscribe webhook at this URL either**: the endpoint ignores the
+  event type and always revokes. A subscribe from MailUp wouldn't count as consent anyway, since the site's history is
+  the proof.
 - **The webhook reaches the site through a Cloudflare Worker, not directly.** MailUp sends
   `User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0`, and SiteGround's security
   layer closes the connection on that user-agent before WordPress and without a line in the access log — so a webhook
@@ -437,7 +450,7 @@ from the newsletter link.
   by both IP and URL (2026-11-03). The Worker (one per environment, in the Cloudflare account, not in this repo) has a
   fixed destination, forwards the query string with its own user-agent and returns the status; WordPress still checks
   the token. Staging2's is `sparkling-brook-6216.francesco-zerbinato.workers.dev` (webhook on list 4), production's is
-  `dark-shadow-9261.francesco-zerbinato.workers.dev` (webhook on list 2). If MailUp ever changes its user-agent, put the
+  `mailup-to-laviadellterme.francesco-zerbinato.workers.dev` (webhooks on list 2). If MailUp ever changes its user-agent, put the
   direct URL back and delete the Worker. Weak spot: if the Worker or the site is down, that unsubscribe may be lost in
   silence, so align periodically against MailUp's export.
 - **Importing MailUp's unsubscribed contacts**: `importa-disiscritti-mailup.php` in the repo root (WP-CLI only, excluded

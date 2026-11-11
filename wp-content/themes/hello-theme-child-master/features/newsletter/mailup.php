@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const LAVIADELLETERME_MAILUP_JOB              = 'laviadelleterme_mailup_sincronizza';
 const LAVIADELLETERME_MAILUP_JOB_DISISCRIVI   = 'laviadelleterme_mailup_disiscrivi_email';
 const LAVIADELLETERME_MAILUP_TENTATIVI        = 3;
-const LAVIADELLETERME_MAILUP_META_STATO       = 'laviadelleterme_mailup_stato'; // 'in coda' | 'ok' | 'errore'
+const LAVIADELLETERME_MAILUP_META_STATO       = 'laviadelleterme_mailup_stato'; // 'in coda' | 'ok' | 'errore' | 'attenzione'
 const LAVIADELLETERME_MAILUP_META_DATA        = 'laviadelleterme_mailup_data';
 const LAVIADELLETERME_MAILUP_META_ESITO       = 'laviadelleterme_mailup_esito';
 // Email, nome e cognome inviati all'ultima iscrizione riuscita: ciò che MailUp ha in lista.
@@ -267,6 +267,19 @@ add_action( LAVIADELLETERME_MAILUP_JOB, function ( $user_id, $tentativo = 1 ) {
 
 	update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_DATA, current_time( 'mysql' ) );
 
+	// 1 = "mai stato in lista": normale per chi dal sito non è mai stato iscritto, una
+	// contraddizione per un indirizzo che il sito ha iscritto con successo (c'è lo snapshot).
+	// Lì la causa più probabile è la configurazione, tipicamente un ListGuid errato, che
+	// Xmlunsubscribe usa e xmlSubscribe no. Nessun nuovo tentativo, darebbe lo stesso codice:
+	// stato "attenzione" in Utenti e un warning nel log, invece di un "ok" che lo nasconde.
+	if ( ! $iscritto && 1 === $esito && get_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO, true ) ) {
+		delete_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO );
+		update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_STATO, 'attenzione' );
+		update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_ESITO, "disiscrizione: MailUp dice che <$email_lista> non era in lista, ma il sito l'aveva iscritto — controllare il ListGuid" );
+		laviadelleterme_mailup_log( 'warning', "Utente $user_id <$email_lista>: disiscrizione con codice 1 (non in lista) per un indirizzo iscritto dal sito. Controllare LAVIADELLETERME_MAILUP_LIST_GUID." );
+		return;
+	}
+
 	if ( ! is_wp_error( $esito ) ) {
 		if ( $iscritto ) {
 			update_user_meta( $user_id, LAVIADELLETERME_MAILUP_META_CONTATTO, laviadelleterme_mailup_contatto( $user ) );
@@ -309,6 +322,13 @@ add_action( LAVIADELLETERME_MAILUP_JOB_DISISCRIVI, function ( $email, $tentativo
 	}
 
 	$esito = laviadelleterme_mailup_disiscrivi( $email );
+
+	// Questo job parte quasi sempre per un indirizzo iscritto dal sito, quindi il codice 1
+	// ("mai stato in lista") qui è sospetto: stesso ragionamento del job di sincronizzazione.
+	if ( 1 === $esito ) {
+		laviadelleterme_mailup_log( 'warning', "Utente cancellato <$email>: disiscrizione con codice 1 (non in lista). Se l'indirizzo era iscritto, controllare LAVIADELLETERME_MAILUP_LIST_GUID." );
+		return;
+	}
 
 	if ( ! is_wp_error( $esito ) ) {
 		laviadelleterme_mailup_log( 'info', "Utente cancellato <$email>: disiscrizione ok, codice $esito." );
