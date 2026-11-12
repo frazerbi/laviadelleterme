@@ -381,8 +381,9 @@ class Booking_Handler {
             $errors->add('no_guests', 'Devi selezionare almeno un ingresso.');
         }
 
-        if ($total_guests > 20) {
-            $errors->add('too_many_guests', 'Numero massimo di ingressi: 20.');
+        // Il limite e' sulla prenotazione intera, uomini + donne insieme (come MAX_GUESTS nel form)
+        if ($total_guests > 10) {
+            $errors->add('too_many_guests', 'Puoi prenotare al massimo 10 ingressi in tutto (uomini + donne).');
         }
 
         if ($errors->has_errors()) {

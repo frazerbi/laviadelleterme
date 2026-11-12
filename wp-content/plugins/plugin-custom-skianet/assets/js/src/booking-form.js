@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitBtn = form.querySelector('.btn-submit');
     const responseDiv = document.getElementById('booking-response');
 
+    // Ingressi massimi per prenotazione, uomini + donne insieme
+    // (come Booking_Handler::validate_booking_data())
+    const MAX_GUESTS = 10;
+    const MAX_GUESTS_MESSAGE = `Puoi prenotare al massimo ${MAX_GUESTS} ingressi in tutto (uomini + donne).`;
+
     // Reset form al caricamento per evitare stato residuo dal browser back button
     form.reset();
 
@@ -561,13 +566,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return timeSlotField.options.length > 1;
     }
 
+    function getTotalGuests() {
+        return (parseInt(numMaleField.value) || 0) + (parseInt(numFemaleField.value) || 0);
+    }
+
     function checkSubmitButton() {
-        // Massimo per genere = attributo max dei campi (10, come Booking_Handler::validate_booking_data()):
-        // su type="tel" il browser non lo applica, e un numero scritto a mano lo supererebbe
-        const male = parseInt(numMaleField.value) || 0;
-        const female = parseInt(numFemaleField.value) || 0;
-        const withinMax = male <= Number(numMaleField.max) && female <= Number(numFemaleField.max);
-        submitBtn.disabled = !(male + female > 0 && withinMax && timeSlotField.value);
+        // Il limite e' sul totale: i pulsanti + si fermano da soli, ma su type="tel" il browser
+        // non applica max e un numero scritto a mano lo supererebbe
+        const total = getTotalGuests();
+        const withinMax = total <= MAX_GUESTS;
+
+        // Il messaggio sul limite si toglie solo se e' quello mostrato: checkSubmitButton()
+        // gira anche dopo un errore di invio, che deve restare a video
+        if (!withinMax) {
+            showMessage('error', MAX_GUESTS_MESSAGE);
+        } else if (responseDiv.textContent === MAX_GUESTS_MESSAGE) {
+            hideMessage();
+        }
+
+        submitBtn.disabled = !(total > 0 && withinMax && timeSlotField.value);
     }
 
     function showMessage(type, text) {
@@ -605,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         wrap.appendChild(btnUp);
         btnUp.addEventListener('click', function() {
             let currentValue = parseInt(field.value) || 0; 
-            if (currentValue < field.max) {
+            if (getTotalGuests() < MAX_GUESTS) {
                 field.value = currentValue + 1;
                 field.dispatchEvent(new Event('input'));
             }
@@ -699,6 +716,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (total === 0) {
             showMessage('error', 'Seleziona almeno un ingresso.');
+            return;
+        }
+
+        if (total > MAX_GUESTS) {
+            showMessage('error', MAX_GUESTS_MESSAGE);
             return;
         }
 
