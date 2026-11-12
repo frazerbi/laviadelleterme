@@ -31,15 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
             form.reset();
             // Esplicitamente deseleziona i radio (form.reset può ripristinare il default HTML)
             locationRadios.forEach(r => r.checked = false);
-            resetTicketType();
-            if (calendar) {
-                calendar.destroy();
-                calendar = null;
-                availabilityData = null;
-            }
+            resetAfter('start');
             createCalendarWrapper();
-            dateField.disabled = true;
-            disableFieldsFrom('ticket');
             hideMessage();
         }
     });
@@ -243,8 +236,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return disabledDates;
     }
 
+    /**
+     * Crea il calendario per la location. Restituisce true se il calendario è pronto,
+     * false se la location è chiusa o nel frattempo ne è stata scelta un'altra.
+     */
     async function initCalendar(location) {
-        if (calendar) return;
+        if (calendar) return true;
 
         // Range: primo giorno del mese corrente → ultimo giorno del mese successivo
         const today = new Date();
@@ -254,14 +251,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const dateMaxStr = formatLocalDate(lastDayNextMonth);
 
         // Recupera i dati di disponibilità dal JSON
-        availabilityData = await fetchAvailabilityJSON(location);
+        const data = await fetchAvailabilityJSON(location);
+
+        // Nel frattempo l'utente ha scelto un'altra location: questo calendario non serve più
+        if (getSelectedLocation() !== location) return false;
+        if (calendar) return true;
+
+        availabilityData = data;
 
         if (isLocationClosed(availabilityData)) {
             const closedRadio = document.querySelector(`input[name="location"][value="${location}"]`);
             if (closedRadio) markLocationAsClosed(closedRadio);
-            dateField.disabled = true;
             showMessage('error', 'Questa struttura è temporaneamente chiusa.');
-            return;
+            return false;
         }
 
         // Costruisci l'array delle date disabilitate
@@ -275,6 +277,8 @@ document.addEventListener('DOMContentLoaded', function() {
             dateMax: dateMaxStr,
             disableDates: disabledDates,
             disableDatesPast: true,
+            // Un secondo clic sulla data scelta non la deseleziona (dava "Data non disponibile")
+            enableDateToggle: false,
             selectedDates: dateField.value ? [dateField.value] : [],
             onShow() {
                 // Assicura che il calendario sia visibile con display: block
@@ -283,7 +287,10 @@ document.addEventListener('DOMContentLoaded', function() {
             onClickDate(self, event) {
                 // Ottieni la data cliccata dal data attribute (formato YYYY-MM-DD)
                 const clickedDate = self.context.selectedDates[0];
-                if (clickedDate && !disabledDates.includes(clickedDate)) {
+                if (clickedDate && clickedDate === dateField.value) {
+                    // Stessa data di prima: niente da azzerare, si chiude e basta
+                    calendarWrapper.style.display = 'none';
+                } else if (clickedDate && !disabledDates.includes(clickedDate)) {
                     const [year, month, day] = clickedDate.split('-');
 
                     dateField.value = clickedDate;
@@ -304,6 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
         calendar = new Calendar(calendarWrapper, options);
         calendar.init();
 
+        return true;
     }
 
     // Mostra calendario al click sull'input
@@ -327,115 +335,139 @@ document.addEventListener('DOMContentLoaded', function() {
     let apiData = null;
 
     // === GESTIONE PROGRESSIVA DEI CAMPI ===
-    locationRadios.forEach(radio => {
-        radio.addEventListener('change', async function() {
-            // Reset campi successivi quando cambia la location
+    //
+    // Regola unica: quando un passo cambia, tutti i passi DOPO tornano vuoti e bloccati
+    // (resetAfter), e si riaprono uno alla volta man mano che l'utente va avanti.
+
+    // Numero dell'ultima richiesta di disponibilità: una risposta che arriva dopo un cambio
+    // di data o location porta un numero vecchio e viene scartata, altrimenti le fasce di
+    // un giorno finirebbero sotto un altro giorno.
+    let availabilityRequest = 0;
+
+    const STEPS = ['start', 'location', 'date', 'ticket', 'time'];
+
+    /**
+     * Svuota e blocca tutti i campi che vengono dopo lo step indicato:
+     * 'start' → tutto; 'location' → dalla data in poi; 'date' → dal tipo di ingresso;
+     * 'ticket' → dalla fascia oraria; 'time' → numero ingressi e pulsante.
+     */
+    function resetAfter(step) {
+        const from = STEPS.indexOf(step);
+
+        if (from < STEPS.indexOf('date')) {
+            // Data (il calendario si ricrea quando si sceglie la location)
             dateField.value = '';
-            resetTicketType();
-            timeSlotField.value = '';
-            timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
-            numMaleField.value = '0';
-            numFemaleField.value = '0';
+            dateField.disabled = true;
             if (calendar) {
                 calendar.destroy();
                 calendar = null;
-                availabilityData = null;
             }
+            availabilityData = null;
+        }
 
+        if (from < STEPS.indexOf('ticket')) {
+            // Tipo di ingresso: deselezionato, bloccato, etichette di default
+            availabilityRequest++;
+            apiData = null;
+            resetTicketType();
+            setTicketTypeOptionState('giornaliero', false, 'Giornaliero');
+            setTicketTypeOptionState('serale', false, 'Serale');
+            setTicketTypeDisabled(true);
+        }
+
+        if (from < STEPS.indexOf('time')) {
+            // Fascia oraria
+            timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+            timeSlotField.disabled = true;
+            const seraleNote = document.getElementById('serale-note');
+            if (seraleNote) seraleNote.style.display = 'none';
+        }
+
+        // Numero ingressi, dati della fascia scelta e pulsante: sempre
+        numMaleField.value = '0';
+        numFemaleField.value = '0';
+        numMaleField.disabled = true;
+        numFemaleField.disabled = true;
+        verifyNumberFieldsState();
+        setHiddenField('selected_categorie', 'categorie', '');
+        setHiddenField('selected_disponibilita', 'disponibilita', '');
+        submitBtn.disabled = true;
+    }
+
+    /**
+     * Campo hidden inviato col form (creato al primo uso)
+     */
+    function setHiddenField(id, name, value) {
+        let input = document.getElementById(id);
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.id = id;
+            input.name = name;
+            form.appendChild(input);
+        }
+        input.value = value;
+    }
+
+    locationRadios.forEach(radio => {
+        radio.addEventListener('change', async function() {
+            resetAfter('location');
             hideMessage();
 
-            apiData = null;
+            if (!this.value) return;
 
-            if (this.value) {
-                // Ricrea completamente il wrapper del calendario
-                createCalendarWrapper();
-                // Inizializza nuovo calendario per la nuova location
-                await initCalendar(this.value);
+            // Ricrea completamente il wrapper del calendario per la nuova location
+            createCalendarWrapper();
+            if (await initCalendar(this.value)) {
                 dateField.disabled = false;
                 scrollToNext(dateField.closest('.form-group'));
-            } else {
-                dateField.disabled = true;
-                disableFieldsFrom('ticket');
             }
-
         });
     });
 
     dateField.addEventListener('change', function() {
-        // Reset campi successivi quando cambia la data
-        resetTicketType();
-        timeSlotField.value = '';
-        timeSlotField.innerHTML = '<option value="">-- Seleziona una fascia oraria --</option>';
+        resetAfter('date');
 
         const selectedLocation = getSelectedLocation();
         if (this.value && selectedLocation) {
-
             handleTicketTypeOptions(this.value);
-
             callAvailabilityAPI(selectedLocation, this.value);
-        } else {
-            disableFieldsFrom('ticket');
         }
     });
 
     ticketTypeRadios.forEach(radio => {
         radio.addEventListener('change', function() {
+            resetAfter('ticket');
+
             const value = this.value;
-            timeSlotField.disabled = !value;
-            timeSlotField.value = '';
+            if (!value) return;
+
             const seraleNote = document.getElementById('serale-note');
             if (seraleNote) {
                 seraleNote.style.display = (value === 'serale') ? '' : 'none';
             }
 
-            if (!value) {
-                disableFieldsFrom('time');
-            } else {
-                filterTimeSlotsByTicketType(value);
+            if (filterTimeSlotsByTicketType(value)) {
+                timeSlotField.disabled = false;
                 scrollToNext(timeSlotField.closest('.form-group'));
             }
         });
     });
 
     timeSlotField.addEventListener('change', function() {
+        resetAfter('time');
 
-        const isEnabled = !!this.value;
-        numMaleField.disabled = !isEnabled;
-        numFemaleField.disabled = !isEnabled;
+        if (!this.value) return;
+
+        const selectedOption = this.options[this.selectedIndex];
+        setHiddenField('selected_categorie', 'categorie', selectedOption.dataset.categorie || '');
+        setHiddenField('selected_disponibilita', 'disponibilita', selectedOption.dataset.disponibilita || '0');
+
+        numMaleField.disabled = false;
+        numFemaleField.disabled = false;
         verifyNumberFieldsState();
-        if (!isEnabled) {
-            numMaleField.value = '0';
-            numFemaleField.value = '0';
-            submitBtn.disabled = true;
-        } else {
-            const selectedOption = this.options[this.selectedIndex];
-            const categorie = selectedOption.dataset.categorie || '';
-            const disponibilita = selectedOption.dataset.disponibilita || '0';
-        
-            // Aggiungi campo hidden
-            let categorieInput = document.getElementById('selected_categorie');
-            if (!categorieInput) {
-                categorieInput = document.createElement('input');
-                categorieInput.type = 'hidden';
-                categorieInput.id = 'selected_categorie';
-                categorieInput.name = 'categorie';
-                form.appendChild(categorieInput);
-            }
-            categorieInput.value = categorie;
-            
-            let disponibilitaInput = document.getElementById('selected_disponibilita');
-            if (!disponibilitaInput) {
-                disponibilitaInput = document.createElement('input');
-                disponibilitaInput.type = 'hidden';
-                disponibilitaInput.id = 'selected_disponibilita';
-                disponibilitaInput.name = 'disponibilita';
-                form.appendChild(disponibilitaInput);
-            }
-            disponibilitaInput.value = disponibilita;
-
-            scrollToNext(numMaleField.closest('.form-group'));
-            checkSubmitButton();
-        }
+        scrollToNext(numMaleField.closest('.form-group'));
+        checkSubmitButton();
     });
 
     numMaleField.addEventListener('input', checkSubmitButton);
@@ -510,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Altri: solo slot con almeno una categoria che non sia serale.
      */
     function filterTimeSlotsByTicketType(ticketType) {
-        if (!apiData || !apiData.available_slots) return;
+        if (!apiData || !apiData.available_slots) return false;
 
         const allSlots = apiData.available_slots;
         let filteredSlots;
@@ -524,30 +556,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateTimeSlots(filteredSlots);
-    }
-    function disableFieldsFrom(from) {
-        apiData = null;
 
-        if (from === 'date') {
-            setTicketTypeDisabled(true);
-            resetTicketType();
-        }
-
-        const fields = {
-            'date': [timeSlotField, numMaleField, numFemaleField],
-            'ticket': [timeSlotField, numMaleField, numFemaleField],
-            'time': [numMaleField, numFemaleField]
-        };
-
-        if (fields[from]) {
-            fields[from].forEach(field => {
-                field.disabled = true;
-                field.value = field.type === 'tel' ? '0' : '';
-            });
-        }
-
-        submitBtn.disabled = true;
-        verifyNumberFieldsState();
+        // La prima option e' il segnaposto "-- Seleziona --"
+        return timeSlotField.options.length > 1;
     }
 
     function checkSubmitButton() {
@@ -606,9 +617,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === CHIAMATA API DISPONIBILITÀ ===
     function callAvailabilityAPI(location, date) {
+        // resetAfter('date') ha gia' svuotato e bloccato i passi successivi
+        const request = ++availabilityRequest;
 
         showMessage('', 'Verifica disponibilità in corso...');
-        disableFieldsFrom('ticket');
 
         const formData = new FormData();
         formData.append('action', 'check_availability_api');
@@ -622,31 +634,32 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                apiData = data.data;
+            // Nel frattempo e' cambiata la data o la location: risposta superata
+            if (request !== availabilityRequest) return;
 
-                const availableSlots = apiData.available_slots.filter(slot => slot.disponibilita > 0);
-
-                if (availableSlots.length === 0) {
-                    showMessage('error', 'Nessuna fascia oraria disponibile per questa data.');
-                    disableFieldsFrom('ticket');
-                    return;
-                }
-
-                showMessage('success', data.data.message || 'Disponibilità verificata!');
-                updateTimeSlots(apiData.available_slots);
-                handleTicketTypeByCategories(apiData.available_slots, date);
-
-                setTicketTypeDisabled(false);
-                scrollToNext(ticketTypeGroup);
-            } else {
+            if (!data.success) {
                 showMessage('error', data.data.message || 'Nessuna disponibilità per questa data.');
-                disableFieldsFrom('ticket');
+                return;
             }
+
+            const availableSlots = data.data.available_slots.filter(slot => slot.disponibilita > 0);
+
+            if (availableSlots.length === 0) {
+                showMessage('error', 'Nessuna fascia oraria disponibile per questa data.');
+                return;
+            }
+
+            apiData = data.data;
+            showMessage('success', data.data.message || 'Disponibilità verificata!');
+
+            // Le fasce si riempiono solo dopo la scelta del tipo di ingresso, gia' filtrate
+            handleTicketTypeByCategories(apiData.available_slots, date);
+            setTicketTypeDisabled(false);
+            scrollToNext(ticketTypeGroup);
         })
         .catch(error => {
+            if (request !== availabilityRequest) return;
             showMessage('error', 'Errore di connessione durante la verifica disponibilità.');
-            disableFieldsFrom('ticket');
         });
     }
 
@@ -685,6 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const submitLabel = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Invio in corso...';
         hideMessage();
@@ -704,39 +718,28 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                showMessage('success', 'Dati prenotazione completati, verrai indirizzato per completare l\'acquisto.');
+                // Tutto resta bloccato fino al redirect: niente doppio invio
                 form.reset();
-                disableFieldsFrom('date');
-                dateField.disabled = true;
+                locationRadios.forEach(r => r.checked = false);
+                resetAfter('start');
+                showMessage('success', 'Dati prenotazione completati, verrai indirizzato per completare l\'acquisto.');
 
                 if (data.data.redirect_url) {
                     setTimeout(() => {
                         window.location.href = data.data.redirect_url;
-                    }, 500); // Aspetta 1.5s per mostrare messaggio
-                } else {
-                    // Reset form se non c'è redirect
-                    form.reset();
-                    disableFieldsFrom('date');
-                    dateField.disabled = true;
+                    }, 500); // Mezzo secondo per leggere il messaggio
                 }
-
             } else {
                 showMessage('error', data.data.message || 'Errore durante la prenotazione.');
-                submitBtn.disabled = false;
+                submitBtn.textContent = submitLabel;
+                checkSubmitButton();
             }
         })
         .catch(error => {
             console.error('Errore submit:', error);
             showMessage('error', 'Errore di connessione.');
-            submitBtn.disabled = false;
-        })
-        .finally(() => {
-            
-            if (submitBtn.disabled) {
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                }, 200);
-            }
+            submitBtn.textContent = submitLabel;
+            checkSubmitButton();
         });
     });
 });
