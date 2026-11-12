@@ -132,6 +132,13 @@ class Booking_Redirect {
     const CHRISTMAS_END   = '01-06';
 
     /**
+     * Categorie TermeGest dei biglietti natalizi: pm (4 ore, 27370) e v4 (serale, 124174).
+     * Sulla loro scheda, arrivando dal form, resta l'immagine del prodotto invece della
+     * foto della struttura (enqueue_location_image()).
+     */
+    const CHRISTMAS_CATEGORIES = array('pm', 'v4');
+
+    /**
      * Verifica se una data (Y-m-d) è nel periodo natalizio
      */
     public static function is_christmas_period($date_string) {
@@ -260,7 +267,8 @@ class Booking_Redirect {
             $time = '';
         }
 
-        $mapping = $this->get_product_mapping_from_category(sanitize_key($get['category']));
+        $category = sanitize_key($get['category']);
+        $mapping  = $this->get_product_mapping_from_category($category);
         if (!$mapping || (int) $mapping['product_id'] !== get_queried_object_id()) {
             return null;
         }
@@ -274,6 +282,7 @@ class Booking_Redirect {
 
         $this->pdp_booking = array(
             'product_id'  => (int) $mapping['product_id'],
+            'category'    => $category,
             'attributes'  => $sellable->is_type('variation') ? $sellable->get_variation_attributes() : array(),
             'location_id' => $location,
             'location'    => $locations[$location],
@@ -424,6 +433,11 @@ class Booking_Redirect {
     public function enqueue_location_image() {
         $booking = $this->get_pdp_booking();
         if (!$booking) {
+            return;
+        }
+
+        // I biglietti natalizi hanno un'immagine prodotto loro, scelta apposta: resta quella
+        if (in_array($booking['category'], self::CHRISTMAS_CATEGORIES, true)) {
             return;
         }
 
