@@ -49,7 +49,7 @@ class Booking_Email_Notification {
     }
 
     public function custom_email_footer_text() {
-        return 'La Via Delle Terme';
+        return skianet_site()['name'];
     }
 
     /**

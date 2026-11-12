@@ -37,6 +37,7 @@ jobs:
           --exclude=.DS_Store
           --exclude=wp-content/plugins/plugin-custom-skianet/assets/data/
           --exclude=wp-content/plugins/plugin-custom-skianet/build.js
+          --exclude=wp-content/plugins/plugin-custom-skianet/README.md
           --exclude=wp-content/plugins/plugin-custom-skianet/composer.json
           --exclude=wp-content/plugins/plugin-custom-skianet/composer.lock
           --exclude=wp-content/plugins/plugin-custom-skianet/package.json

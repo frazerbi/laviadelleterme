@@ -39,7 +39,7 @@ class TermeGest_API {
      */
     private const WSDL_GET_RESERV = 'https://www.termegest.it/getReserv.asmx?WSDL';
     private const WSDL_SET_INFO = 'https://www.termegest.it/setinfo.asmx?WSDL';
-    private const SECURITY_KEY = 'qpoz79nt1z3p2vcllpt2iqnz66c7zk3';
+    // La chiave di setVenduto dipende dal sito: skianet_site()['termegest_security_key'].
 
     /**
      * Ottieni istanza singleton
@@ -262,12 +262,20 @@ class TermeGest_API {
      * @return string Risultato operazione
      */
     public function set_venduto(string $codice, float $prezzo, string $nome, string $email): array {
+        $security = skianet_site()['termegest_security_key'];
+
+        // Su termeshop la chiave arriva solo dal wp-config: senza, meglio un errore
+        // che finisce nella nota dell'ordine che un setVenduto col canale sbagliato.
+        if ('' === $security) {
+            return ['status' => false, 'message' => 'Chiave TermeGest non configurata (SKIANET_TERMEGEST_SECURITY_KEY in wp-config.php).'];
+        }
+
         $parameters = [
             'codice' => $codice,
             'prezzo' => $prezzo,
             'nome' => $nome,
             'email' => $email,
-            'security' => self::SECURITY_KEY,
+            'security' => $security,
         ];
 
         try {

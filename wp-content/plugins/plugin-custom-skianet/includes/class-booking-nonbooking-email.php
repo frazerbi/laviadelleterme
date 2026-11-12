@@ -235,7 +235,7 @@ class Booking_Nonbooking_Email {
             // Titolo
             $title = "Coupon per: $product_name";
             $pdf->SetFont('Helvetica', 'B', 24);
-            $pdf->SetTextColor(0, 116, 160);
+            $pdf->SetTextColor(...skianet_site()['pdf_title_rgb']);
             $pdf->MultiCell(0, 10, iconv('UTF-8', 'CP1252//IGNORE', $title), 0, 'C');
 
             // Corpo
@@ -273,6 +273,7 @@ class Booking_Nonbooking_Email {
      * Prepara contenuto email
      */
     private function prepare_email_content($attachment_paths, $items) {
+        $site = skianet_site();
         $attachment_count = count($attachment_paths);
         $is_plural = $attachment_count > 1;
         
@@ -286,21 +287,15 @@ class Booking_Nonbooking_Email {
             <p>Gentile Cliente,<br>grazie per l'acquisto effettuato.</p>
             <p>$intro_text</p>
             <p>Cordiali saluti</p>
-            <p>Il team La Via Delle Terme</p>
+            <p>Il team {$site['name']}</p>
         ";
 
-        $body_cond = "
-            <p style='margin-top:60px;font-size:12px;'>Alcuni link utili: <br>
-            Solo per i coupon di ingresso SPA, la prenotazione è obbligatoria al seguente link: 
-            <a href='https://www.termegest.it/prenota.aspx' target='_blank' style='color:#0074A0; text-decoration:underline;'>termegest.it/prenota.aspx</a>.<br>
-            Il coupon è prorogabile di 90 giorni con supplemento al link: 
-            <a href='https://laviadelleterme.it/shop/proroghe/' target='_blank' style='color:#0074A0; text-decoration:underline;'>laviadelleterme.it/shop/proroghe/</a>
-            </p>
-        ";
+        // Link utili (prenotazione, proroghe / area riservata): dipendono dal sito.
+        $body_cond = $site['coupon_links_html'];
 
         // Verifica se servono condizioni aggiuntive
         $needs_conditions = false;
-        $excluded_variations = array(28747, 1677, 1678, 1690, 392, 393, 394, 1907, 1908, 1637, 1639, 1640, 21800);
+        $excluded_variations = $site['no_links_variations'];
         
         foreach ($items as $item) {
             $variation_id = $item->get_variation_id();
@@ -336,7 +331,7 @@ class Booking_Nonbooking_Email {
         $wc_email = new WC_Email();
         $html_message = $wc_email->style_inline($wrapped_message);
         
-        $admin = 'biglietti@laviadelleterme.it';
+        $admin = skianet_site()['admin_email'];
 
         $recipients = $send_to_admin ?  array($admin) : array($to_email);
         $success = true;

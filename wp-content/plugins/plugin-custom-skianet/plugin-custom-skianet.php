@@ -18,14 +18,17 @@ if (! \defined('ABSPATH')) {
 }
 
 const PLUGIN_SKIANET_FILE = __FILE__;
-const PLUGIN_SKIANET_VERSION = '2.0.5';
+const PLUGIN_SKIANET_VERSION = '2.0.6';
 const PLUGIN_SKIANET_TEXT_DOMAIN = 'skianet-custom';
 
 \define('PLUGIN_SKIANET_PATH', untrailingslashit(plugin_dir_path(PLUGIN_SKIANET_FILE)));
 \define('PLUGIN_SKIANET_URL', untrailingslashit(plugin_dir_url(PLUGIN_SKIANET_FILE)));
 
+// Profilo del sito (laviadelleterme / termeshop), scelto con SKIANET_SITE in wp-config.
+require_once PLUGIN_SKIANET_PATH . '/includes/site-config.php';
+
 if ( ! defined( 'LOGO_TERME_PATH' ) ) {
-    define( 'LOGO_TERME_PATH', PLUGIN_SKIANET_PATH . '/assets/img/header-la-via-delle-terme.jpg' );
+    define( 'LOGO_TERME_PATH', PLUGIN_SKIANET_PATH . '/assets/img/' . skianet_site()['header_image'] );
 }
 if ( ! defined( 'LOGO_TERME_FOOTER_PATH' ) ) {
     define( 'LOGO_TERME_FOOTER_PATH', PLUGIN_SKIANET_PATH . '/assets/img/footer-coupon.JPG' );
@@ -57,9 +60,9 @@ require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-checkout-fields.php'
 require_once PLUGIN_SKIANET_PATH . '/includes/class-booking-only-handler.php';
 
 
-// Hook activation - registra il cron
+// Hook activation - registra il cron (solo dove ci sono le prenotazioni)
 register_activation_hook(__FILE__, function() {
-    if (!wp_next_scheduled('termegest_check_availability')) {
+    if (skianet_site()['bookings'] && !wp_next_scheduled('termegest_check_availability')) {
         wp_schedule_event(time(), 'daily', 'termegest_check_availability');
     }
 });
@@ -67,53 +70,33 @@ register_activation_hook(__FILE__, function() {
 // Hook deactivation - rimuovi il cron
 register_deactivation_hook(__FILE__, array('Availability_Checker', 'deactivate'));
 
-// Inizializza la classe Booking Handler
 add_action('plugins_loaded', 'init_booking_handler_plugin');
 function init_booking_handler_plugin() {
-    
-    if (class_exists('Booking_Handler')) {
+
+    // Prenotazioni: form, redirect della PDP, cron di disponibilita', dati di
+    // prenotazione nel carrello, dichiarazione sanitaria, form "solo prenotazione".
+    // Su un sito solo coupon (profilo con bookings => false) non si istanziano:
+    // i file restano caricati perche' il resto usa i loro metodi statici
+    // (Booking_Cart_Handler::get_item_license_codes(), Booking_Handler::get_ticket_types()).
+    if (skianet_site()['bookings']) {
         Booking_Handler::get_instance();
-    }
-
-    if (class_exists('Booking_Redirect')) {
         Booking_Redirect::get_instance();
-    }
-
-    if (class_exists('Availability_Checker')) {
         Availability_Checker::get_instance();
-    }
-
-    if (class_exists('Booking_Cart_Handler')) {
         Booking_Cart_Handler::get_instance();
-    }
-
-    if (class_exists('Booking_Code_Assignment')) {
-        Booking_Code_Assignment::get_instance();
-    }
-    
-    if (class_exists('Booking_Termegest_Sync')) {
-        Booking_Termegest_Sync::get_instance();
-    }
-    
-    if (class_exists('Booking_Order_Status')) {
-        Booking_Order_Status::get_instance();
-    }
-
-    if (class_exists('Booking_Email_Notification')) {
-        Booking_Email_Notification::get_instance();
-    }
-    
-    if (class_exists('Booking_Nonbooking_Email')) {
-        Booking_Nonbooking_Email::get_instance();
-    }
-
-    if (class_exists('Booking_Checkout_Fields')) {
         Booking_Checkout_Fields::get_instance();
+        Booking_Only_Handler::get_instance();
+    } elseif (wp_next_scheduled('termegest_check_availability')) {
+        // Evento rimasto da un'attivazione precedente: senza Availability_Checker
+        // girerebbe a vuoto ogni giorno.
+        Availability_Checker::deactivate();
     }
 
-    if (class_exists('Booking_Only_Handler')) {
-        Booking_Only_Handler::get_instance();
-    }
+    // Coupon e codici: servono su tutti i siti.
+    Booking_Code_Assignment::get_instance();
+    Booking_Termegest_Sync::get_instance();
+    Booking_Order_Status::get_instance();
+    Booking_Email_Notification::get_instance();
+    Booking_Nonbooking_Email::get_instance();
 }
 
 add_action('init', 'skianet_plugin_load_textdomain', \PHP_INT_MAX);

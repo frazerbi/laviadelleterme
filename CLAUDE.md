@@ -665,6 +665,37 @@ Unico consumatore oggi: `Booking_Redirect`, che tiene due mappe gemelle categori
 percio' la mappa e' duplicata per intero invece di avere una base con override. Una voce con `product_id` vuoto vale
 "categoria non mappata su questo ambiente" e ferma il redirect prima di passare `null` a `wc_get_product()`.
 
+### Configurazione per sito (laviadelleterme / termeshop)
+
+Il plugin deve poter girare anche sull'istanza termeshop, al posto di `plugin-custom-termeshop` (repo a parte,
+`../termeshop`). Quello che cambia fra i due siti sta in un profilo, `skianet_site()` in `includes/site-config.php`,
+scelto con `define( 'SKIANET_SITE', 'termeshop' );` nel wp-config. **Senza la costante vale `laviadelleterme`**, con
+gli stessi valori che erano scritti nel codice fino al 2026-11-12: su laviadelleterme non c'e' nulla da configurare.
+
+Il profilo contiene nome del marchio (footer email WooCommerce, firma dell'email coupon), destinatario admin
+dell'email coupon, immagine di intestazione del PDF (`assets/img/`, letta da `LOGO_TERME_PATH`, che il wp-config puo'
+ancora sovrascrivere), il colore del titolo del PDF (blu `#0074A0` su laviadelleterme, azzurro `#60A4B7` su
+termeshop, gli stessi dei link nelle rispettive email), il blocco "link utili" dell'email coupon (su laviadelleterme la proroga, su termeshop "non
+prorogabili" + area riservata, copiato dal vecchio plugin) e le variazioni per cui quel blocco non si mostra (id di
+laviadelleterme, vuoto su termeshop).
+
+**Chiave TermeGest di `setVenduto`**: `SKIANET_TERMEGEST_SECURITY_KEY` nel wp-config la sovrascrive. Il profilo
+termeshop **non ha una chiave di default** di proposito: ripiegare su quella di laviadelleterme manderebbe i codici a
+un altro canale senza errori visibili. Senza chiave `set_venduto()` non chiama TermeGest e restituisce un errore, che
+finisce nella nota "ATTENZIONE … NON sincronizzati" dell'ordine. Non va confuso con `TERMEGEST_SECURITY_TOKEN`, la
+costante del vecchio plugin termeshop: nome diverso apposta, per non raccogliere un valore rimasto in un wp-config.
+
+**`bookings`** (`true` su laviadelleterme, `false` su termeshop): con `false` `init_booking_handler_plugin()` non
+istanzia `Booking_Handler`, `Booking_Redirect`, `Availability_Checker`, `Booking_Cart_Handler`,
+`Booking_Checkout_Fields` e `Booking_Only_Handler`, quindi niente shortcode, cron di disponibilita', sessione PHP
+all'aggiunta al carrello e dichiarazione sanitaria. I file restano caricati perche' il flusso coupon usa i loro metodi
+statici (`Booking_Cart_Handler::get_item_license_codes()` in primis). L'hook di attivazione non programma il cron, e un
+evento rimasto da prima viene cancellato al caricamento. Restano sempre attivi assegnazione codici, sync TermeGest,
+stati ordine ed email.
+
+Fuori dal profilo, perche' riguardano solo le prenotazioni (che su termeshop non esistono): il link al regolamento e
+il destinatario admin dell'email di conferma prenotazione in `Booking_Email_Notification`.
+
 ### Assets Pipeline (plugin-custom-skianet)
 
 - Source CSS: `assets/css/booking-form.css`, `assets/css/booking-only-form.css`, `assets/css/pdp.css`
