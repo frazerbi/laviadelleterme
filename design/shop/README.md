@@ -11,6 +11,25 @@ Mockup della nuova `/shop/`, non implementato. Esclusa dal deploy (`--exclude=de
   i pulsanti aprono le schede prodotto reali del sito. Le descrizioni brevi di Massaggio, Private SPA e Hotel lì
   sono già scritte (ricavate dai nomi prodotto), al posto dei segnaposto del canvas: da far confermare al cliente.
 
+## Link ai prodotti variabili (deciso 2026-11-12)
+
+Mezza giornata e Giornata intera sono **variazioni dello stesso prodotto** (14 Lun–Ven: 225 mezza / 224 giornaliero;
+228 Lun–Dom: 229 / 230). Ogni card porta alla scheda prodotto con la variazione già scelta via query string, che
+WooCommerce legge da sé (`wc_dropdown_variation_attribute_options()`):
+
+```
+/shop/ingresso-terme-lunedi-venerdi/?attribute_pa_tipologia-ingressi=mezza-giornata
+/shop/ingresso-terme-lunedi-venerdi/?attribute_pa_tipologia-ingressi=giornaliero
+```
+
+Senza parametro la scheda si apre sulla mezza giornata: era il bug segnalato dal cliente sulla card Giornata intera.
+Scartato il link diretto `?add-to-cart=…&variation_id=…`: salta le condizioni e aggiunge al carrello a ogni
+ricarica o prefetch. Verificato sul sito vero: `Booking_Redirect::preselect_variation()` non interferisce (agisce
+solo con `category` nell'URL); SiteGround non mette in cache gli URL con query string (sempre `MISS`, risultato
+corretto) — **non** aggiungere `attribute_*` ai parametri ignorati dalla cache, o servirebbe a tutti la stessa
+variazione. Il link dipende dagli slug (`mezza-giornata`, `giornaliero`): se si rinominano, ricade in silenzio sulla
+variazione di default.
+
 ## Problema di partenza
 
 Le card dello shop mostrano solo nome, prezzo (o fascia di prezzo) e pulsante. Quello che distingue i biglietti —
