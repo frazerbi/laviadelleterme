@@ -66,7 +66,7 @@ durata, kit, piatto light, giorni, Splash & Spa Tamaro — sta solo nelle condiz
     quindi un serale prenotato dal form per il 26 dicembre finisce sul serale normale (109134), che a Natale non
     vale. Il serale natalizio 124174 non è in nessuna mappa di `Booking_Redirect`: serve la sua categoria
     TermeGest.
-  - `Booking_Redirect::is_christmas_period()` e `get_christmas_dates()` partono dal **25** dicembre, mentre le
-    condizioni di vendita escludono i biglietti normali dal **24**: dal form, il 24 dicembre porta a un biglietto
-    normale.
+  - ~~`Booking_Redirect::is_christmas_period()` e `get_christmas_dates()` partono dal **25** dicembre~~ — corretto
+    il 2026-11-12: il periodo è definito una volta sola in `Booking_Redirect::CHRISTMAS_START` / `CHRISTMAS_END`
+    (24 dic – 6 gen) e lo leggono entrambe.
   - 124174 non è nella mappa di `controllo-codici`, quindi le sue scorte di codici non si vedono.

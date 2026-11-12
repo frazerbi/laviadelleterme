@@ -111,28 +111,29 @@ class Booking_Redirect {
     private $pdp_booking = false;
 
     /**
-     * Verifica se una data è nel periodo natalizio (25 dic - 6 gen)
+     * Periodo natalizio, estremi inclusi, in formato MM-DD: quello in cui valgono solo i
+     * biglietti natalizi (condizioni di vendita: 24 dicembre - 6 gennaio). Unica
+     * definizione: la leggono is_christmas_period() sul server e
+     * Booking_Handler::get_christmas_dates() per il form.
+     *
+     * Il periodo scavalca l'anno (inizio > fine): is_christmas_period() conta su questo.
+     */
+    const CHRISTMAS_START = '12-24';
+    const CHRISTMAS_END   = '01-06';
+
+    /**
+     * Verifica se una data (Y-m-d) è nel periodo natalizio
      */
     public static function is_christmas_period($date_string) {
-        $date = DateTime::createFromFormat('Y-m-d', $date_string);
-        if (!$date) {
+        $date = DateTime::createFromFormat('!Y-m-d', (string) $date_string);
+        if (!$date || $date->format('Y-m-d') !== $date_string) {
             return false;
         }
-        
-        $month = (int) $date->format('m');
-        $day = (int) $date->format('d');
-        
-        // 25-31 Dicembre
-        if ($month === 12 && $day >= 25) {
-            return true;
-        }
-        
-        // 1-6 Gennaio
-        if ($month === 1 && $day <= 6) {
-            return true;
-        }
-        
-        return false;
+
+        // MM-DD con gli zeri iniziali si confronta correttamente come stringa
+        $month_day = $date->format('m-d');
+
+        return $month_day >= self::CHRISTMAS_START || $month_day <= self::CHRISTMAS_END;
     }
 
     /**

@@ -527,23 +527,21 @@ class Booking_Handler {
     }
 
     /**
-     * Genera array di date natalizie per anno corrente e successivo
+     * Genera array di date natalizie (dicembre anno corrente → gennaio successivo).
+     * Il periodo viene da Booking_Redirect::CHRISTMAS_START / CHRISTMAS_END.
      */
     public static function get_christmas_dates() {
         $dates = array();
         $current_year = (int) date('Y');
-        
-        // 25-31 Dicembre anno corrente
-        for ($day = 25; $day <= 31; $day++) {
-            $dates[] = sprintf('%04d-12-%02d', $current_year, $day);
+
+        $day = new DateTime(sprintf('%04d-%s', $current_year, Booking_Redirect::CHRISTMAS_START));
+        $end = new DateTime(sprintf('%04d-%s', $current_year + 1, Booking_Redirect::CHRISTMAS_END));
+
+        while ($day <= $end) {
+            $dates[] = $day->format('Y-m-d');
+            $day->modify('+1 day');
         }
-        
-        // 1-6 Gennaio anno successivo
-        $next_year = $current_year + 1;
-        for ($day = 1; $day <= 6; $day++) {
-            $dates[] = sprintf('%04d-01-%02d', $next_year, $day);
-        }
-        
+
         return $dates;
     }
 
