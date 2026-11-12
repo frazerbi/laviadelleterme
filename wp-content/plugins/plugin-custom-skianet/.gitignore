@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# vendor/ si costruisce in locale (composer install --no-dev --optimize-autoloader
+# --no-scripts) e si carica a mano: il deploy non esegue composer. FPDF sta in lib/.
+vendor/
+
 # Build artifacts
 assets/js/dist/*.map
 
