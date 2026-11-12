@@ -527,19 +527,27 @@ class Booking_Handler {
     }
 
     /**
-     * Genera array di date natalizie (dicembre anno corrente → gennaio successivo).
+     * Date natalizie per il form: il periodo che finisce a gennaio di quest'anno e quello
+     * che inizia a dicembre. Il calendario mostra mese corrente + successivo, quindi a
+     * gennaio serve il primo e a novembre/dicembre il secondo: restituendoli entrambi la
+     * lista e' giusta in qualunque giorno dell'anno.
      * Il periodo viene da Booking_Redirect::CHRISTMAS_START / CHRISTMAS_END.
      */
     public static function get_christmas_dates() {
         $dates = array();
-        $current_year = (int) date('Y');
+        $wp_timezone = wp_timezone();
 
-        $day = new DateTime(sprintf('%04d-%s', $current_year, Booking_Redirect::CHRISTMAS_START));
-        $end = new DateTime(sprintf('%04d-%s', $current_year + 1, Booking_Redirect::CHRISTMAS_END));
+        // Anno del sito, non del server: date('Y') e' UTC e a Capodanno sbaglia di un'ora
+        $current_year = (int) (new DateTime('now', $wp_timezone))->format('Y');
 
-        while ($day <= $end) {
-            $dates[] = $day->format('Y-m-d');
-            $day->modify('+1 day');
+        foreach (array($current_year - 1, $current_year) as $start_year) {
+            $day = new DateTime(sprintf('%04d-%s', $start_year, Booking_Redirect::CHRISTMAS_START), $wp_timezone);
+            $end = new DateTime(sprintf('%04d-%s', $start_year + 1, Booking_Redirect::CHRISTMAS_END), $wp_timezone);
+
+            while ($day <= $end) {
+                $dates[] = $day->format('Y-m-d');
+                $day->modify('+1 day');
+            }
         }
 
         return $dates;
