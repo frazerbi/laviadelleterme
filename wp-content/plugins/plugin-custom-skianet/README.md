@@ -17,9 +17,9 @@ spente (`bookings => false` nel profilo).
 - **Stato ordine `not-booked`** registrato (Custom Order Status), con slug esattamente `not-booked`. Il plugin porta
   ogni ordine pagato `processing` → `completed` → `not-booked`. Se lo stato non esiste, WooCommerce lo sostituisce con
   `pending` e gli ordini pagati risultano "In attesa di pagamento".
-- **`not-booked` contato come stato pagato**: se Custom Order Status ha l'opzione, va attivata. Senza, `is_paid()` e'
-  falso per tutti gli ordini e l'evento GA4 `purchase` non parte (stesso guasto risolto ad agosto 2026 per
-  `coupon-sent`).
+- `not-booked` conta come stato pagato grazie al plugin stesso (`Booking_Order_Status::add_paid_statuses()`): non
+  serve configurarlo in Custom Order Status. In Analytics → Impostazioni di WooCommerce va invece controllato che
+  `not-booked` sia incluso nei report.
 - **WC License Delivery**: annotare lo stato di consegna dei codici (`processing` su laviadelleterme, il flusso
   testato). Ogni prodotto in vendita deve avere un blocco di codici libero caricato, altrimenti il carrello si ferma
   con un avviso.

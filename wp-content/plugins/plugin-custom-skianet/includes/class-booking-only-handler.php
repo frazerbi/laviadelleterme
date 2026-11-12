@@ -164,7 +164,7 @@ class Booking_Only_Handler {
         foreach ($orders as $order) {
             $order_id = $order->get_id();
             $order_number = $order->get_order_number();
-            $order_date = $order->get_date_created()->format('d/m/Y');
+            $order_date = $order->get_date_created()->date_i18n('d/m/Y');
             
             // Ottieni i codici associati a questo ordine
             $codes = self::get_codes_from_order($order);

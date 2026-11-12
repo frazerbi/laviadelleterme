@@ -195,7 +195,10 @@ class Booking_Nonbooking_Email {
             : "Questi sono i codici che hai acquistato:";
 
         $date = $order->get_date_completed();
-        $order_date = $date ? $date->format('d/m/Y H:i') : date('d/m/Y H:i');
+        // Ora del sito, non UTC: format() di WC_DateTime ignora l'offset quando il fuso
+        // e' impostato come "UTC+1" invece che come citta', e date() usa sempre UTC
+        // (WordPress forza il default di PHP). date_i18n / wp_date valgono in entrambi i casi.
+        $order_date = $date ? $date->date_i18n('d/m/Y H:i') : wp_date('d/m/Y H:i');
 
         $body_pdf = "
             $heading_pdf 

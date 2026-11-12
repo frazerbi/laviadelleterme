@@ -41,6 +41,29 @@ class Booking_Order_Status {
         
         // STEP 2: Completed → Booked/Not-Booked (in base a prenotazioni)
         add_action('woocommerce_order_status_completed', array($this, 'move_to_booked_status'), 10, 1);
+
+        // booked / not-booked sono stati pagati
+        add_filter('woocommerce_order_is_paid_statuses', array($this, 'add_paid_statuses'));
+    }
+
+    /**
+     * Dichiara booked e not-booked come stati pagati.
+     *
+     * Li registra il plugin Custom Order Status, fuori dall'elenco di WooCommerce
+     * (solo processing e completed), quindi senza questo filtro is_paid() e' falso per
+     * ogni ordine arrivato a destinazione. Il caso concreto e' l'evento GA4 purchase:
+     * WooCommerce Google Analytics Pro lo manda su woocommerce_payment_complete solo se
+     * is_paid(), ma a quel punto la catena processing → completed → booked/not-booked
+     * (gli hook qui sopra, dentro il save di payment_complete()) ha gia' spostato
+     * l'ordine. E' lo stesso guasto che termeshop aveva con coupon-sent fino ad agosto 2026.
+     *
+     * Valutato a runtime: nessun effetto retroattivo, nessun evento per lo storico.
+     *
+     * @param string[] $statuses stati pagati, senza prefisso wc-
+     * @return string[]
+     */
+    public function add_paid_statuses($statuses) {
+        return array_values(array_unique(array_merge((array) $statuses, array('booked', 'not-booked'))));
     }
 
     /**

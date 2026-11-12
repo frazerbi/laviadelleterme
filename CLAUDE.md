@@ -132,11 +132,16 @@ it lives only on the server. Searching here for a `register_post_status` / `wc_o
 that creates them finds nothing; that is expected, not a missing piece.
 `Booking_Order_Status::move_to_booked_status()` only ever *moves* orders into them.
 
-Because they are registered outside WooCommerce's own set, they are **not** in
-`wc_get_is_paid_statuses()` (which returns just `processing` and `completed`). Anywhere the code asks
-"is this order paid?", the two must therefore be listed explicitly — or the check must use something
-else entirely: `laviadelleterme_order_is_confirmed()` in the theme names all four statuses, and
-`features/satispay/satispay.php` sidesteps the list by testing `$order->get_date_paid()` instead.
+Because they are registered outside WooCommerce's own set, WooCommerce's paid list
+(`wc_get_is_paid_statuses()`) is just `processing` and `completed`. **Since 2026-11-12
+`Booking_Order_Status::add_paid_statuses()` adds both to it** via `woocommerce_order_is_paid_statuses`, so
+`$order->is_paid()` is true for them. The trigger was GA4 `purchase`: WooCommerce Google Analytics Pro sends it on
+`woocommerce_payment_complete` only if `is_paid()`, and by then the processing → completed → booked/not-booked chain
+(which runs inside the `save()` of `payment_complete()`) has already moved the order, so no purchase was ever sent —
+seen on termeshop's first order. The theme's checks predate the filter and stay as they are:
+`laviadelleterme_order_is_confirmed()` names all four statuses, and `features/satispay/satispay.php` tests
+`$order->get_date_paid()` instead. WooCommerce **Analytics** keeps its own status list (Analytics → Settings),
+independent of this filter.
 
 ### Not-booked-only products (no booking form)
 
