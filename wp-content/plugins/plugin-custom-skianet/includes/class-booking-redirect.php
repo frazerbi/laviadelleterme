@@ -37,6 +37,11 @@ class Booking_Redirect {
         'v3' => array(
             'product_id'   => 109134,
             'variation_id' => null
+        ),
+        // Serale natalizio: la categoria della fascia serale dal 24 dicembre al 6 gennaio
+        'v4' => array(
+            'product_id'   => 124174,
+            'variation_id' => null
         )
     );
 
@@ -71,6 +76,11 @@ class Booking_Redirect {
         ),
         'v3' => array(
             'product_id'   => 93933,
+            'variation_id' => null
+        ),
+        // Serale natalizio: la categoria della fascia serale dal 24 dicembre al 6 gennaio
+        'v4' => array(
+            'product_id'   => 124174,
             'variation_id' => null
         )
     );

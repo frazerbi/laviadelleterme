@@ -62,11 +62,10 @@ durata, kit, piatto light, giorni, Splash & Spa Tamaro — sta solo nelle condiz
   un nuovo modulo del tema (`features/shop-ingressi/`) che legge prezzi da prodotti/variazioni WooCommerce (228,
   14, 109134, 120150, 120140), così i prezzi non si duplicano a mano; il resto della pagina resta Elementor.
 - **Biglietti natalizi nel codice** (visti cercando i due prodotti, non toccati):
-  - `Booking_Handler::validate_category()` gestisce il serale (`v3`) *prima* del controllo sul periodo natalizio,
-    quindi un serale prenotato dal form per il 26 dicembre finisce sul serale normale (109134), che a Natale non
-    vale. Il serale natalizio 124174 non è in nessuna mappa di `Booking_Redirect`: serve la sua categoria
-    TermeGest.
+  - ~~Un serale prenotato dal form a Natale finiva sul serale normale (109134)~~ — corretto il 2026-11-12: nel
+    periodo natalizio la fascia serale di TermeGest ha categoria **`v4`**, mappata sul 124174 in entrambe le mappe
+    di `Booking_Redirect`; `validate_category()` e il form accettano solo la categoria serale del periodo.
   - ~~`Booking_Redirect::is_christmas_period()` e `get_christmas_dates()` partono dal **25** dicembre~~ — corretto
     il 2026-11-12: il periodo è definito una volta sola in `Booking_Redirect::CHRISTMAS_START` / `CHRISTMAS_END`
     (24 dic – 6 gen) e lo leggono entrambe.
-  - 124174 non è nella mappa di `controllo-codici`, quindi le sue scorte di codici non si vedono.
+  - ~~124174 non è nella mappa di `controllo-codici`~~ — aggiunto il 2026-11-12 al listino a prezzo pieno.

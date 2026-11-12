@@ -555,6 +555,8 @@ class Booking_Handler {
 
     /**
      * Valida e seleziona la categoria corretta in base alle priorità:
+     * 0) Ticket serale → v4 nel periodo natalizio (serale natalizio), v3 il resto
+     *    dell'anno; la fascia deve avere proprio quella categoria
      * 1) Se periodo natalizio → ritorna solo ['pm']
      * 2) Se presenti p1/p3 → mappa in base al ticket_type
      *      - ticket 4h        → p1
@@ -565,21 +567,25 @@ class Booking_Handler {
      */
     public function validate_category($categorie_raw, $booking_date, $ticket_type) {
 
-        // --- 1. NORMALIZZA E FILTRA CATEGORIE ---
-        // Converti la stringa in array (es: "p1,p3,p4" o "v3")
-        $categorie = array_map('trim', explode(',', $categorie_raw));
+        // --- 1. NORMALIZZA CATEGORIE ---
+        // Converti la stringa in array (TermeGest le manda come ",pm,pn,al,po," o ",v3,")
+        $categorie = array_map('strtolower', array_map('trim', explode(',', (string) $categorie_raw)));
 
-        // Categorie riconosciute
-        $allowed = array('p1', 'p2', 'p3', 'p4', 'v3');
-        $categorie = array_intersect($categorie, $allowed);
-
-        // --- 2. GESTIONE SERALE (V3) ---
+        // --- 2. GESTIONE SERALE ---
+        // Nel periodo natalizio la fascia serale ha v4 (serale natalizio, prodotto a parte),
+        // il resto dell'anno v3. Si accetta solo la categoria del periodo: a Natale il serale
+        // normale non vale. Stessa regola in booking-form.js (seraleCategory()).
         if ($ticket_type === 'serale') {
-            if (in_array('v3', $categorie, true)) {
-                return array('v3');
+            $serale = Booking_Redirect::is_christmas_period($booking_date) ? 'v4' : 'v3';
+            if (in_array($serale, $categorie, true)) {
+                return array($serale);
             }
-            return new WP_Error('invalid_category', 'Categoria V3 non disponibile per il biglietto serale.');
+            return new WP_Error('invalid_category', 'Ingresso serale non disponibile per la data selezionata.');
         }
+
+        // --- FILTRA CATEGORIE ---
+        $allowed = array('p1', 'p2', 'p3', 'p4');
+        $categorie = array_intersect($categorie, $allowed);
 
         if (empty($categorie)) {
             return new WP_Error('invalid_category', 'Nessuna categoria valida trovata.');

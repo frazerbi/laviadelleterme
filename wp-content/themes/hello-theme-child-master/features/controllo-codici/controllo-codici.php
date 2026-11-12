@@ -98,6 +98,7 @@ function laviadelleterme_controllo_codici_prezzo_pieno() {
 		1243   => 'W1 Proroghe Ingressi',
 		1244   => 'W2 Proroghe Hotel + Ingressi',
 		27370  => 'PM Ingresso Lunedì - Domenica 4 Ore Per Festività Natalizie',
+		124174 => 'V4 Ingresso Serale da 3 ore Festività Natalizie',
 		28750  => 'Veglione di Capodanno in Accappatoio - Monterosa',
 		28749  => 'Veglione di Capodanno in Accappatoio - Saint Vincent',
 		28748  => 'Veglione di Capodanno in Accappatoio - Genova',

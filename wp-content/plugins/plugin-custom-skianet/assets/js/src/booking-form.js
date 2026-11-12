@@ -457,12 +457,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Disabilita "giornaliero" se nessuno slot disponibile ha le categorie p3 o p4,
-     * disabilita "serale" se nessuno slot disponibile ha categoria v3 con ora >= 18.
+     * Categorie di una fascia. TermeGest le manda con le virgole ai bordi (",pm,pn,al,po,",
+     * ",v4,"): gli elementi vuoti vanno scartati, o every()/some() li contano.
      */
-    function handleTicketTypeByCategories(slots) {
+    function getSlotCategorie(slot) {
+        return (slot.categorie || '').toLowerCase().split(',').map(c => c.trim()).filter(Boolean);
+    }
+
+    // Categorie delle sole fasce serali, in qualunque periodo
+    const SERALE_CATEGORIES = ['v3', 'v4'];
+
+    /**
+     * Categoria serale valida per la data: v4 nel periodo natalizio (serale natalizio),
+     * v3 il resto dell'anno. Stessa regola di Booking_Handler::validate_category().
+     */
+    function seraleCategory(dateString) {
+        return isChristmasPeriod(dateString) ? 'v4' : 'v3';
+    }
+
+    function isSeraleSlot(slot, dateString) {
+        const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
+        return getSlotCategorie(slot).includes(seraleCategory(dateString)) && hour >= 18;
+    }
+
+    /**
+     * Disabilita "giornaliero" se nessuno slot disponibile ha le categorie p3 o p4,
+     * disabilita "serale" se nessuno slot disponibile ha la categoria serale della data
+     * (v3, o v4 nel periodo natalizio) con ora >= 18.
+     */
+    function handleTicketTypeByCategories(slots, dateString) {
         const hasGiornaliero = slots.some(slot => {
-            const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
+            const categorie = getSlotCategorie(slot);
             return categorie.includes('p3') || categorie.includes('p4');
         });
         if (!hasGiornaliero) {
@@ -471,11 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTicketTypeOptionState('giornaliero', false, 'Giornaliero');
         }
 
-        const hasSerale = slots.some(slot => {
-            const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
-            const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
-            return categorie.includes('v3') && hour >= 18;
-        });
+        const hasSerale = slots.some(slot => isSeraleSlot(slot, dateString));
         if (!hasSerale) {
             setTicketTypeOptionState('serale', true, 'Serale (non disponibile per questa data)');
         } else {
@@ -485,8 +506,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Filtra le fasce orarie in base al tipo di ingresso selezionato.
-     * Serale: solo slot con categoria v3 e ora >= 18.
-     * Altri: solo slot senza v3 (o con p1/p2/p3/p4).
+     * Serale: solo slot con la categoria serale della data e ora >= 18.
+     * Altri: solo slot con almeno una categoria che non sia serale.
      */
     function filterTimeSlotsByTicketType(ticketType) {
         if (!apiData || !apiData.available_slots) return;
@@ -495,16 +516,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let filteredSlots;
 
         if (ticketType === 'serale') {
-            filteredSlots = allSlots.filter(slot => {
-                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
-                const hour = parseInt((slot.time || '00:00').split(':')[0], 10);
-                return categorie.includes('v3') && hour >= 18;
-            });
+            filteredSlots = allSlots.filter(slot => isSeraleSlot(slot, dateField.value));
         } else {
-            filteredSlots = allSlots.filter(slot => {
-                const categorie = (slot.categorie || '').toLowerCase().split(',').map(c => c.trim());
-                return !categorie.every(c => c === 'v3');
-            });
+            filteredSlots = allSlots.filter(slot =>
+                getSlotCategorie(slot).some(c => !SERALE_CATEGORIES.includes(c))
+            );
         }
 
         updateTimeSlots(filteredSlots);
@@ -619,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 showMessage('success', data.data.message || 'Disponibilità verificata!');
                 updateTimeSlots(apiData.available_slots);
-                handleTicketTypeByCategories(apiData.available_slots);
+                handleTicketTypeByCategories(apiData.available_slots, date);
 
                 setTicketTypeDisabled(false);
                 scrollToNext(ticketTypeGroup);
