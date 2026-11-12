@@ -234,11 +234,15 @@ class Booking_Email_Notification {
         $has_mezza  = str_contains($lower, 'mezza');
         $has_giorna = str_contains($lower, 'giorna');
 
+        // Natale prima del serale: "V4 Ingresso Serale da 3 ore Festività Natalizie"
+        // contiene entrambe le parole e finiva sul testo del serale normale
+        if (str_contains($lower, 'natal')) {
+            return str_contains($lower, 'sera')
+                ? 'Coupon per l\'ingresso di 3 ore serale natalizio da Lunedì a Domenica'
+                : 'Coupon per l\'ingresso di 4 ore natalizio da Lunedì a Domenica';
+        }
         if (str_contains($lower, 'sera')) {
             return 'Coupon per l\'ingresso di 3 ore serale da Lunedì a Domenica';
-        }
-        if (str_contains($lower, 'natal')) {
-            return 'Coupon per l\'ingresso di 4 ore natalizio da Lunedì a Domenica';
         }
         if ($has_vene && $has_mezza) {
             return 'Coupon per l\'ingresso di 4 ore da Lunedì a Venerdì';
