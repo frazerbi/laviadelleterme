@@ -562,8 +562,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function checkSubmitButton() {
-        const total = (parseInt(numMaleField.value) || 0) + (parseInt(numFemaleField.value) || 0);
-        submitBtn.disabled = !(total > 0 && total <= 20 && timeSlotField.value);
+        // Massimo per genere = attributo max dei campi (10, come Booking_Handler::validate_booking_data()):
+        // su type="tel" il browser non lo applica, e un numero scritto a mano lo supererebbe
+        const male = parseInt(numMaleField.value) || 0;
+        const female = parseInt(numFemaleField.value) || 0;
+        const withinMax = male <= Number(numMaleField.max) && female <= Number(numFemaleField.max);
+        submitBtn.disabled = !(male + female > 0 && withinMax && timeSlotField.value);
     }
 
     function showMessage(type, text) {

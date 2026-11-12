@@ -18,7 +18,7 @@ if (! \defined('ABSPATH')) {
 }
 
 const PLUGIN_SKIANET_FILE = __FILE__;
-const PLUGIN_SKIANET_VERSION = '2.0.3';
+const PLUGIN_SKIANET_VERSION = '2.0.4';
 const PLUGIN_SKIANET_TEXT_DOMAIN = 'skianet-custom';
 
 \define('PLUGIN_SKIANET_PATH', untrailingslashit(plugin_dir_path(PLUGIN_SKIANET_FILE)));
