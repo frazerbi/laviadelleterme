@@ -557,7 +557,7 @@ class Booking_Handler {
      * Valida e seleziona la categoria corretta in base alle priorità:
      * 0) Ticket serale → v4 nel periodo natalizio (serale natalizio), v3 il resto
      *    dell'anno; la fascia deve avere proprio quella categoria
-     * 1) Se periodo natalizio → ritorna solo ['pm']
+     * 1) Se periodo natalizio → solo ticket 4h, e solo se la fascia ha pm → ['pm']
      * 2) Se presenti p1/p3 → mappa in base al ticket_type
      *      - ticket 4h        → p1
      *      - ticket giornaliero → p3
@@ -583,17 +583,29 @@ class Booking_Handler {
             return new WP_Error('invalid_category', 'Ingresso serale non disponibile per la data selezionata.');
         }
 
+        // --- 3. PERIODO NATALIZIO ---
+        // Dal 24/12 al 6/1 vale solo il 4 ore natalizio (pm): le fasce di giorno hanno
+        // ",pm,pn,al,po," e nessuna p1-p4, e non esiste un giornaliero natalizio. Il
+        // controllo sta prima del filtro su p1-p4, che altrimenti scarterebbe pm.
+        if (Booking_Redirect::is_christmas_period($booking_date)) {
+            if ($ticket_type === 'giornaliero') {
+                return new WP_Error('invalid_category', 'L\'ingresso giornaliero non è disponibile nel periodo natalizio.');
+            }
+            if ($ticket_type !== '4h') {
+                return new WP_Error('invalid_ticket', 'Tipo di biglietto non valido.');
+            }
+            if (in_array('pm', $categorie, true)) {
+                return array('pm');
+            }
+            return new WP_Error('invalid_category', 'Ingresso di 4 ore non disponibile per la fascia selezionata.');
+        }
+
         // --- FILTRA CATEGORIE ---
         $allowed = array('p1', 'p2', 'p3', 'p4');
         $categorie = array_intersect($categorie, $allowed);
 
         if (empty($categorie)) {
             return new WP_Error('invalid_category', 'Nessuna categoria valida trovata.');
-        }
-
-        // --- 3. CONTROLLO PERIODO NATALIZIO ---
-        if (Booking_Redirect::is_christmas_period($booking_date)) {
-            return array('pm');
         }
 
         // --- 4. CONTROLLA PRIMA p1 / p3 ---
