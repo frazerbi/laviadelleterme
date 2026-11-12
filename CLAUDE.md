@@ -237,9 +237,15 @@ $current_date = new DateTime('first day of this month', $wp_timezone);
 $next_date    = new DateTime('first day of next month', $wp_timezone);
 ```
 
-**Category mapping** in `check_location_availability()`:
-- December / January → `pm`
-- All other months → `p2`
+**Category mapping** — per **day**, not per month, the same category the form will accept that day
+(`Booking_Handler::validate_category()`):
+- Inside the Christmas period (24/12–6/1, `Booking_Redirect::is_christmas_period()`) → `pm`
+- Every other day → `p2`
+
+So December and January are queried twice (`get_categories_for_month()` returns `p2` and `pm`) and
+`merge_availability()` counts each response only on its own days. Until 2026-11-12 the whole of December and January
+was checked with `pm` alone, so 1–23 December and 7–31 January were opened or closed by a category the form rejects
+on those days.
 
 **Triggering manually** (for debug/test):
 ```bash

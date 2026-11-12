@@ -102,7 +102,7 @@ class Availability_Checker {
             return;
         }
 
-        if (!function_exists('skianet_termegest_get_disponibilita')) {
+        if (!function_exists('skianet_termegest_get_disponibilita') || !class_exists('Booking_Redirect')) {
             return;
         }
 
@@ -132,56 +132,73 @@ class Availability_Checker {
         foreach ($months_to_check as $period) {
             $month = $period['month'];
             $year = $period['year'];
-            
-            
-            // Determina categoria in base al mese
-            if ($month == 12 || $month == 1) {
-                $cat = 'pm';
-            } else {
-                $cat = 'p2';
-            }
-            
-            // Chiama API TermeGest per il mese
-            $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
 
-            // LOG: Struttura dati
+            foreach ($this->get_categories_for_month($month) as $cat) {
+                // Chiama API TermeGest per il mese
+                $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
 
+                if (!empty($dispArr)) {
+                    $this->merge_availability($results, $dispArr, $cat);
+                }
 
-            if (empty($dispArr)) {
-                continue;
+                // Pausa fra le chiamate
+                usleep(500000); // 0.5 secondi
             }
-            
-            // Step 4: Aggiorna risultati per i giorni disponibili
-            foreach ($dispArr as $dispo) {
-                if (!isset($dispo->data)) {
-                    continue;
-                }
-                
-                // Parse data (formato: "2025-12-09 00:00:00")
-                $date_obj = DateTime::createFromFormat('Y-m-d H:i:s', $dispo->data);
-                if (!$date_obj) {
-                    continue;
-                }
-                
-                $date_key = $date_obj->format('Y-m-d'); // Es: "2025-12-09"
-                
-                // Se questo giorno è già disponibile, skip
-                if (isset($results[$date_key]) && $results[$date_key] === true) {
-                    continue;
-                }
-                
-                // Verifica se questa fascia ha disponibilità
-                if (isset($dispo->disponibili) && (int)$dispo->disponibili > 0) {
-                    $results[$date_key] = true; // ✅ SALVA TRUE per questo giorno
-                }
-            }
-            
-            // Pausa tra i mesi
-            usleep(500000); // 0.5 secondi
         }
-        
+
         // Step 5: Salva nel file JSON
         $this->save_json_file($location, $results);
+    }
+
+    /**
+     * Categorie da chiedere a TermeGest per un mese.
+     *
+     * Ogni giorno va giudicato sulla categoria che il form accettera' quel giorno
+     * (Booking_Handler::validate_category()): p2 fuori dal periodo natalizio, pm dentro.
+     * Dicembre e gennaio contengono entrambi, quindi si chiedono tutte e due; prima si
+     * chiedeva pm per tutto il mese, e i giorni fuori dal periodo (1-23 dicembre,
+     * 7-31 gennaio) risultavano aperti o chiusi secondo una categoria che il form scarta.
+     */
+    private function get_categories_for_month($month) {
+        return ($month == 12 || $month == 1) ? array('p2', 'pm') : array('p2');
+    }
+
+    /**
+     * Segna come disponibili i giorni con posti liberi nella risposta di una categoria,
+     * contando solo i giorni in cui quella categoria e' quella giusta (pm nel periodo
+     * natalizio, p2 fuori).
+     */
+    private function merge_availability(array &$results, array $dispArr, $cat) {
+        $want_christmas = ($cat === 'pm');
+
+        foreach ($dispArr as $dispo) {
+            if (!isset($dispo->data)) {
+                continue;
+            }
+
+            // Parse data (formato: "2025-12-09 00:00:00")
+            $date_obj = DateTime::createFromFormat('Y-m-d H:i:s', $dispo->data);
+            if (!$date_obj) {
+                continue;
+            }
+
+            $date_key = $date_obj->format('Y-m-d'); // Es: "2025-12-09"
+
+            // Giorno di competenza dell'altra categoria
+            if (Booking_Redirect::is_christmas_period($date_key) !== $want_christmas) {
+                continue;
+            }
+
+            // Se questo giorno è già disponibile, skip
+            if (isset($results[$date_key]) && $results[$date_key] === true) {
+                continue;
+            }
+
+            // Verifica se questa fascia ha disponibilità
+            if (isset($dispo->disponibili) && (int)$dispo->disponibili > 0) {
+                $results[$date_key] = true;
+            }
+        }
     }
 
     /**
