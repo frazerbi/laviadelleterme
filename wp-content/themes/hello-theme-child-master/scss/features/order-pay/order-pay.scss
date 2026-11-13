@@ -112,6 +112,10 @@ body.woocommerce-checkout form#order_review .booking-status {
    a zero.
    ============================================================ */
 
+// 1024 scritto a mano, non bp.up-from(tablet) (= 1025) — deciso il 2026-11-13: a 1024 px
+// esatti (iPad orizzontale) la checkout normale, cioè il widget Checkout di Elementor, è
+// già a due colonne, e order-pay è la stessa esperienza al secondo tentativo, quindi va a
+// capo nello stesso punto. Non "allinearlo" al breakpoint tablet.
 @media (min-width: 1024px) {
 
 	body.woocommerce-checkout form#order_review {

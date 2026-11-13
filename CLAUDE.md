@@ -387,8 +387,9 @@ Elementor, change the map. The mobile breakpoint is **767**, as in Elementor (de
 had 768). Also aligned that day: the notices' stacked button 600 → `max(mobile)`, the 16px input font-size against
 iOS zoom (checkout, lost-password) 1080 → `max(tablet)`, and the menu promo button in `style.css` from
 `min-width: 1024px` to `up-from(tablet)` = 1025, Elementor's desktop. The only literal left is `min-width: 1024px` in
-`order-pay` (two-column layout), deliberately not touched: at exactly 1024px (iPad landscape) it applies together with
-Elementor's tablet layout.
+`order-pay` (two-column layout), and it is **deliberate** (decided 2026-11-13): at exactly 1024px (iPad landscape) the
+normal checkout — Elementor's Checkout widget — is already two columns, and order-pay is the same experience on the
+retry, so it switches at the same width. Don't "fix" it to `bp.up-from(tablet)`.
 **Status colours come from `scss/_colors.scss`** (`@use 'colors' as c;`): for each of red/amber/green a full-strength
 colour (`c.$red` `#c81e1e` — borders, dots, `accent-color`, base of the tints) and a text colour (`c.$red-text`), with
 the tints derived by `c.tint(c.$red, c.$tint-notice)` (0.18 notices, 0.1 badges, 0.06 in-page boxes) instead of
