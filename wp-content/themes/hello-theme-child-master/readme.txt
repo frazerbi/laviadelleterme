@@ -108,6 +108,11 @@ Node. La cartella scss/ invece non va sul server (esclusa in deploy.yml, e non v
 caricata via FTP). Una modifica fatta direttamente a un .css si perde alla compilazione
 successiva: va riportata nel .scss.
 
+Breakpoint: da scss/_breakpoints.scss, copia di quelli impostati in Elementor
+(Impostazioni sito -> Layout -> Breakpoint; mobile 767, tablet 1024). Si usano con
+@use 'breakpoints' as bp; e @include bp.max(mobile) { ... }. Se cambiano in Elementor,
+vanno cambiati anche lì.
+
 Valori che devono vivere a runtime (colori del kit Elementor, --lvdt-*) restano custom
 property; le variabili SCSS servono solo per le costanti. Annidare solo pseudo-classi e
 media query, non gli antenati: la specificità dei selettori è tarata a mano.

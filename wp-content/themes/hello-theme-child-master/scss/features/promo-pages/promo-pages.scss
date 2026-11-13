@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/promo-pages/promo-pages.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Pagine protette da password (plugin PPWP)
    Landing promozionali e pagina convenzione ADAVA: il form di
@@ -172,7 +174,7 @@
    Responsive
    ============================================================ */
 
-@media only screen and (min-width: 768px) {
+@include bp.up-from(mobile) {
   .post-password-form {
       padding-left: 2em;
       padding-right: 2em;
@@ -189,7 +191,7 @@
   }
 }
 
-@media only screen and (max-width: 767px) {
+@include bp.max(mobile) {
   .post-password-form > p > label > input {
       max-width:50vw;
       height: 3rem;

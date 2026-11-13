@@ -99,12 +99,12 @@
 /* ============================================================
    Responsive
    ============================================================ */
-@media only screen and (max-width: 992px) {
+@media (max-width: 992px) {
   .cross-sell li.product {
     width: 100%;
   }
 }
-@media only screen and (max-width: 767px) {
+@media (max-width: 767px) {
   .cont-prodotti img {
     height: 40vh !important;
     object-fit: cover;

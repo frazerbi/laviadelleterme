@@ -1,0 +1,44 @@
+// Breakpoint del sito: gli stessi di Elementor (Impostazioni sito → Layout → Breakpoint).
+// Se cambiano lì, vanno cambiati qui e ricompilato: il CSS del tema deve andare a capo
+// negli stessi punti dei widget Elementor che gli stanno accanto.
+//
+// Come in Elementor, ogni dispositivo vale "fino a" il suo valore (max-width), e il
+// dispositivo successivo parte dal pixel dopo. Widescreen fa eccezione in Elementor
+// (vale "da" 1800 in su): qui lo si ottiene con up-from(laptop).
+//
+// Uso:
+//   @use 'breakpoints' as bp;
+//   @include bp.max(mobile)      { … }   // fino a 767px
+//   @include bp.up-from(mobile)  { … }   // da 768px in su
+
+@use 'sass:map';
+
+$breakpoints: (
+	mobile: 767px,        // Mobile Portrait
+	mobile-extra: 992px,  // Mobile Landscape
+	tablet: 1024px,       // Tablet verticale
+	tablet-extra: 1200px, // Tablet orizzontale
+	laptop: 1366px,       // Laptop
+	widescreen: 1800px,   // Widescreen
+);
+
+@function -value($device) {
+	@if not map.has-key($breakpoints, $device) {
+		@error "Breakpoint sconosciuto: #{$device}. Validi: #{map.keys($breakpoints)}";
+	}
+	@return map.get($breakpoints, $device);
+}
+
+// Fino al breakpoint compreso.
+@mixin max($device) {
+	@media (max-width: -value($device)) {
+		@content;
+	}
+}
+
+// Dal pixel dopo il breakpoint in su: il dispositivo successivo.
+@mixin up-from($device) {
+	@media (min-width: -value($device) + 1px) {
+		@content;
+	}
+}

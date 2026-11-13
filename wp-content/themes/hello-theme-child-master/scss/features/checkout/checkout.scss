@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/checkout/checkout.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ---- Larghezza/allineamento dei notice sulla checkout ----
    L'aspetto (colori, bordi, spaziature) è in features/global/wc-notices.css,
    condiviso con tutto il sito: qui resta solo il posizionamento. */
@@ -221,7 +223,7 @@ body.woocommerce-checkout #wc-stripe-express-checkout-element > * {
 	min-width: 0;
 }
 
-@media (min-width: 768px) {
+@include bp.up-from(mobile) {
 
 	body.woocommerce-checkout #wc-stripe-express-checkout-element {
 		flex-direction: row;

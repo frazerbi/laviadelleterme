@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/promo-pages/promozioni-speciali.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Pagina "Promozioni speciali" (/promozioni-speciali/)
    ============================================================
@@ -138,7 +140,7 @@
    Responsive
    ============================================================ */
 
-@media only screen and (max-width: 767px) {
+@include bp.max(mobile) {
   .ppw-pcp-password-form .ppw-pcp-password-label {
     flex-basis: 100%;
     max-width: none;

@@ -54,7 +54,7 @@
   grid-area: ld;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .woocommerce-order {
     grid-template-columns: 1fr;
     grid-template-areas: "notice" "overview" "details" "customer" "ld";

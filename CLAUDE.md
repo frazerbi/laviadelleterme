@@ -380,8 +380,18 @@ kept off the server by one `--exclude` in `deploy.yml` — don't FTP it either. 
 are still where the modules load them. A fix made directly to a `.css` (FTP hotfix, or out of habit) is **lost at the
 next build**, so carry it into the `.scss`. Step 0 (2026-11-13) was a pure rename: the compiled output was checked to
 be identical to the old hand-written files once minified (only `var( x )` → `var(x)` and `1 / -1` → `1/-1` differ).
-Planned next, one module at a time: partials for compile-time constants (status palette, the `rgba(66,66,66,…)` line
-grey, the Muli font stack, breakpoint mixins). Runtime values stay **custom properties** (`--lvdt-*`): they resolve
+**Breakpoints come from `scss/_breakpoints.scss`** (`@use 'breakpoints' as bp;`, then `@include bp.max(mobile)` /
+`bp.up-from(mobile)`), whose map is a copy of the site's Elementor breakpoints (Site Settings → Layout → Breakpoints:
+mobile 767, mobile-extra 992, tablet 1024, tablet-extra 1200, laptop 1366, widescreen 1800) — if they change in
+Elementor, change the map. The mobile breakpoint is **767**, as in Elementor (decided 2026-11-13; the thank-you page
+had 768). Three media queries are still literal because their value is not an Elementor breakpoint and moving them
+changes the layout: `min-width: 1024px` in `style.css` and `order-pay` (Elementor's desktop starts at 1025, so at
+exactly 1024px — iPad landscape — these apply together with Elementor's tablet layout), `max-width: 1080px` (the 16px
+input font-size against iOS zoom, checkout and lost-password) and `max-width: 600px` in `wc-notices`.
+**`#a51616` is the red of the free-standing error texts** (terms error, Stripe card error, thank-you "complete payment"
+text) and stays as is (decided 2026-11-13); notices and status badges use `#8e1414` on their tint.
+Planned next, one module at a time: partials for the other compile-time constants (status palette, the
+`rgba(66,66,66,…)` line grey, the Muli font stack). Runtime values stay **custom properties** (`--lvdt-*`): they resolve
 Elementor's kit globals on `body` and are read by Stripe's `getComputedStyle`, which Sass variables can't do. Nest only
 pseudo-classes and media queries, never ancestors: the selectors here are tuned to exact specificities and nesting
 hides the final score.

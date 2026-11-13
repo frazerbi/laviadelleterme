@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/global/elementor-carousel.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Caroselli immagini di Elementor — altezza uniforme delle slide
    ============================================================
@@ -38,13 +40,13 @@
 	object-position: center;
 }
 
-@media (max-width: 1024px) {
+@include bp.max(tablet) {
 	.elementor-widget-image-carousel .swiper-slide-image {
 		height: clamp(240px, 38vh, 440px);
 	}
 }
 
-@media (max-width: 767px) {
+@include bp.max(mobile) {
 	.elementor-widget-image-carousel .swiper-slide-image {
 		height: clamp(200px, 32vh, 340px);
 	}
@@ -142,7 +144,7 @@
 	outline-offset: 2px;
 }
 
-@media (max-width: 767px) {
+@include bp.max(mobile) {
 	.elementor-widget-image-carousel {
 		--lvdt-carousel-arrow-size: 2.25rem;
 		--lvdt-carousel-arrow-gap-y: 1.25rem;

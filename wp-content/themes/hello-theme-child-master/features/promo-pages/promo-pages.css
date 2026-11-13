@@ -185,7 +185,7 @@
 /* ============================================================
    Responsive
    ============================================================ */
-@media only screen and (min-width: 768px) {
+@media (min-width: 768px) {
   .post-password-form {
     padding-left: 2em;
     padding-right: 2em;
@@ -201,7 +201,7 @@
     height: 3rem;
   }
 }
-@media only screen and (max-width: 767px) {
+@media (max-width: 767px) {
   .post-password-form > p > label > input {
     max-width: 50vw;
     height: 3rem;

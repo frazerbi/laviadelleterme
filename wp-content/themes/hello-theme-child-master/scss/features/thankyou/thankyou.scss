@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/thankyou/thankyou.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Thank You page — redesign moderno
    Usa le variabili globali Elementor del sito
@@ -47,7 +49,7 @@
 .woocommerce-customer-details         { grid-area: customer; }
 .wc_ld_description                    { grid-area: ld; }
 
-@media ( max-width: 768px ) {
+@include bp.max(mobile) {
 	.woocommerce-order {
 		grid-template-columns: 1fr;
 		grid-template-areas:

@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/shop/shop.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Catalogo, scheda prodotto e carrello
    Ritocchi al markup WooCommerce e ai widget prodotto di
@@ -92,13 +94,13 @@
    Responsive
    ============================================================ */
 
-@media only screen and (max-width: 992px) {
+@include bp.max(mobile-extra) {
   .cross-sell li.product {
     width: 100%;
   }
 }
 
-@media only screen and (max-width: 767px) {
+@include bp.max(mobile) {
   .cont-prodotti img {
     height: 40vh !important;
     object-fit: cover;
