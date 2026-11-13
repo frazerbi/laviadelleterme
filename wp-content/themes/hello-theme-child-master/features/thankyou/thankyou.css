@@ -202,7 +202,9 @@
   padding: 1.25rem 1.5rem;
   border-radius: var(--lvdt-radius-lg);
   background: rgba(200, 30, 30, 0.06);
-  border: 1px solid rgba(200, 30, 30, 0.25);
+  /* Bordo pieno, come notice e badge: al 25% di trasparenza era ~1,4:1 sul
+     bianco, cioè non si vedeva. */
+  border: 1px solid #c81e1e;
   text-align: center;
 }
 

@@ -2,6 +2,7 @@
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
 @use 'breakpoints' as bp;
+@use 'colors' as c;
 
 /* ---- Larghezza/allineamento dei notice sulla checkout ----
    L'aspetto (colori, bordi, spaziature) è in features/global/wc-notices.css,
@@ -150,8 +151,10 @@ body.woocommerce-checkout .form-row.validate-required label.checkbox .woocommerc
    via JS non appena l'utente spunta la casella. */
 
 body.order-pay-terms-error .form-row.validate-required {
-	background: rgba(200, 30, 30, 0.06);
-	border: 1px solid rgba(200, 30, 30, 0.35);
+	background: c.tint(c.$red, c.$tint-box);
+	/* Bordo pieno, come notice e badge: al 35% di trasparenza era ~1,4:1 sul
+	   bianco, cioè non si vedeva. */
+	border: 1px solid c.$red;
 	border-radius: var(--lvdt-radius-md);
 	padding: 0.9rem 1rem !important;
 	margin: 0 !important;
@@ -160,12 +163,12 @@ body.order-pay-terms-error .form-row.validate-required {
 
 body.order-pay-terms-error .form-row.validate-required label.checkbox,
 body.order-pay-terms-error .form-row.validate-required .woocommerce-terms-and-conditions-checkbox-text {
-	color: #a51616 !important;
+	color: c.$red-text !important;
 }
 
 body.order-pay-terms-error .form-row.validate-required input.input-checkbox {
-	accent-color: #c81e1e;
-	outline: 2px solid rgba(200, 30, 30, 0.45);
+	accent-color: c.$red;
+	outline: 2px solid c.tint(c.$red, 0.45);
 	outline-offset: 2px;
 }
 
@@ -335,7 +338,7 @@ body.woocommerce-checkout #payment .wc-stripe-upe-element {
 body.woocommerce-checkout #payment #wc-stripe-upe-errors,
 body.woocommerce-checkout #payment .stripe-source-errors {
 	font-size: 0.85rem;
-	color: #a51616;
+	color: c.$red-text;
 }
 
 body.woocommerce-checkout #payment #wc-stripe-upe-errors:not(:empty) {

@@ -31,8 +31,8 @@
    stile impostato a mano dall'editor continua a vincere. Per lo stesso
    motivo qui non si usa `!important`.
 
-   Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
-   rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
+   Palette condivisa con i badge di stato: sta in scss/_colors.scss (rosso #a51616,
+   arancio #7a4100, verde #14663d per il testo) — vedi la nota sul contrasto più sotto.
    Ogni blocco di tipo pubblica quel colore anche come --lvdt-notice-color: è
    una proprietà personalizzata, quindi eredita a tutto il contenuto del notice
    ed è così che il pulsante prende il colore del proprio tipo senza dover
@@ -205,13 +205,14 @@ body .woocommerce-message a.button:focus-visible {
 
    TESTO: sopra 4.5:1 sul proprio sfondo tinto, cioè WCAG AA per testo
    normale. L'arancio e il verde ancora precedenti (#a05800, #1a7a4a)
-   erano al limite e risultavano slavati.
+   erano al limite e risultavano slavati. Il rosso è #a51616 dal
+   2026-11-13 (prima #8e1414, il più scuro dei tre).
 
    FONDO: tinta del colore del tipo al 18% su bianco. Era al 10-12% e il
    notice si confondeva con la pagina: la differenza rispetto al bianco
    era di pochi punti per canale. Il 18% è il massimo utile prima che il
    testo cominci a perdere contrasto — a questa tinta i tre restano fra
-   5,7:1 e 6,9:1, quindi c'è ancora margine.
+   5,7:1 e 6,7:1, quindi c'è ancora margine.
 
    BORDO: colore del tipo a piena intensità, non più una versione
    trasparente. Al 35% l'arancio su bianco valeva ~1,4:1 — il bordo
@@ -223,10 +224,10 @@ body .woocommerce-message a.button:focus-visible {
    dichiarata nel blocco comune in cima al file. */
 /* ---- Errore — rosso ---- */
 body .woocommerce-error.woocommerce-error {
-  --lvdt-notice-color: #8e1414;
+  --lvdt-notice-color: #a51616;
   background: rgba(200, 30, 30, 0.18);
   border-color: #c81e1e;
-  color: #8e1414 !important;
+  color: #a51616 !important;
 }
 
 /* ---- Informazione / attesa — arancio ---- */

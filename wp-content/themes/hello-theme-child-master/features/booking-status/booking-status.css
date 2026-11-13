@@ -19,15 +19,15 @@
   letter-spacing: 0.02em;
 }
 
-/* I colori del testo sono la stessa terna scura di features/global/wc-notices.css: la
-   precedente (#a51616 / #a05800 / #1a7a4a) su questi sfondi tinti stava sotto il 4.5:1
-   richiesto da WCAG AA per il testo normale, e a 0.78rem si leggeva slavata.
+/* Colori da scss/_colors.scss, gli stessi dei notice WooCommerce. L'arancio e il verde
+   precedenti (#a05800 / #1a7a4a) su questi sfondi tinti stavano sotto il 4.5:1 richiesto
+   da WCAG AA per il testo normale, e a 0.78rem si leggevano slavati.
    Bordo e pallino usano lo stesso colore pieno: il bordo era un'alfa 0.25-0.3 della
    tinta (circa 1.4:1 sul bianco, cioè invisibile, lo stesso difetto dei notice prima
    del 2026-08-26). Pieno sta fra 3.1:1 e 5.7:1 sul bianco, sopra il 3:1 WCAG per gli
    elementi non testuali. Non è il colore del testo, come nei notice: su una pillola
    così piccola un perimetro scuro peserebbe più del messaggio. Tinta 0.1 per tutti e
-   tre; il testo sta fra 6.3:1 e 7.9:1. */
+   tre; il testo sta fra 6.3:1 e 7.4:1. */
 .booking-status__dot {
   width: 7px;
   height: 7px;
@@ -61,7 +61,7 @@
 .booking-status--awaiting {
   background: rgba(200, 30, 30, 0.1);
   border: 1px solid #c81e1e;
-  color: #8e1414;
+  color: #a51616;
 }
 
 .booking-status--awaiting .booking-status__dot {

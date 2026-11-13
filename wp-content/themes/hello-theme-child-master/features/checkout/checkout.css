@@ -145,7 +145,9 @@ body.woocommerce-checkout .form-row.validate-required label.checkbox .woocommerc
    via JS non appena l'utente spunta la casella. */
 body.order-pay-terms-error .form-row.validate-required {
   background: rgba(200, 30, 30, 0.06);
-  border: 1px solid rgba(200, 30, 30, 0.35);
+  /* Bordo pieno, come notice e badge: al 35% di trasparenza era ~1,4:1 sul
+     bianco, cioè non si vedeva. */
+  border: 1px solid #c81e1e;
   border-radius: var(--lvdt-radius-md);
   padding: 0.9rem 1rem !important;
   margin: 0 !important;

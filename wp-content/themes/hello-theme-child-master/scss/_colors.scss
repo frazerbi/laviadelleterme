@@ -1,0 +1,39 @@
+// Colori di stato: errore (rosso), attesa/informazione (arancio), conferma (verde).
+// Li usano i notice WooCommerce (features/global/wc-notices), i badge di riga ordine
+// (features/booking-status) e i riquadri d'errore di checkout e thank-you.
+//
+// Due colori per stato, con due compiti diversi:
+//   $<stato>       colore pieno: bordi, pallini, accent-color, e la base delle tinte.
+//                  Sul bianco sta fra 3,1:1 e 5,7:1, sopra il 3:1 WCAG per gli
+//                  elementi non testuali.
+//   $<stato>-text  colore del testo: scuro abbastanza da superare 4,5:1 (WCAG AA)
+//                  anche sul fondo tinto più carico, quello dei notice (tinta 0.18).
+//
+// Contrasto dei testi su bianco / notice (0.18) / badge (0.10):
+//   rosso  #a51616  7,7 / 5,7 / 6,5
+//   arancio #7a4100 8,1 / 6,7 / 7,4
+//   verde  #14663d  7,0 / 5,8 / 6,3
+// Il rosso del testo è #a51616 dappertutto dal 2026-11-13; prima notice e badge
+// usavano #8e1414, più scuro degli altri due, e il notice d'errore tirava al bordeaux.
+//
+// Le tinte di fondo si ricavano dal colore pieno con tint(): mai una tripletta rgba a mano.
+
+@use 'sass:color';
+
+$red: #c81e1e;
+$red-text: #a51616;
+
+$amber: #dc7800;
+$amber-text: #7a4100;
+
+$green: #22a064;
+$green-text: #14663d;
+
+// Opacità delle tinte, dalla più leggera alla più carica.
+$tint-box: 0.06;    // riquadri d'avviso dentro la pagina (CTA thank-you, termini non accettati)
+$tint-badge: 0.1;   // pillole di stato
+$tint-notice: 0.18; // notice WooCommerce: il massimo prima che il testo perda contrasto
+
+@function tint($color, $alpha) {
+	@return color.change($color, $alpha: $alpha);
+}
