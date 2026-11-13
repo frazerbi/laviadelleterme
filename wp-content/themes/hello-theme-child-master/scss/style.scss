@@ -17,6 +17,8 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    Version e gli altri dati del tema. */
 
 @use 'breakpoints' as bp;
+@use 'sass:meta';
+@use 'fonts' as f;
 
 /* ============================================================
    Foglio principale del tema: solo regole realmente globali.
@@ -95,7 +97,7 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
 body {
   --lvdt-button-bg: var( --e-global-color-57f91e2, #0074a0 );
   --lvdt-button-color: var( --e-global-color-31904c4d, #fff );
-  --lvdt-button-font: "Muli", Sans-serif;
+  --lvdt-button-font: #{meta.inspect(f.$base)}; // inspect() tiene le virgolette di "Muli"
   --lvdt-button-font-size: 1.3rem;
   --lvdt-button-font-weight: 400;
   --lvdt-button-line-height: 1.3rem;

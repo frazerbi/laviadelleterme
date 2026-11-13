@@ -1,4 +1,16 @@
-// Colori di stato: errore (rosso), attesa/informazione (arancio), conferma (verde).
+// Colori del tema: i neutri (grigio del testo e delle linee) e i colori di stato.
+//
+// ---- Neutri ----
+// Il grigio è quello del testo del sito (#424242). Linee, bordi e separatori sono lo
+// stesso grigio a tre trasparenze, dalla più leggera alla più marcata; scegliere quella
+// del ruolo, non un'altra opacità a mano:
+//   $line-soft    0.10  separatori fra le righe di una tabella (righe ordine della thank-you)
+//   $line         0.12  bordo delle card e linee interne (thank-you, order-pay, payment_box)
+//   $line-strong  0.15  contenitori e voci da distinguere dal fondo (metodi di pagamento,
+//                       shop_table di order-pay, separatore "oppure" dei wallet)
+//
+// ---- Colori di stato ----
+// Errore (rosso), attesa/informazione (arancio), conferma (verde).
 // Li usano i notice WooCommerce (features/global/wc-notices), i badge di riga ordine
 // (features/booking-status) e i riquadri d'errore di checkout e thank-you.
 //
@@ -20,6 +32,15 @@
 
 @use 'sass:color';
 
+@function tint($color, $alpha) {
+	@return color.change($color, $alpha: $alpha);
+}
+
+$grey: #424242;
+$line-soft: tint($grey, 0.1);
+$line: tint($grey, 0.12);
+$line-strong: tint($grey, 0.15);
+
 $red: #c81e1e;
 $red-text: #a51616;
 
@@ -33,7 +54,3 @@ $green-text: #14663d;
 $tint-box: 0.06;    // riquadri d'avviso dentro la pagina (CTA thank-you, termini non accettati)
 $tint-badge: 0.1;   // pillole di stato
 $tint-notice: 0.18; // notice WooCommerce: il massimo prima che il testo perda contrasto
-
-@function tint($color, $alpha) {
-	@return color.change($color, $alpha: $alpha);
-}

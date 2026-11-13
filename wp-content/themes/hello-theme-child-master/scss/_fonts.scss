@@ -1,0 +1,8 @@
+// Font del sito: Muli, lo stesso impostato nel kit Elementor. Serve dove il markup
+// non passa da Elementor (template WooCommerce, form di plugin) e il font va
+// dichiarato a mano. Se cambia nel kit, va cambiato qui e ricompilato.
+//
+// I pulsanti non lo usano direttamente: passano da --lvdt-button-font (style.scss),
+// che a sua volta vale questo.
+
+$base: "Muli", Sans-serif;

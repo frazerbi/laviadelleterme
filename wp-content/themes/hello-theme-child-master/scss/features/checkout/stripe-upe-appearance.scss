@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/checkout/stripe-upe-appearance.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'fonts' as f;
+
 /* ============================================================
    Aspetto dei campi carta DENTRO l'iframe Stripe (UPE)
    ============================================================
@@ -44,7 +46,7 @@
 	padding: 16px;
 	box-shadow: none;
 	outline: none;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.4;

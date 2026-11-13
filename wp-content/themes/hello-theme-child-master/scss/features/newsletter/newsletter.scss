@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/newsletter/newsletter.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'fonts' as f;
+
 /* ============================================================
    Riquadro consenso newsletter
    Stampato da laviadelleterme_newsletter_campo() (newsletter.php) con lo
@@ -42,7 +44,7 @@
 .laviadelleterme-newsletter-box .form-row.laviadelleterme-newsletter label.checkbox {
 	display: block;
 	margin: 0;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	font-size: 1rem;
 	font-weight: 600;
 	line-height: 1.5;
@@ -67,7 +69,7 @@
 /* Rientro pari a casella + margine, così la nota si allinea al testo. */
 .laviadelleterme-newsletter-box p.laviadelleterme-newsletter-box__nota {
 	margin: 0.4rem 0 0 1.85rem;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	font-size: 0.85rem;
 	line-height: 1.4;
 	color: #555;

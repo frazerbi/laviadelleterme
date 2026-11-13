@@ -396,7 +396,13 @@ hand-written `rgba()` triplets. **The text red is `#a51616` everywhere** since 2
 `#8e1414` before, the darkest of the three, which made the error notice look maroon; `#a51616` is 5.7:1 on the notice
 tint, level with the green. The same day the two in-page red boxes (thank-you "Completa il pagamento", order-pay terms
 error) got a full-strength `c.$red` border instead of a 0.25/0.35 alpha (~1.4:1 on white, invisible), like notices
-and badges. Planned next: the `rgba(66,66,66,…)` line grey and the Muli font stack. Runtime values stay **custom properties** (`--lvdt-*`): they resolve
+and badges. The same partial holds the neutrals: `c.$grey` (`#424242`, the text grey) and the three line weights
+derived from it — `c.$line-soft` (0.10, table row separators), `c.$line` (0.12, card borders and inner lines),
+`c.$line-strong` (0.15, containers such as payment methods and the order-pay `shop_table`). The font stack is
+`f.$base` in `scss/_fonts.scss` (`@use 'fonts' as f;`); in `style.scss` it feeds `--lvdt-button-font` through
+`meta.inspect()`, because plain `#{}` interpolation drops the quotes around `"Muli"`. Both partials were introduced
+with byte-identical output, so they changed nothing on screen. **No hex, `rgba()` or font-family literal for these
+values should be written in a module any more** — use the partials. Runtime values stay **custom properties** (`--lvdt-*`): they resolve
 Elementor's kit globals on `body` and are read by Stripe's `getComputedStyle`, which Sass variables can't do. Nest only
 pseudo-classes and media queries, never ancestors: the selectors here are tuned to exact specificities and nesting
 hides the final score.

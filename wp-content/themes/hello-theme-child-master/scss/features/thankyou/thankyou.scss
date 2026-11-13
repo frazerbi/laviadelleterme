@@ -3,6 +3,7 @@
 
 @use 'breakpoints' as bp;
 @use 'colors' as c;
+@use 'fonts' as f;
 
 /* ============================================================
    Thank You page — redesign moderno
@@ -23,7 +24,7 @@
 		"ld       ld";
 	gap: 0 2.5rem;
 	align-items: start;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 1.3em;
@@ -98,7 +99,7 @@
 	text-align: center;
 	padding: 1rem 1.25rem !important;
 	border-radius: var(--lvdt-radius-md);
-	border: 1px solid rgba(66, 66, 66, 0.12);
+	border: 1px solid c.$line;
 	font-size: 0.8rem !important;
 	margin-right: 0 !important;
 }
@@ -141,7 +142,7 @@
 .woocommerce-order-details,
 .woocommerce-customer-details {
 	background: var(--e-global-color-31904c4d);
-	border: 1px solid rgba(66, 66, 66, 0.12);
+	border: 1px solid c.$line;
 	border-radius: var(--lvdt-radius-lg);
 	padding: 1.5rem;
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 5%);
@@ -171,7 +172,7 @@
 	align-items: flex-start;
 	gap: 1rem;
 	background: var(--e-global-color-31904c4d);
-	border-bottom: 1px solid rgba(66, 66, 66, 0.1);
+	border-bottom: 1px solid c.$line-soft;
 	margin-bottom: 0;
 }
 
@@ -353,7 +354,7 @@
 	display: flex;
 	align-items: center;
 	gap: 0.35rem;
-	border: 1px solid rgba(66, 66, 66, 0.12);
+	border: 1px solid c.$line;
 	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
 	padding: 0.3rem 0.85rem 0.3rem 0.7rem;
 	font-size: 0.85rem;

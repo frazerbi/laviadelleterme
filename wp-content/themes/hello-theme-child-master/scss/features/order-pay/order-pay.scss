@@ -1,6 +1,9 @@
 /* GENERATO da scss/features/order-pay/order-pay.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'colors' as c;
+@use 'fonts' as f;
+
 /* ============================================================
    Pagina order-pay (/checkout/order-pay/…) — stile
    Caricato da order-pay.php insieme a checkout/checkout.css:
@@ -21,7 +24,7 @@
 body.woocommerce-checkout form#order_review {
 	max-width: 800px;
 	margin: 0 auto;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	color: var(--e-global-color-secondary);
 }
 
@@ -29,7 +32,7 @@ body.woocommerce-checkout form#order_review {
 
 body.woocommerce-checkout form#order_review > table.shop_table {
 	width: 100%;
-	border: 1px solid rgba(66, 66, 66, 0.15);
+	border: 1px solid c.$line-strong;
 	border-radius: var(--lvdt-radius-lg);
 	border-collapse: separate;
 	border-spacing: 0;
@@ -57,7 +60,7 @@ body.woocommerce-checkout form#order_review > table.shop_table thead th {
 }
 
 body.woocommerce-checkout form#order_review > table.shop_table tbody td {
-	border-top: 1px solid rgba(66, 66, 66, 0.12);
+	border-top: 1px solid c.$line;
 }
 
 body.woocommerce-checkout form#order_review > table.shop_table td.product-name {
@@ -75,7 +78,7 @@ body.woocommerce-checkout form#order_review > table.shop_table td.product-subtot
 
 body.woocommerce-checkout form#order_review > table.shop_table tfoot th,
 body.woocommerce-checkout form#order_review > table.shop_table tfoot td {
-	border-top: 1px solid rgba(66, 66, 66, 0.12);
+	border-top: 1px solid c.$line;
 	font-weight: 500;
 	padding-top: 0.7rem;
 	padding-bottom: 0.7rem;

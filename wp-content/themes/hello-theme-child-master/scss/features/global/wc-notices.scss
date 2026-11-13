@@ -3,6 +3,7 @@
 
 @use 'breakpoints' as bp;
 @use 'colors' as c;
+@use 'fonts' as f;
 
 /* ============================================================
    Notice WooCommerce — stile unico per tutto il sito
@@ -55,7 +56,7 @@ body .woocommerce-message.woocommerce-message {
 	/* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
 	   quello che li rende riconoscibili a colpo d'occhio. */
 	border-left-width: 4px;
-	font-family: "Muli", Sans-serif;
+	font-family: f.$base;
 	font-size: 0.95rem;
 	font-weight: 500;
 	line-height: 1.5;

@@ -2,6 +2,8 @@
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
 @use 'breakpoints' as bp;
+@use 'colors' as c;
+@use 'fonts' as f;
 
 /* ============================================================
    Pagina "Promozioni speciali" (/promozioni-speciali/)
@@ -73,11 +75,11 @@
 .ppw-pcp-password-form input.ppw-pcp-pf-password-input {
   width: 100%;
   height: auto;
-  font-family: "Muli", Sans-serif;
+  font-family: f.$base;
   font-size: 1.3rem;
   line-height: 1.3rem;
   padding: 0.9rem 1.2rem 1.1rem;
-  color: #424242;
+  color: c.$grey;
   background-color: #fff;
   border: 1px solid #c9c9c9;
   border-radius: var( --lvdt-radius-sm );
