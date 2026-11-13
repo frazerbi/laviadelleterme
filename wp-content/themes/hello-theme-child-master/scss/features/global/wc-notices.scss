@@ -1,6 +1,8 @@
 /* GENERATO da scss/features/global/wc-notices.scss — non modificare questo file:
    si modifica il sorgente e si ricompila (cd scss && npm run build). */
 
+@use 'breakpoints' as bp;
+
 /* ============================================================
    Notice WooCommerce — stile unico per tutto il sito
    ============================================================
@@ -190,7 +192,7 @@ body .woocommerce-message a.button:focus-visible {
 /* Da mobile testo e bottone si impilano, allineati a sinistra. In colonna il
    margine automatico spingerebbe il bottone sull'asse trasversale, cioè a
    destra: va riportato a zero. */
-@media only screen and (max-width: 600px) {
+@include bp.max(mobile) {
 	.woocommerce-error:has( > a.button ),
 	.woocommerce-info:has( > a.button ),
 	.woocommerce-message:has( > a.button ) {

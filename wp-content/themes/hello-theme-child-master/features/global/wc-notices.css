@@ -188,7 +188,7 @@ body .woocommerce-message a.button:focus-visible {
 /* Da mobile testo e bottone si impilano, allineati a sinistra. In colonna il
    margine automatico spingerebbe il bottone sull'asse trasversale, cioè a
    destra: va riportato a zero. */
-@media only screen and (max-width: 600px) {
+@media (max-width: 767px) {
   .woocommerce-error:has(> a.button),
   .woocommerce-info:has(> a.button),
   .woocommerce-message:has(> a.button) {

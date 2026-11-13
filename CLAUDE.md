@@ -384,10 +384,11 @@ be identical to the old hand-written files once minified (only `var( x )` → `v
 `bp.up-from(mobile)`), whose map is a copy of the site's Elementor breakpoints (Site Settings → Layout → Breakpoints:
 mobile 767, mobile-extra 992, tablet 1024, tablet-extra 1200, laptop 1366, widescreen 1800) — if they change in
 Elementor, change the map. The mobile breakpoint is **767**, as in Elementor (decided 2026-11-13; the thank-you page
-had 768). Three media queries are still literal because their value is not an Elementor breakpoint and moving them
-changes the layout: `min-width: 1024px` in `style.css` and `order-pay` (Elementor's desktop starts at 1025, so at
-exactly 1024px — iPad landscape — these apply together with Elementor's tablet layout), `max-width: 1080px` (the 16px
-input font-size against iOS zoom, checkout and lost-password) and `max-width: 600px` in `wc-notices`.
+had 768). Also aligned that day: the notices' stacked button 600 → `max(mobile)`, the 16px input font-size against
+iOS zoom (checkout, lost-password) 1080 → `max(tablet)`, and the menu promo button in `style.css` from
+`min-width: 1024px` to `up-from(tablet)` = 1025, Elementor's desktop. The only literal left is `min-width: 1024px` in
+`order-pay` (two-column layout), deliberately not touched: at exactly 1024px (iPad landscape) it applies together with
+Elementor's tablet layout.
 **`#a51616` is the red of the free-standing error texts** (terms error, Stripe card error, thank-you "complete payment"
 text) and stays as is (decided 2026-11-13); notices and status badges use `#8e1414` on their tint.
 Planned next, one module at a time: partials for the other compile-time constants (status palette, the

@@ -4,7 +4,7 @@ Theme URI: https://laviadelleterme.it/
 Description: Tema figlio di Hello Elementor per La Via delle Terme: personalizzazioni WooCommerce (checkout, order-pay, thank-you, account) e integrazione con il sistema di prenotazione TermeGest.
 Author: Francesco Zerbinato
 Template: hello-elementor
-Version: 2.2.4
+Version: 2.2.5
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -15,6 +15,8 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    si modifica il sorgente e si ricompila (cd scss && npm run build).
    L'header qui sopra resta in testa perché WordPress legge da qui
    Version e gli altri dati del tema. */
+
+@use 'breakpoints' as bp;
 
 /* ============================================================
    Foglio principale del tema: solo regole realmente globali.
@@ -182,7 +184,7 @@ button.woocommerce-Button:hover {
    Responsive
    ============================================================ */
 
-@media only screen and (min-width: 1024px) {
+@include bp.up-from(tablet) {
   #menu-main .btn-promo > a.elementor-item {
     height: fit-content;
     background-color: var(--e-global-color-primary);
