@@ -1,0 +1,72 @@
+/* GENERATO da scss/features/booking-status/booking-status.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ============================================================
+   Badge stato prenotazione / pagamento per riga ordine.
+   Stampato da booking-status.php su woocommerce_order_item_meta_end,
+   quindi compare sia sulla pagina order-received sia nella tabella
+   riepilogo della pagina order-pay: booking-status.php lo accoda con le
+   stesse due condizioni del gate laviadelleterme_show_booking_status_badge().
+   ============================================================ */
+
+.booking-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin: 0.85rem 0 0 !important;
+	padding: 0.3rem 0.75rem;
+	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+/* I colori del testo sono la stessa terna scura di features/global/wc-notices.css: la
+   precedente (#a51616 / #a05800 / #1a7a4a) su questi sfondi tinti stava sotto il 4.5:1
+   richiesto da WCAG AA per il testo normale, e a 0.78rem si leggeva slavata.
+   Bordo e pallino usano lo stesso colore pieno: il bordo era un'alfa 0.25-0.3 della
+   tinta (circa 1.4:1 sul bianco, cioè invisibile, lo stesso difetto dei notice prima
+   del 2026-08-26). Pieno sta fra 3.1:1 e 5.7:1 sul bianco, sopra il 3:1 WCAG per gli
+   elementi non testuali. Non è il colore del testo, come nei notice: su una pillola
+   così piccola un perimetro scuro peserebbe più del messaggio. Tinta 0.1 per tutti e
+   tre; il testo sta fra 6.3:1 e 7.9:1. */
+
+.booking-status__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%; /* forma: cerchio */
+	flex-shrink: 0;
+}
+
+/* Confermata — verde */
+.booking-status--confirmed {
+	background: rgba(34, 160, 100, 0.1);
+	border: 1px solid #22a064;
+	color: #14663d;
+}
+
+.booking-status--confirmed .booking-status__dot {
+	background: #22a064;
+}
+
+/* Da prenotare — arancio */
+.booking-status--pending {
+	background: rgba(220, 120, 0, 0.1);
+	border: 1px solid #dc7800;
+	color: #7a4100;
+}
+
+.booking-status--pending .booking-status__dot {
+	background: #dc7800;
+}
+
+/* In attesa di pagamento — rosso */
+.booking-status--awaiting {
+	background: rgba(200, 30, 30, 0.1);
+	border: 1px solid #c81e1e;
+	color: #8e1414;
+}
+
+.booking-status--awaiting .booking-status__dot {
+	background: #c81e1e;
+}

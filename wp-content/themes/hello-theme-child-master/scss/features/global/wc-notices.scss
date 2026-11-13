@@ -1,0 +1,251 @@
+/* GENERATO da scss/features/global/wc-notices.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ============================================================
+   Notice WooCommerce — stile unico per tutto il sito
+   ============================================================
+   WooCommerce stampa gli stessi tre tipi di notice con markup
+   diverso a seconda del contesto:
+
+   - `.woocommerce-notices-wrapper > div.woocommerce-info`   (cart, order-pay, my-account…)
+   - `.woocommerce-NoticeGroup > div[role=alert] > ul.woocommerce-error > li`
+     (validazione della checkout, anche via AJAX)
+   - `ul.woocommerce-error` / `ul.woocommerce-message` sciolti
+
+   Qui si stila la classe di tipo (`.woocommerce-error`, `.woocommerce-info`,
+   `.woocommerce-message`) indipendentemente dal wrapper, così tutte le
+   varianti hanno lo stesso aspetto.
+
+   Il `!important` su padding/margin/list-style è necessario: woocommerce.css
+   li dichiara a sua volta `!important`.
+
+   La classe di tipo è ripetuta due volte, con `body` davanti. Non è un
+   refuso: il widget "Checkout" di Elementor Pro azzera i notice con
+   `.elementor-widget-woocommerce-checkout-page .woocommerce-info`, che
+   vale due classi (0,2,0) e batterebbe una regola sulla sola classe di
+   tipo (0,1,0) — in checkout il fondo e il bordo superiore tornavano
+   trasparenti. Ripetere la classe porta a (0,2,0) e `body` aggiunge
+   l'elemento che decide, (0,2,1), senza dipendere da un wrapper o da
+   una body class: i notice escono in contesti troppo diversi perché
+   agganciarsi a quelli sia affidabile. La quota resta comunque sotto
+   alle regole per-elemento di Elementor (almeno (0,4,0)), quindi uno
+   stile impostato a mano dall'editor continua a vincere. Per lo stesso
+   motivo qui non si usa `!important`.
+
+   Palette del testo condivisa con i badge di stato (booking-status/booking-status.css):
+   rosso #8e1414, arancio #7a4100, verde #14663d — vedi la nota sul contrasto più sotto.
+   Ogni blocco di tipo pubblica quel colore anche come --lvdt-notice-color: è
+   una proprietà personalizzata, quindi eredita a tutto il contenuto del notice
+   ed è così che il pulsante prende il colore del proprio tipo senza dover
+   triplicare le sue regole.
+   ============================================================ */
+
+body .woocommerce-error.woocommerce-error,
+body .woocommerce-info.woocommerce-info,
+body .woocommerce-message.woocommerce-message {
+	display: block;
+	list-style: none !important;
+	margin: 0 0 1.25rem !important;
+	padding: 1rem 1.25rem !important;
+	border-radius: var(--lvdt-radius-md);
+	border: 1px solid transparent;
+	/* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
+	   quello che li rende riconoscibili a colpo d'occhio. */
+	border-left-width: 4px;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.95rem;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+/* WooCommerce mette un'icona in ::before contando su un padding-left ampio:
+   qui il padding è simmetrico, quindi l'icona va tolta. */
+.woocommerce-error::before,
+.woocommerce-info::before,
+.woocommerce-message::before {
+	display: none !important;
+}
+
+/* Righe multiple (ul > li), es. più errori di validazione insieme */
+.woocommerce-error > li,
+.woocommerce-info > li,
+.woocommerce-message > li {
+	list-style: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.woocommerce-error > li + li,
+.woocommerce-info > li + li,
+.woocommerce-message > li + li {
+	margin-top: 0.5rem !important;
+}
+
+/* I link dentro al notice (es. "#terms" nell'errore dei termini) restano del
+   colore del notice, senza sottolineatura: scelta sua, la riga sottolineata
+   dentro una striscia già tinta e bordata faceva rumore.
+
+   `text-decoration: none` va dichiarato, non basta togliere la regola: senza
+   una dichiarazione esplicita torna a valere la sottolineatura di default del
+   browser sugli `<a>`.
+
+   Il pulsante è escluso: la regola vale `!important` e altrimenti gli
+   imporrebbe il colore del notice, costringendo il blocco del pulsante qui
+   sotto a rispondere con un altro !important — che è proprio quello che
+   impedirebbe a Elementor di sovrascriverlo. */
+.woocommerce-error a:not(.button),
+.woocommerce-info a:not(.button),
+.woocommerce-message a:not(.button) {
+	color: inherit !important;
+	text-decoration: none;
+}
+
+/* Il bottone dentro ai notice di WooCommerce (es. "Continua con gli acquisti"
+   dopo l'aggiunta al carrello). Senza queste regole eredita `color: inherit`
+   dal blocco qui sopra e non ha né fondo né padding: resta indistinguibile da
+   un link.
+
+   Colori: quelli del proprio notice, non il blu dei pulsanti del sito. In
+   pieno il blu si prendeva la scena — è un colore estraneo al messaggio,
+   messo su un fondo tinto di un'altra tinta, e finiva per pesare più del
+   testo che dovrebbe leggersi per primo. Qui il pulsante è delineato: fondo
+   trasparente (passa la tinta del notice), bordo e testo nel colore del tipo,
+   e solo in hover il colore riempie il fondo con il testo in bianco. Così a
+   riposo resta secondario e in hover diventa chiaramente premibile.
+
+   Il colore arriva da --lvdt-notice-color, dichiarata nei blocchi per tipo in
+   fondo al file ed ereditata dal contenitore: un solo gruppo di regole invece
+   di tre. Il fallback su --lvdt-button-bg copre l'ipotesi di un notice senza
+   classe di tipo riconosciuta.
+
+   Contrasto: a riposo il testo è lo stesso colore del testo del notice, quindi
+   già verificato sopra 4,5:1 sulla propria tinta; il bordo è a piena intensità,
+   sopra il 3:1 richiesto agli elementi non testuali. In hover il bianco sui tre
+   colori sta fra 6,9:1 e 8,7:1.
+
+   Dalle --lvdt-button-* restano forma e impaginazione (famiglia, peso, raggio,
+   maiuscolo), non i colori. La scala però è ridotta: quelle variabili sono
+   tarate sui pulsanti d'azione a piena pagina (1.3rem, padding 0.9/2/1.1)
+   mentre il notice è una striscia compatta il cui testo sta a 0.95rem, e alla
+   misura piena il pulsante pesava più del messaggio.
+
+   Niente !important: è il default del pulsante, non l'ultima parola. Il `body`
+   in testa al selettore porta la specificità a (0,2,2), quel tanto che basta a
+   battere `.woocommerce a.button` di woocommerce.css (0,2,1) senza dipendere
+   dall'ordine dei fogli, e resta comunque sotto alle regole per-elemento di
+   Elementor. */
+body .woocommerce-error a.button,
+body .woocommerce-info a.button,
+body .woocommerce-message a.button {
+	display: inline-block;
+	padding: 0.55rem 1.25rem 0.65rem;
+	border: 1px solid var(--lvdt-notice-color, var(--lvdt-button-bg));
+	border-radius: var(--lvdt-radius-sm);
+	background: transparent;
+	color: var(--lvdt-notice-color, var(--lvdt-button-bg));
+	text-decoration: none;
+	font-family: var(--lvdt-button-font);
+	font-size: 0.9rem;
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: 1.2;
+	text-transform: uppercase;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body .woocommerce-error a.button:hover,
+body .woocommerce-error a.button:focus-visible,
+body .woocommerce-info a.button:hover,
+body .woocommerce-info a.button:focus-visible,
+body .woocommerce-message a.button:hover,
+body .woocommerce-message a.button:focus-visible {
+	background: var(--lvdt-notice-color, var(--lvdt-button-bg));
+	color: #fff;
+}
+
+/* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa
+   riga; appena il testo andava a capo il bottone restava incollato a sinistra.
+   Il :has() serve a non trasformare in flex anche i notice senza bottone, che
+   sono la maggioranza. */
+.woocommerce-error:has( > a.button ),
+.woocommerce-info:has( > a.button ),
+.woocommerce-message:has( > a.button ) {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 1rem;
+}
+
+/* Da desktop il bottone sta a destra. Il margine automatico al posto di
+   justify-content: space-between non è un dettaglio: con space-between il
+   bottone torna a sinistra proprio nel caso critico, cioè quando il testo è
+   lungo e lo manda a capo su una riga tutta sua, dove resta l'unico elemento da
+   distribuire. Il margine automatico assorbe lo spazio libero della riga in cui
+   si trova, quindi lo tiene a destra in entrambi i casi. */
+.woocommerce-error a.button,
+.woocommerce-info a.button,
+.woocommerce-message a.button {
+	margin-left: auto;
+}
+
+/* Da mobile testo e bottone si impilano, allineati a sinistra. In colonna il
+   margine automatico spingerebbe il bottone sull'asse trasversale, cioè a
+   destra: va riportato a zero. */
+@media only screen and (max-width: 600px) {
+	.woocommerce-error:has( > a.button ),
+	.woocommerce-info:has( > a.button ),
+	.woocommerce-message:has( > a.button ) {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.woocommerce-error a.button,
+	.woocommerce-info a.button,
+	.woocommerce-message a.button {
+		margin-left: 0;
+	}
+}
+
+/* Tre valori per tipo, con tre criteri diversi.
+
+   TESTO: sopra 4.5:1 sul proprio sfondo tinto, cioè WCAG AA per testo
+   normale. L'arancio e il verde ancora precedenti (#a05800, #1a7a4a)
+   erano al limite e risultavano slavati.
+
+   FONDO: tinta del colore del tipo al 18% su bianco. Era al 10-12% e il
+   notice si confondeva con la pagina: la differenza rispetto al bianco
+   era di pochi punti per canale. Il 18% è il massimo utile prima che il
+   testo cominci a perdere contrasto — a questa tinta i tre restano fra
+   5,7:1 e 6,9:1, quindi c'è ancora margine.
+
+   BORDO: colore del tipo a piena intensità, non più una versione
+   trasparente. Al 35% l'arancio su bianco valeva ~1,4:1 — il bordo
+   semplicemente non si vedeva, ed è il motivo per cui il notice
+   sembrava sfumare nella pagina. A piena intensità i tre stanno fra
+   3,1:1 e 5,7:1, cioè sopra la soglia 3:1 che WCAG chiede agli elementi
+   non testuali. Non c'è più un border-left-color separato: la barra
+   laterale ora si distingue per la sola larghezza (4px contro 1px)
+   dichiarata nel blocco comune in cima al file. */
+
+/* ---- Errore — rosso ---- */
+body .woocommerce-error.woocommerce-error {
+	--lvdt-notice-color: #8e1414;
+	background: rgba(200, 30, 30, 0.18);
+	border-color: #c81e1e;
+	color: #8e1414 !important;
+}
+
+/* ---- Informazione / attesa — arancio ---- */
+body .woocommerce-info.woocommerce-info {
+	--lvdt-notice-color: #7a4100;
+	background: rgba(220, 120, 0, 0.18);
+	border-color: #dc7800;
+	color: #7a4100 !important;
+}
+
+/* ---- Conferma — verde ---- */
+body .woocommerce-message.woocommerce-message {
+	--lvdt-notice-color: #14663d;
+	background: rgba(34, 160, 100, 0.18);
+	border-color: #22a064;
+	color: #14663d !important;
+}

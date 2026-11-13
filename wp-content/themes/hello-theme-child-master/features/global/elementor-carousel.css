@@ -1,3 +1,5 @@
+/* GENERATO da scss/features/global/elementor-carousel.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
 /* ============================================================
    Caroselli immagini di Elementor — altezza uniforme delle slide
    ============================================================
@@ -21,33 +23,29 @@
    I breakpoint sono quelli predefiniti di Elementor: tablet ≤1024px,
    mobile ≤767px.
    ============================================================ */
-
 .elementor-widget-image-carousel .swiper-slide-inner {
-	display: block;
-	margin: 0;
+  display: block;
+  margin: 0;
 }
 
 .elementor-widget-image-carousel .swiper-slide-image {
-	display: block;
-	width: 100%;
-	height: clamp(320px, 55vh, 660px);
-	object-fit: cover;
-	object-position: center;
+  display: block;
+  width: 100%;
+  height: clamp(320px, 55vh, 660px);
+  object-fit: cover;
+  object-position: center;
 }
 
 @media (max-width: 1024px) {
-	.elementor-widget-image-carousel .swiper-slide-image {
-		height: clamp(240px, 38vh, 440px);
-	}
+  .elementor-widget-image-carousel .swiper-slide-image {
+    height: clamp(240px, 38vh, 440px);
+  }
 }
-
 @media (max-width: 767px) {
-	.elementor-widget-image-carousel .swiper-slide-image {
-		height: clamp(200px, 32vh, 340px);
-	}
+  .elementor-widget-image-carousel .swiper-slide-image {
+    height: clamp(200px, 32vh, 340px);
+  }
 }
-
-
 /* ============================================================
    Frecce prev/next — dischi blu sotto l'immagine, a destra
    ============================================================
@@ -81,71 +79,64 @@
    quel blu sta sopra il 4.5:1 richiesto da WCAG AA. L'icona è un SVG
    inline con fill: currentColor, quindi basta impostarne il color.
    ============================================================ */
-
 .elementor-widget-image-carousel {
-	--lvdt-carousel-arrow-size: 2.75rem;
-	/* Divario fra i due dischi. */
-	--lvdt-carousel-arrow-gap: 0.5rem;
-	/* Distacco fra il bordo inferiore dell'immagine e la cima dei dischi. */
-	--lvdt-carousel-arrow-gap-y: 2rem;
-	/* Rientro dal bordo destro dell'immagine: 0 = allineate alla foto. */
-	--lvdt-carousel-arrow-inset: 0rem;
+  --lvdt-carousel-arrow-size: 2.75rem;
+  /* Divario fra i due dischi. */
+  --lvdt-carousel-arrow-gap: 0.5rem;
+  /* Distacco fra il bordo inferiore dell'immagine e la cima dei dischi. */
+  --lvdt-carousel-arrow-gap-y: 2rem;
+  /* Rientro dal bordo destro dell'immagine: 0 = allineate alla foto. */
+  --lvdt-carousel-arrow-inset: 0rem;
 }
 
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper {
-	padding-bottom: calc(
-		var(--lvdt-carousel-arrow-gap-y) + var(--lvdt-carousel-arrow-size)
-	);
+  padding-bottom: calc(var(--lvdt-carousel-arrow-gap-y) + var(--lvdt-carousel-arrow-size));
 }
 
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button {
-	top: auto;
-	left: auto;
-	transform: none;
-	bottom: 0;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: var(--lvdt-carousel-arrow-size);
-	height: var(--lvdt-carousel-arrow-size);
-	/* Cerchio: una geometria, non un passo della scala --lvdt-radius-*. */
-	border-radius: 50%;
-	background-color: var(--lvdt-button-bg);
-	color: #fff;
-	font-size: 1.25rem;
-	transition: filter 0.15s ease-in-out;
+  top: auto;
+  left: auto;
+  transform: none;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lvdt-carousel-arrow-size);
+  height: var(--lvdt-carousel-arrow-size);
+  /* Cerchio: una geometria, non un passo della scala --lvdt-radius-*. */
+  border-radius: 50%;
+  background-color: var(--lvdt-button-bg);
+  color: #fff;
+  font-size: 1.25rem;
+  transition: filter 0.15s ease-in-out;
 }
 
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button-prev {
-	right: calc(
-		var(--lvdt-carousel-arrow-inset) + var(--lvdt-carousel-arrow-size) +
-			var(--lvdt-carousel-arrow-gap)
-	);
+  right: calc(var(--lvdt-carousel-arrow-inset) + var(--lvdt-carousel-arrow-size) + var(--lvdt-carousel-arrow-gap));
 }
 
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button-next {
-	right: var(--lvdt-carousel-arrow-inset);
+  right: var(--lvdt-carousel-arrow-inset);
 }
 
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:hover,
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:focus-visible {
-	filter: brightness(0.88);
+  filter: brightness(0.88);
 }
 
 /* Le frecce hanno role="button" e tabindex="0": senza un focus visibile
    chi naviga da tastiera non sa dove si trova. */
 .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button:focus-visible {
-	outline: 2px solid #fff;
-	outline-offset: 2px;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 @media (max-width: 767px) {
-	.elementor-widget-image-carousel {
-		--lvdt-carousel-arrow-size: 2.25rem;
-		--lvdt-carousel-arrow-gap-y: 1.25rem;
-	}
-
-	.elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button {
-		font-size: 1rem;
-	}
+  .elementor-widget-image-carousel {
+    --lvdt-carousel-arrow-size: 2.25rem;
+    --lvdt-carousel-arrow-gap-y: 1.25rem;
+  }
+  .elementor-widget-image-carousel .elementor-image-carousel-wrapper .elementor-swiper-button {
+    font-size: 1rem;
+  }
 }

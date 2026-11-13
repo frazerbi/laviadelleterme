@@ -1,0 +1,40 @@
+/* GENERATO da scss/features/my-account/my-account.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ============================================================
+   Area account e login/registrazione
+   Caricato da my-account.php su is_account_page() e sulla pagina
+   /login-e-registrazione/ (URL impostato dai filtri login_url e
+   register_url in my-account.php): la registrazione NON è un
+   endpoint WooCommerce, è una pagina a sé, quindi entrambe le
+   condizioni servono.
+   Lo stile della pagina password dimenticata sta in lost-password.css.
+   ============================================================ */
+
+/* ---- Dashboard: pulsante del plugin User Registration ---- */
+
+/* Colori dal blocco pulsanti di style.css (variabili --lvdt-button-*): il
+   pulsante arriva da un plugin e non ha le classi WooCommerce, quindi lo stile
+   va riapplicato qui invece di ereditarlo. */
+.woocommerce-account.woocommerce-page #my-account-dashboard input.user-registration-Button {
+  color: var( --lvdt-button-color );
+  background-color: var( --lvdt-button-bg );
+  border-style: solid;
+  border-width: 1px 1px 1px 1px;
+  border-color: var( --lvdt-button-bg );
+}
+
+.woocommerce-account.woocommerce-page #my-account-dashboard input.user-registration-Button:hover  {
+  color: var( --lvdt-button-bg );
+  background-color: var( --lvdt-button-color );
+  border-color: var( --lvdt-button-bg );
+}
+
+/* ---- Login e registrazione ---- */
+
+body .container-social-login .elementor-shortcode {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}

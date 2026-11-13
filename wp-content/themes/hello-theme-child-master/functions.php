@@ -15,7 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Versione unica per tutti gli asset del tema: l'header Version di style.css.
+ * Versione unica per tutti gli asset del tema: l'header Version di style.css
+ * (generato: si modifica in scss/style.scss e si ricompila).
  * Va alzata a ogni modifica di un CSS/JS, altrimenti i browser tengono la copia in cache.
  *
  * @return string

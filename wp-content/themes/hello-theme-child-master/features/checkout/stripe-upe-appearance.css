@@ -1,3 +1,5 @@
+/* GENERATO da scss/features/checkout/stripe-upe-appearance.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
 /* ============================================================
    Aspetto dei campi carta DENTRO l'iframe Stripe (UPE)
    ============================================================
@@ -25,7 +27,6 @@
    non quello del `.payment_box`, quindi un colore semitrasparente renderebbe
    diverso da qui.
    ============================================================ */
-
 /* Stessa forma dei campi di fatturazione del widget Checkout di Elementor
    (pagina 960): senza bordo, angoli vivi, padding 16px, Muli 1rem, testo nero.
    Il riempimento invece è invertito: quei campi sono #F1F1F1 su pagina bianca,
@@ -35,15 +36,15 @@
    Se in Elementor cambiano i campi del checkout, va riallineato a mano: il
    campione non può leggere i valori del widget. */
 #wc-stripe-hidden-style-input {
-	background-color: #ffffff;
-	border: 0 none #ffffff;
-	border-radius: 0;
-	padding: 16px;
-	box-shadow: none;
-	outline: none;
-	font-family: "Muli", Sans-serif;
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.4;
-	color: #000000;
+  background-color: #ffffff;
+  border: 0 none #ffffff;
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: none;
+  outline: none;
+  font-family: "Muli", Sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #000000;
 }

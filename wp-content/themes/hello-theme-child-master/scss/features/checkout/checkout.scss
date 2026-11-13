@@ -1,0 +1,372 @@
+/* GENERATO da scss/features/checkout/checkout.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ---- Larghezza/allineamento dei notice sulla checkout ----
+   L'aspetto (colori, bordi, spaziature) è in features/global/wc-notices.css,
+   condiviso con tutto il sito: qui resta solo il posizionamento. */
+
+body.woocommerce-checkout .woocommerce-notices-wrapper,
+body.woocommerce-checkout .woocommerce-NoticeGroup {
+	display: block;
+	max-width: 800px;
+	margin: 0 auto 1.5rem;
+}
+
+/* ---- Checkbox privacy ----
+   Spostata qui da style.css: era una regola globale ma il markup
+   esce solo nel form di checkout. */
+
+.privacy-checkout {
+	align-items: flex-start!important;
+}
+.privacy-checkout > input {
+	margin-top: 0.2rem;
+	width: 1.1em;
+	height: 1.1em;
+}
+.privacy-checkout > label {
+	width: 90%!important;
+	margin-left: 2%!important;
+	line-height: 1.3;
+}
+
+/* ---- Metodi di pagamento ---- */
+
+body.woocommerce-checkout #payment {
+	background: none;
+	border: none;
+	padding: 0;
+}
+
+body.woocommerce-checkout #payment ul.wc_payment_methods {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	list-style: none !important;
+	padding: 0 !important;
+	margin: 0 0 1.5rem !important;
+}
+
+body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	background: var(--e-global-color-31904c4d, #fff);
+	border: 1px solid rgba(66, 66, 66, 0.15);
+	border-radius: var(--lvdt-radius-lg);
+	padding: 0 !important;
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method:has(input:checked) {
+	border-color: var(--e-global-color-50b7ea4, #0074a0);
+	background: rgba(0, 116, 160, 0.05);
+}
+
+body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method input.input-radio {
+	flex-shrink: 0;
+	margin: 0 0.5rem 0 1rem;
+}
+
+body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method label {
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	padding: 0.9rem 1rem 0.9rem 0;
+	margin: 0 !important;
+	cursor: pointer;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--e-global-color-secondary);
+}
+
+body.woocommerce-checkout #payment ul.payment_methods li.wc_payment_method label img {
+	height: 22px;
+	width: auto;
+	vertical-align: middle;
+}
+
+body.woocommerce-checkout #payment .payment_box {
+	flex: 1 0 100%;
+	background: rgba(0, 0, 0, 0.02);
+	border-top: 1px solid rgba(66, 66, 66, 0.12);
+	padding: 1.25rem 1rem !important;
+	margin: 0 !important;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.9rem;
+	border-radius: var(--lvdt-radius-lg);
+}
+
+body.woocommerce-checkout #payment .payment_box::before {
+	display: none;
+}
+
+/* ---- Termini e pulsante ordine ---- */
+
+body.woocommerce-checkout .woocommerce-terms-and-conditions-wrapper {
+	margin: 1.5rem 0;
+}
+
+body.woocommerce-checkout .woocommerce-privacy-policy-text p {
+	font-size: 0.8rem;
+	color: #888;
+	font-family: "Muli", Sans-serif;
+}
+
+/* Checkbox termini e condizioni: casella più grande, testo affiancato.
+   Dentro la label sono fratelli <input>, <span> e <abbr class="required">:
+   con `display: flex` diventerebbero tre colonne separate, quindi si tiene
+   il flusso inline e si allinea la casella con `vertical-align`. */
+body.woocommerce-checkout .form-row.validate-required label.checkbox {
+	display: block;
+	margin: 0;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.9rem;
+	line-height: 1.5;
+	cursor: pointer;
+}
+
+body.woocommerce-checkout .form-row.validate-required label.checkbox input.input-checkbox {
+	width: 1.15rem;
+	height: 1.15rem;
+	margin: 0 0.6rem 0 0;
+	vertical-align: -0.25em;
+	accent-color: var(--e-global-color-50b7ea4, #0074a0);
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+body.woocommerce-checkout .form-row.validate-required label.checkbox .woocommerce-terms-and-conditions-checkbox-text {
+	display: inline;
+}
+
+/* ---- Termini non accettati: riga evidenziata in rosso ----
+   La classe sul body arriva da order-pay/order-pay.php e viene rimossa
+   via JS non appena l'utente spunta la casella. */
+
+body.order-pay-terms-error .form-row.validate-required {
+	background: rgba(200, 30, 30, 0.06);
+	border: 1px solid rgba(200, 30, 30, 0.35);
+	border-radius: var(--lvdt-radius-md);
+	padding: 0.9rem 1rem !important;
+	margin: 0 !important;
+	scroll-margin-block: 2rem;
+}
+
+body.order-pay-terms-error .form-row.validate-required label.checkbox,
+body.order-pay-terms-error .form-row.validate-required .woocommerce-terms-and-conditions-checkbox-text {
+	color: #a51616 !important;
+}
+
+body.order-pay-terms-error .form-row.validate-required input.input-checkbox {
+	accent-color: #c81e1e;
+	outline: 2px solid rgba(200, 30, 30, 0.45);
+	outline-offset: 2px;
+}
+
+/* Pulsante d'ordine: stesso aspetto dei pulsanti Elementor del sito.
+   Le misure arrivano dalle variabili --lvdt-button-* definite in style.css.
+
+   Niente !important, di proposito: questo è il DEFAULT del pulsante, non
+   l'ultima parola. Il selettore `body.woocommerce-checkout #place_order`
+   vale (1,1,1) — un ID batte le tre classi di `.woocommerce button.button.alt`
+   di woocommerce.css, che è l'unica regola da superare qui — e resta invece
+   sotto alle regole per-elemento di Elementor, che partono da
+   `.elementor-NNN .elementor-element.elementor-element-XXX …`. Così quello che
+   viene impostato dall'editor Elementor sul widget vince senza dover
+   rincorrere con altri !important.
+
+   Attenzione se cambi il fondo da Elementor: il border-color qui sotto NON
+   segue, va impostato anche quello nell'editor o resterà del colore di
+   default. */
+body.woocommerce-checkout #place_order {
+	width: 100%;
+	padding: var(--lvdt-button-padding);
+	border-radius: var(--lvdt-radius-sm);
+	font-family: var(--lvdt-button-font);
+	font-size: var(--lvdt-button-font-size);
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: var(--lvdt-button-line-height);
+	text-transform: uppercase;
+	color: var(--lvdt-button-color);
+	background-color: var(--lvdt-button-bg);
+	border: 1px solid var(--lvdt-button-bg);
+}
+
+body.woocommerce-checkout #place_order:hover {
+	color: var(--lvdt-button-bg);
+	background-color: var(--lvdt-button-color);
+	border-color: var(--lvdt-button-bg);
+}
+
+/* ============================================================
+   Wallet / express checkout (Apple Pay, Google Pay, Link)
+   ============================================================ */
+
+/* I bottoni wallet sono figli diretti del container: in colonna da
+   mobile, affiancati da tablet in su. `flex: 1 1 0` + `min-width: 0`
+   li rende di larghezza uguale a prescindere da quanti ne stampa
+   Stripe (Apple Pay / Google Pay / Link, variabili per device). */
+body.woocommerce-checkout #wc-stripe-express-checkout-element {
+	margin: 0 0 0.5rem !important;
+	display: flex;
+	flex-direction: column;
+	gap: 0.6rem;
+}
+
+body.woocommerce-checkout #wc-stripe-express-checkout-element > * {
+	min-width: 0;
+}
+
+@media (min-width: 768px) {
+
+	body.woocommerce-checkout #wc-stripe-express-checkout-element {
+		flex-direction: row;
+		align-items: stretch;
+	}
+
+	body.woocommerce-checkout #wc-stripe-express-checkout-element > * {
+		flex: 1 1 0;
+	}
+}
+
+body.woocommerce-checkout #wc-stripe-express-checkout-button-separator {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.85rem;
+	margin: 1.25rem 0 !important;
+	font-family: "Muli", Sans-serif;
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #999;
+}
+
+body.woocommerce-checkout #wc-stripe-express-checkout-button-separator::before,
+body.woocommerce-checkout #wc-stripe-express-checkout-button-separator::after {
+	content: "";
+	flex: 1 1 auto;
+	height: 1px;
+	background: rgba(66, 66, 66, 0.15);
+}
+
+/* ============================================================
+   Carte (Stripe UPE) — contenuto del payment_box
+   ============================================================ */
+
+/* Metodi di pagamento salvati (es. "Visa che termina con 4242") */
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	list-style: none !important;
+	margin: 0 0 1rem !important;
+	padding: 0 !important;
+}
+
+/* Quando non ci sono carte salvate WooCommerce stampa comunque la <ul> vuota:
+   senza questo lascerebbe 1rem di spazio morto sopra il form carta. */
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods:empty {
+	display: none;
+}
+
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods li {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	flex-wrap: wrap;
+	margin: 0 !important;
+	padding: 0.7rem 0.9rem;
+	background: #fff;
+	border: 1px solid rgba(66, 66, 66, 0.15);
+	border-radius: var(--lvdt-radius-md);
+	transition: border-color 0.15s ease;
+}
+
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods li:has(input:checked) {
+	border-color: var(--e-global-color-50b7ea4, #0074a0);
+	background: rgba(0, 116, 160, 0.05);
+}
+
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods li input {
+	flex-shrink: 0;
+	margin: 0 !important;
+}
+
+body.woocommerce-checkout #payment ul.woocommerce-SavedPaymentMethods li label {
+	flex: 1 1 auto;
+	margin: 0 !important;
+	padding: 0 !important;
+	cursor: pointer;
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+/* Form carta (iframe Stripe): il contenuto interno è cross-origin e
+   non è modificabile da qui, si può solo incorniciarlo. */
+body.woocommerce-checkout #payment #wc-stripe-upe-form {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: none;
+}
+
+/* Nessuna cornice attorno all'iframe Stripe: l'accordion UPE disegna già i
+   propri bordi e sfondo, incorniciarlo raddoppiava bordo e spaziatura.
+
+   I 4px di padding NON sono decorativi: Stripe stampa dentro un wrapper
+   `.__PrivateStripeElement` con `margin: -4px 0 !important` e un iframe con
+   `margin: -4px; width: calc(100% + 8px)` (spazio per il focus ring, tutto
+   inline e !important, non sovrascrivibile da qui). Senza questo padding di
+   compensazione il campo carta sborda di 4px per lato rispetto agli altri
+   elementi della colonna. */
+body.woocommerce-checkout #payment .wc-stripe-upe-element {
+	background: none;
+	border: none;
+	padding: 4px;
+}
+
+body.woocommerce-checkout #payment #wc-stripe-upe-errors,
+body.woocommerce-checkout #payment .stripe-source-errors {
+	font-size: 0.85rem;
+	color: #a51616;
+}
+
+body.woocommerce-checkout #payment #wc-stripe-upe-errors:not(:empty) {
+	margin-top: 0.6rem;
+}
+
+/* Avviso "Test mode: use card 4242…" (solo in modalità test) */
+body.woocommerce-checkout #payment .wc-stripe-payment-method-instruction {
+	font-size: 0.8rem;
+	line-height: 1.5;
+	color: #777;
+	margin-bottom: 0.85rem;
+}
+
+/* Checkbox "Ricorda informazioni di pagamento" */
+body.woocommerce-checkout #payment .woocommerce-SavedPaymentMethods-saveNew {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0.85rem 0 0 !important;
+	font-size: 0.85rem;
+}
+
+body.woocommerce-checkout #payment fieldset {
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+/* ---- Mobile ----
+   16px sugli input evita lo zoom automatico di iOS al focus. */
+
+@media only screen and (max-width: 1080px) {
+	.woocommerce-checkout input {
+		font-size: 16px !important;
+	}
+}

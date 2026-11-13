@@ -1,0 +1,54 @@
+/* GENERATO da scss/features/controllo-codici/controllo-codici.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* =====================================================
+   Controllo Codici – stili per i due shortcode
+   controllo_codici_prezzo_pieno | controllo_codici_promo
+   ===================================================== */
+
+.controllo-codici-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: var( --lvdt-radius-md );
+    overflow: hidden;
+    font-size: 16px;
+}
+
+.controllo-codici-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+}
+
+.controllo-codici-list li:last-child {
+    border-bottom: none;
+}
+
+.controllo-codici-list li:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+.controllo-codici-list li strong {
+    color: #333;
+    font-weight: 600;
+    flex: 1;
+    padding-right: 12px;
+}
+
+.codici-count {
+    display: inline-block;
+    min-width: 36px;
+    padding: 3px 10px;
+    border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
+    background-color: #0073aa;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+}

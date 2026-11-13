@@ -1,3 +1,5 @@
+/* GENERATO da scss/features/global/wc-notices.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
 /* ============================================================
    Notice WooCommerce — stile unico per tutto il sito
    ============================================================
@@ -36,23 +38,22 @@
    ed è così che il pulsante prende il colore del proprio tipo senza dover
    triplicare le sue regole.
    ============================================================ */
-
 body .woocommerce-error.woocommerce-error,
 body .woocommerce-info.woocommerce-info,
 body .woocommerce-message.woocommerce-message {
-	display: block;
-	list-style: none !important;
-	margin: 0 0 1.25rem !important;
-	padding: 1rem 1.25rem !important;
-	border-radius: var(--lvdt-radius-md);
-	border: 1px solid transparent;
-	/* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
-	   quello che li rende riconoscibili a colpo d'occhio. */
-	border-left-width: 4px;
-	font-family: "Muli", Sans-serif;
-	font-size: 0.95rem;
-	font-weight: 500;
-	line-height: 1.5;
+  display: block;
+  list-style: none !important;
+  margin: 0 0 1.25rem !important;
+  padding: 1rem 1.25rem !important;
+  border-radius: var(--lvdt-radius-md);
+  border: 1px solid transparent;
+  /* Barra laterale nel colore del tipo: sul tinta-su-bianco dei notice è
+     quello che li rende riconoscibili a colpo d'occhio. */
+  border-left-width: 4px;
+  font-family: "Muli", Sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 /* WooCommerce mette un'icona in ::before contando su un padding-left ampio:
@@ -60,22 +61,22 @@ body .woocommerce-message.woocommerce-message {
 .woocommerce-error::before,
 .woocommerce-info::before,
 .woocommerce-message::before {
-	display: none !important;
+  display: none !important;
 }
 
 /* Righe multiple (ul > li), es. più errori di validazione insieme */
 .woocommerce-error > li,
 .woocommerce-info > li,
 .woocommerce-message > li {
-	list-style: none !important;
-	margin: 0 !important;
-	padding: 0 !important;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .woocommerce-error > li + li,
 .woocommerce-info > li + li,
 .woocommerce-message > li + li {
-	margin-top: 0.5rem !important;
+  margin-top: 0.5rem !important;
 }
 
 /* I link dentro al notice (es. "#terms" nell'errore dei termini) restano del
@@ -93,8 +94,8 @@ body .woocommerce-message.woocommerce-message {
 .woocommerce-error a:not(.button),
 .woocommerce-info a:not(.button),
 .woocommerce-message a:not(.button) {
-	color: inherit !important;
-	text-decoration: none;
+  color: inherit !important;
+  text-decoration: none;
 }
 
 /* Il bottone dentro ai notice di WooCommerce (es. "Continua con gli acquisti"
@@ -134,19 +135,19 @@ body .woocommerce-message.woocommerce-message {
 body .woocommerce-error a.button,
 body .woocommerce-info a.button,
 body .woocommerce-message a.button {
-	display: inline-block;
-	padding: 0.55rem 1.25rem 0.65rem;
-	border: 1px solid var(--lvdt-notice-color, var(--lvdt-button-bg));
-	border-radius: var(--lvdt-radius-sm);
-	background: transparent;
-	color: var(--lvdt-notice-color, var(--lvdt-button-bg));
-	text-decoration: none;
-	font-family: var(--lvdt-button-font);
-	font-size: 0.9rem;
-	font-weight: var(--lvdt-button-font-weight);
-	line-height: 1.2;
-	text-transform: uppercase;
-	transition: background-color 0.15s ease, color 0.15s ease;
+  display: inline-block;
+  padding: 0.55rem 1.25rem 0.65rem;
+  border: 1px solid var(--lvdt-notice-color, var(--lvdt-button-bg));
+  border-radius: var(--lvdt-radius-sm);
+  background: transparent;
+  color: var(--lvdt-notice-color, var(--lvdt-button-bg));
+  text-decoration: none;
+  font-family: var(--lvdt-button-font);
+  font-size: 0.9rem;
+  font-weight: var(--lvdt-button-font-weight);
+  line-height: 1.2;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 body .woocommerce-error a.button:hover,
@@ -155,21 +156,21 @@ body .woocommerce-info a.button:hover,
 body .woocommerce-info a.button:focus-visible,
 body .woocommerce-message a.button:hover,
 body .woocommerce-message a.button:focus-visible {
-	background: var(--lvdt-notice-color, var(--lvdt-button-bg));
-	color: #fff;
+  background: var(--lvdt-notice-color, var(--lvdt-button-bg));
+  color: #fff;
 }
 
 /* Il `float: right` di prima reggeva finché testo e bottone stavano sulla stessa
    riga; appena il testo andava a capo il bottone restava incollato a sinistra.
    Il :has() serve a non trasformare in flex anche i notice senza bottone, che
    sono la maggioranza. */
-.woocommerce-error:has( > a.button ),
-.woocommerce-info:has( > a.button ),
-.woocommerce-message:has( > a.button ) {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.75rem 1rem;
+.woocommerce-error:has(> a.button),
+.woocommerce-info:has(> a.button),
+.woocommerce-message:has(> a.button) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
 }
 
 /* Da desktop il bottone sta a destra. Il margine automatico al posto di
@@ -181,27 +182,25 @@ body .woocommerce-message a.button:focus-visible {
 .woocommerce-error a.button,
 .woocommerce-info a.button,
 .woocommerce-message a.button {
-	margin-left: auto;
+  margin-left: auto;
 }
 
 /* Da mobile testo e bottone si impilano, allineati a sinistra. In colonna il
    margine automatico spingerebbe il bottone sull'asse trasversale, cioè a
    destra: va riportato a zero. */
 @media only screen and (max-width: 600px) {
-	.woocommerce-error:has( > a.button ),
-	.woocommerce-info:has( > a.button ),
-	.woocommerce-message:has( > a.button ) {
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.woocommerce-error a.button,
-	.woocommerce-info a.button,
-	.woocommerce-message a.button {
-		margin-left: 0;
-	}
+  .woocommerce-error:has(> a.button),
+  .woocommerce-info:has(> a.button),
+  .woocommerce-message:has(> a.button) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .woocommerce-error a.button,
+  .woocommerce-info a.button,
+  .woocommerce-message a.button {
+    margin-left: 0;
+  }
 }
-
 /* Tre valori per tipo, con tre criteri diversi.
 
    TESTO: sopra 4.5:1 sul proprio sfondo tinto, cioè WCAG AA per testo
@@ -222,27 +221,26 @@ body .woocommerce-message a.button:focus-visible {
    non testuali. Non c'è più un border-left-color separato: la barra
    laterale ora si distingue per la sola larghezza (4px contro 1px)
    dichiarata nel blocco comune in cima al file. */
-
 /* ---- Errore — rosso ---- */
 body .woocommerce-error.woocommerce-error {
-	--lvdt-notice-color: #8e1414;
-	background: rgba(200, 30, 30, 0.18);
-	border-color: #c81e1e;
-	color: #8e1414 !important;
+  --lvdt-notice-color: #8e1414;
+  background: rgba(200, 30, 30, 0.18);
+  border-color: #c81e1e;
+  color: #8e1414 !important;
 }
 
 /* ---- Informazione / attesa — arancio ---- */
 body .woocommerce-info.woocommerce-info {
-	--lvdt-notice-color: #7a4100;
-	background: rgba(220, 120, 0, 0.18);
-	border-color: #dc7800;
-	color: #7a4100 !important;
+  --lvdt-notice-color: #7a4100;
+  background: rgba(220, 120, 0, 0.18);
+  border-color: #dc7800;
+  color: #7a4100 !important;
 }
 
 /* ---- Conferma — verde ---- */
 body .woocommerce-message.woocommerce-message {
-	--lvdt-notice-color: #14663d;
-	background: rgba(34, 160, 100, 0.18);
-	border-color: #22a064;
-	color: #14663d !important;
+  --lvdt-notice-color: #14663d;
+  background: rgba(34, 160, 100, 0.18);
+  border-color: #22a064;
+  color: #14663d !important;
 }

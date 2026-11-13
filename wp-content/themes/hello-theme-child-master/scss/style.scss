@@ -1,0 +1,208 @@
+/* 
+Theme Name: Hello Elementor Child
+Theme URI: https://laviadelleterme.it/
+Description: Tema figlio di Hello Elementor per La Via delle Terme: personalizzazioni WooCommerce (checkout, order-pay, thank-you, account) e integrazione con il sistema di prenotazione TermeGest.
+Author: Francesco Zerbinato
+Template: hello-elementor
+Version: 2.2.3
+Text Domain: hello-elementor-child
+License: GNU General Public License v3 or later.
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
+*/
+
+/* GENERATO da scss/style.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build).
+   L'header qui sopra resta in testa perché WordPress legge da qui
+   Version e gli altri dati del tema. */
+
+/* ============================================================
+   Foglio principale del tema: solo regole realmente globali.
+   Tutto ciò che appartiene a una pagina o a una funzionalità sta
+   nel modulo di quella funzionalità, in features/ (vedi readme.txt):
+     features/global/       menu mobile, notice, carosello Elementor,
+                            mini carrello dell'header
+     features/shop/         catalogo, prodotto, carrello
+     features/promo-pages/  pagine protette da password
+     features/my-account/   account, login, password persa
+     features/checkout/     checkout e order-pay
+     features/thankyou/     pagina order-received
+   ============================================================ */
+
+
+/* ============================================================
+   Raggi degli angoli — tre taglie
+   ============================================================
+   Prima ogni foglio scriveva il proprio valore a mano e ne giravano
+   sette diversi (3, 5, 6, 8, 10, 12, 14px) senza che la differenza
+   volesse dire niente. Le tre taglie qui sotto sono l'unico posto in
+   cui si decide, e corrispondono a tre pesi visivi diversi:
+
+     sm  controlli: pulsanti, campi di input, il pulsante del menu.
+         È l'unico scostamento dallo stile Elementor di riferimento,
+         che ha gli angoli vivi: appena smussati. Per tornare agli
+         angoli vivi basta portarlo a 0 qui.
+     md  messaggi e righe: notice WooCommerce, righe di tabella, voci
+         di elenco, il riquadro di errore dei termini.
+     lg  contenitori: shop_table del riepilogo, card dei dati ordine,
+         metodi di pagamento, box del CTA. Il più morbido dei tre
+         perché è quello che disegna i blocchi grandi della pagina.
+
+   Non fanno parte della scala le forme, che non sono una misura ma
+   una geometria e restano scritte per esteso dove servono: le pillole
+   (badge di stato, chip dei meta prenotazione, contatore dei codici)
+   e il cerchio del pallino di stato.
+   ============================================================ */
+
+:root {
+  --lvdt-radius-sm: 3px;
+  --lvdt-radius-md: 10px;
+  --lvdt-radius-lg: 12px;
+}
+
+/* ============================================================
+   Pulsanti — aspetto condiviso
+   ============================================================
+   I pulsanti stampati dai template WooCommerce non passano da
+   Elementor, quindi il look dei pulsanti del sito (colori globali
+   del kit, Muli maiuscolo, bordo pieno da 1px) va replicato a mano.
+   Le misure stanno qui una volta sola perché questo foglio è l'unico
+   caricato su tutte le pagine: le riusano features/checkout/checkout.css
+   (#place_order), features/order-pay/order-pay.css, features/global/wc-notices.css
+   (pulsante dentro ai notice), features/thankyou/thankyou.css e
+   features/my-account/lost-password.css.
+
+   Il raggio non sta qui ma nella scala --lvdt-radius-* poco sopra: il
+   pulsante è il gradino piccolo di quella scala, non un valore suo.
+
+   Il blocco è dichiarato su :root E su body, e i due colori del kit
+   hanno un fallback esplicito. Non è ridondanza: Elementor stampa i
+   --e-global-color-* nella regola .elementor-kit-NNN, e quella classe
+   sta sul BODY, non su html. Una var() dentro una custom property si
+   risolve nello scope in cui la custom property è dichiarata, quindi
+   su :root --e-global-color-57f91e2 non esiste e --lvdt-button-bg
+   diventa guaranteed-invalid: background e border-color cadono a
+   trasparente/currentColor mentre --lvdt-button-color sopravvive
+   grazie al suo fallback #fff. Risultato: pulsante bianco sul nulla.
+   La dichiarazione su body risolve le variabili dove il kit le
+   definisce davvero; il fallback copre il caso in cui l'ID globale
+   cambi (gli ID del kit non sono stabili fra installazioni).
+   ============================================================ */
+
+:root,
+body {
+  --lvdt-button-bg: var( --e-global-color-57f91e2, #0074a0 );
+  --lvdt-button-color: var( --e-global-color-31904c4d, #fff );
+  --lvdt-button-font: "Muli", Sans-serif;
+  --lvdt-button-font-size: 1.3rem;
+  --lvdt-button-font-weight: 400;
+  --lvdt-button-line-height: 1.3rem;
+  --lvdt-button-padding: 0.9rem 2rem 1.1rem;
+}
+
+/* Globale di proposito: la stessa classe esce nell'area account,
+   nel form di login incorporato nella checkout e nel carrello.
+   WooCommerce stampa entrambe le grafie della classe, a seconda
+   del template.
+
+   Questo è l'unico blocco pulsanti rimasto con !important, ed è
+   un'eccezione consapevole: altrove (features/checkout/checkout.css su
+   #place_order, features/thankyou/thankyou.css sul CTA, features/global/wc-notices.css
+   sul pulsante dei notice) le regole sono state ripulite proprio perché
+   uno stile impostato dall'editor Elementor potesse vincere. Qui non si
+   può fare lo stesso a costo zero: la regola da battere è
+   `.woocommerce button.button.alt` di woocommerce.css, che vale tre
+   classi, mentre questo selettore ne ha una. Senza !important servirebbe
+   agganciarsi anche a `.button` e a un antenato `.woocommerce`, e la
+   regola smetterebbe di applicarsi in silenzio il giorno in cui un
+   template cambia quelle classi. Nessuna regola Elementor compete oggi
+   su questi pulsanti (non sono widget, sono markup di template
+   WooCommerce dentro a widget); se dovesse servire, la strada è alzare
+   la specificità qui, non aggiungere !important dall'altra parte. */
+
+button.woocommerce-button,
+button.woocommerce-Button {
+  font-family: var( --lvdt-button-font );
+  font-size: var( --lvdt-button-font-size );
+  font-weight: var( --lvdt-button-font-weight );
+  line-height: var( --lvdt-button-line-height );
+  text-transform: uppercase;
+  padding: var( --lvdt-button-padding ) !important;
+  color: var( --lvdt-button-color ) !important;
+  background-color: var( --lvdt-button-bg ) !important;
+  border-style: solid !important;
+  border-width: 1px 1px 1px 1px !important;
+  border-color: var( --lvdt-button-bg ) !important;
+  border-radius: var( --lvdt-radius-sm );
+}
+button.woocommerce-button:hover,
+button.woocommerce-Button:hover {
+  color: var( --lvdt-button-bg ) !important;
+  background-color: var( --lvdt-button-color ) !important;
+  border-color: var( --lvdt-button-bg ) !important;
+}
+
+/* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
+   account: su checkout e order-pay le stesse proprietà sono ridichiarate, più
+   specifiche, in features/checkout/checkout.css (che lì è l'unico file caricato). */
+.payment_box.payment_method_stripe {
+  padding: 0 !important;
+}
+.payment_box.payment_method_stripe fieldset {
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* ============================================================
+   Form del plugin "mupwp"
+   Da ricollocare: il plugin non è nel repository e le classi non
+   compaiono in nessun altro file, quindi la pagina che stampa
+   questo markup va identificata prima di spostarle in un modulo.
+   ============================================================ */
+
+#mupwp-form-fields {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#mupwp-form-fields > .mupwp-form-field {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#mpwp-container .mupwp-form-term label {
+  font-size: 1rem !important;
+}
+#mpwp-container .mupwp-form-term input {
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media only screen and (min-width: 1024px) {
+  #menu-main .btn-promo > a.elementor-item {
+    height: fit-content;
+    background-color: var(--e-global-color-primary);
+    color: white;
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    line-height: 1;
+    border-radius: var( --lvdt-radius-sm );
+    border: 1px solid var(--e-global-color-primary);
+    margin-left: 1rem;
+  }
+  #menu-main .btn-promo > a.elementor-item:hover {
+    background-color: white;
+    color: var(--e-global-color-primary);
+    border: 1px solid var(--e-global-color-primary);
+  }
+  .btn-promo a::after {
+    display: none;
+  }
+  .elementor-nav-menu {
+    align-items: center;
+  }
+}

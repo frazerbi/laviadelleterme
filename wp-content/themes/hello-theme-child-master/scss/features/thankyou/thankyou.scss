@@ -1,0 +1,483 @@
+/* GENERATO da scss/features/thankyou/thankyou.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ============================================================
+   Thank You page — redesign moderno
+   Usa le variabili globali Elementor del sito
+   ============================================================ */
+
+/* ============================================================
+   Layout due colonne: order-details | customer-details
+   ============================================================ */
+
+.woocommerce-order {
+	display: grid;
+	grid-template-columns: 3fr 2fr;
+	grid-template-areas:
+		"notice   notice"
+		"overview overview"
+		"details  customer"
+		"ld       ld";
+	gap: 0 2.5rem;
+	align-items: start;
+	font-family: "Muli", Sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 1.3em;
+	color: var(--e-global-color-secondary);
+}
+
+/* Normalizza i colori ereditati da Elementor/WooCommerce dentro il riquadro ordine.
+   Due esclusioni, entrambe perché la regola vale `!important` e altrimenti
+   vincerebbe su chi il colore ce l'ha di suo:
+   - il badge di stato, che ha i propri rosso/arancio/verde in
+     booking-status/booking-status.css (senza l'esclusione resterebbe visibile
+     solo il pallino colorato);
+   - il CTA "Completa il pagamento", che così può tenere il proprio colore senza
+     doverlo a sua volta dichiarare !important — e quindi restare sovrascrivibile
+     da Elementor. */
+.woocommerce-order *:not(.booking-status):not(.thankyou-complete-payment__button) {
+	font-family: inherit;
+	color: inherit !important;
+}
+
+.woocommerce-thankyou-order-received  { grid-area: notice; }
+.woocommerce-order-overview           { grid-area: overview; }
+.woocommerce-order-details            { grid-area: details; }
+.woocommerce-customer-details         { grid-area: customer; }
+.wc_ld_description                    { grid-area: ld; }
+
+@media ( max-width: 768px ) {
+	.woocommerce-order {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"notice"
+			"overview"
+			"details"
+			"customer"
+			"ld";
+	}
+}
+
+/* ============================================================
+   Messaggio di conferma
+   ============================================================ */
+
+.woocommerce-thankyou-order-received {
+	font-size: 1.15rem !important;
+	font-weight: 500;
+	text-align: center;
+	color: var(--e-global-color-text) !important;
+	margin-bottom: 2rem !important;
+	padding: 0 !important;
+	background: none !important;
+	border: none !important;
+}
+
+/* ============================================================
+   Order overview (numero ordine, data, email, totale, metodo)
+   ============================================================ */
+
+.woocommerce-order-overview {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	list-style: none !important;
+	padding: 0 !important;
+	margin: 0 0 2.5rem !important;
+	justify-content: center;
+}
+
+.woocommerce-order-overview li {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 1rem 1.25rem !important;
+	border-radius: var(--lvdt-radius-md);
+	border: 1px solid rgba(66, 66, 66, 0.12);
+	font-size: 0.8rem !important;
+	margin-right: 0 !important;
+}
+
+.woocommerce-order-overview li::before {
+	display: none !important;
+}
+
+/* Mostra solo Numero ordine e Data */
+.woocommerce-order-overview__email,
+.woocommerce-order-overview__total,
+.woocommerce-order-overview__payment-method {
+	display: none !important;
+}
+
+.woocommerce-order-overview li strong {
+	display: block;
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: inherit;
+	margin-top: 0.35rem;
+	text-transform: none;
+	letter-spacing: 0;
+}
+
+/* ============================================================
+   Titoli sezione
+   ============================================================ */
+
+.woocommerce-order-details__title,
+.woocommerce-column__title {
+	font-size: 2rem !important;
+	margin-bottom: 1rem !important;
+}
+
+/* ============================================================
+   Card container per order-details e customer-details
+   ============================================================ */
+
+.woocommerce-order-details,
+.woocommerce-customer-details {
+	background: var(--e-global-color-31904c4d);
+	border: 1px solid rgba(66, 66, 66, 0.12);
+	border-radius: var(--lvdt-radius-lg);
+	padding: 1.5rem;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 5%);
+}
+
+/* ============================================================
+   Tabella prodotti — layout card
+   ============================================================ */
+
+.woocommerce-table--order-details {
+	display: block !important;
+	border: none !important;
+}
+
+.woocommerce-table--order-details thead {
+	display: none !important;
+}
+
+.woocommerce-table--order-details tbody {
+	display: block;
+}
+.woocommerce-table--order-details tbody .woocommerce-table__line-item {
+	padding-top: 0 !important;
+} 
+.woocommerce-table--order-details tbody tr {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	background: var(--e-global-color-31904c4d);
+	border-bottom: 1px solid rgba(66, 66, 66, 0.1);
+	margin-bottom: 0;
+}
+
+.woocommerce-table--order-details .product-name {
+	flex: 1;
+}
+
+.woocommerce-table--order-details .product-total {
+	white-space: nowrap;
+	padding-top: 1.5rem !important;
+	padding-right: 1.5rem !important;
+	padding-left: 0 !important;
+}
+
+.woocommerce-table--order-details .product-total .woocommerce-Price-amount {
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: inherit
+}
+
+/* Nome prodotto */
+.woocommerce-table--order-details .product-name a {
+	font-size: 1.2rem;
+	font-weight: 600;
+	color: var(--e-global-color-secondary) !important;
+	text-decoration: none !important;
+}
+
+/* ---- Box completamento pagamento ---- */
+
+.thankyou-complete-payment {
+	grid-column: 1 / -1;
+	margin: 0 0 2rem;
+	padding: 1.25rem 1.5rem;
+	border-radius: var(--lvdt-radius-lg);
+	background: rgba(200, 30, 30, 0.06);
+	border: 1px solid rgba(200, 30, 30, 0.25);
+	text-align: center;
+}
+
+.thankyou-complete-payment__text {
+	margin: 0 0 1rem !important;
+	color: #a51616 !important;
+	font-weight: 500;
+}
+
+/* Stesso aspetto degli altri pulsanti del sito (variabili --lvdt-button-* in
+   style.css). Niente !important sul colore: la normalizzazione in cima al file
+   ora esclude questo pulsante dal proprio `color: inherit !important`, quindi
+   basta una regola normale e lo stile resta sovrascrivibile da Elementor. */
+.woocommerce-order a.thankyou-complete-payment__button {
+	display: inline-block;
+	padding: var(--lvdt-button-padding);
+	border: 1px solid var(--lvdt-button-bg);
+	border-radius: var(--lvdt-radius-sm);
+	background: var(--lvdt-button-bg);
+	color: var(--lvdt-button-color);
+	text-decoration: none;
+	font-family: var(--lvdt-button-font);
+	font-size: var(--lvdt-button-font-size);
+	font-weight: var(--lvdt-button-font-weight);
+	line-height: var(--lvdt-button-line-height);
+	text-transform: uppercase;
+}
+
+.woocommerce-order a.thankyou-complete-payment__button:hover {
+	background: var(--lvdt-button-color);
+	color: var(--lvdt-button-bg);
+}
+
+/* Badge quantità */
+.woocommerce-table--order-details .product-quantity {
+	display: inline-flex;
+	align-items: center;
+	background: var(--e-global-color-29fcec7);
+	color: inherit;
+	font-size: 0.75rem;
+	font-weight: 600;
+	padding: 0.2rem 0.55rem;
+	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
+	margin-left: 0.4rem;
+	vertical-align: middle;
+}
+
+/* ============================================================
+   Codici licenza — stile ticket con colori primary
+   ============================================================ */
+
+.license-codes-table {
+	display: block;
+	width: auto !important;
+	margin-top: 1rem;
+}
+
+/* Etichetta dinamica via JS (.is-booked / .is-pending) */
+.license-codes-table::before {
+	display: block;
+	font-size: 0.78rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: inherit;
+	margin-bottom: 0.5rem;
+}
+
+.license-codes-table.is-booked::before {
+	content: "Codici prenotati";
+}
+
+.license-codes-table.is-pending::before {
+	content: "Codici per la prenotazione";
+}
+
+.license-codes-table tbody {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.license-codes-table tr:not(.order-gap) {
+	display: inline-flex;
+	align-items: stretch;
+	border: 1.5px solid var(--e-global-color-50b7ea4);
+	border-radius: var(--lvdt-radius-md);
+	overflow: hidden;
+	background: rgba(0, 116, 160, 0.06);
+}
+.license-codes-table tr {
+	padding: 0 !important;
+}
+.license-codes-table tr.order-gap {
+	display: none;
+}
+
+.license-codes-table th {
+	display: none;
+}
+
+.license-codes-table td {
+	display: flex;
+	align-items: center;
+	padding: 0.4rem 0.75rem !important;
+	font-family: inherit;
+	font-size: 0.88rem;
+	font-weight: 700;
+	border: none !important;
+	background: transparent;
+	color: inherit !important;
+	background-color: white !important;
+}
+
+/* ============================================================
+   Meta prenotazione (Location, Data, Orario) — chips
+   ============================================================ */
+
+.woocommerce-table--order-details .wc-item-meta {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.85rem;
+	list-style: none !important;
+	padding: 0 !important;
+}
+
+.woocommerce-table--order-details .wc-item-meta::before {
+	content: "Info prenotazione";
+	display: block;
+	width: 100%;
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: inherit;
+	margin-bottom: 0.1rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	border: 1px solid rgba(66, 66, 66, 0.12);
+	border-radius: 20px; /* forma: pillola, non un gradino di --lvdt-radius-* */
+	padding: 0.3rem 0.85rem 0.3rem 0.7rem;
+	font-size: 0.85rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li strong {
+	color: inherit;
+	font-weight: 500;
+	font-size: 0.78rem;
+}
+
+.woocommerce-table--order-details .wc-item-meta li p {
+	margin: 0 !important;
+	font-weight: 600;
+	color: inherit;
+}
+
+/* ============================================================
+   Tfoot — riepilogo totali
+   ============================================================ */
+
+.woocommerce-table--order-details tfoot {
+	display: block;
+}
+
+.woocommerce-table--order-details tfoot tr {
+	display: flex;
+	justify-content: space-between;
+	padding: 0.4rem 0;
+	font-size: 1.2rem;
+}
+
+.woocommerce-table--order-details tfoot th,
+.woocommerce-table--order-details tfoot td {
+	border: none !important;
+	padding: 0 !important;
+	font-size: 0.9rem;
+	color: inherit;
+}
+
+/* Nascondi subtotale (ridondante) */
+.woocommerce-table--order-details tfoot tr:first-child {
+	display: none !important;
+}
+
+/* Riga totale finale */
+.woocommerce-table--order-details tfoot tr:last-child {
+	margin-top: 0.5rem;
+	padding-top: 0.75rem;
+	border-top: 2px solid var(--e-global-color-secondary);
+}
+
+.woocommerce-table--order-details tfoot tr:last-child th,
+.woocommerce-table--order-details tfoot tr:last-child td {
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: inherit;
+}
+
+/* ============================================================
+   Indirizzo di fatturazione
+   ============================================================ */
+
+/* Mixin label riutilizzato via custom property */
+.woocommerce-customer-details address {
+	font-size: 0.95rem;
+	line-height: 1.6;
+	padding: 0 !important;
+	background: none !important;
+	border: none !important;
+	font-style: normal;
+	font-family: inherit;
+	color: inherit;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+/* Nome cliente */
+.address-customer-name {
+	padding-top: 15px;
+	font-weight: 600;
+	font-size: 1.2rem;
+}
+
+/* Indirizzo: stesso layout icona di telefono/email */
+.address-customer-address {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.address-customer-address::before {
+	content: "" !important;
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E") no-repeat center;
+	background-size: contain;
+	flex-shrink: 0;
+}
+
+/* Phone e email: layout a riga con icona a sinistra */
+.woocommerce-customer-details--phone,
+.woocommerce-customer-details--email {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0 !important;
+	font-size: 0.95rem;
+	color: var(--e-global-color-secondary);
+}
+
+.woocommerce-customer-details--phone::before,
+.woocommerce-customer-details--email::before {
+	content: "" !important;
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	flex-shrink: 0;
+}
+
+.woocommerce-customer-details--phone::before {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'/%3E%3C/svg%3E");
+}
+
+.woocommerce-customer-details--email::before {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='M2 7l10 7 10-7'/%3E%3C/svg%3E");
+}

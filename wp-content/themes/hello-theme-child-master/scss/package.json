@@ -1,0 +1,12 @@
+{
+  "name": "hello-theme-child-scss",
+  "private": true,
+  "description": "Sorgenti SCSS del tema. Compilati nei .css accanto ai moduli; questa cartella non va sul server.",
+  "scripts": {
+    "build": "sass --no-source-map --no-charset --style=expanded --load-path=. style.scss:../style.css features:../features",
+    "watch": "sass --watch --no-source-map --no-charset --style=expanded --load-path=. style.scss:../style.css features:../features"
+  },
+  "devDependencies": {
+    "sass": "1.108.2"
+  }
+}

@@ -35,6 +35,7 @@ jobs:
           --exclude=importa-disiscritti-mailup.php
           --exclude=design/
           --exclude=.DS_Store
+          --exclude=wp-content/themes/hello-theme-child-master/scss/
           --exclude=wp-content/plugins/plugin-custom-skianet/assets/data/
           --exclude=wp-content/plugins/plugin-custom-skianet/build.js
           --exclude=wp-content/plugins/plugin-custom-skianet/README.md

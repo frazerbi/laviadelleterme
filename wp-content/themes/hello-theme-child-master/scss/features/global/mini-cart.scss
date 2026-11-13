@@ -1,0 +1,156 @@
+/* GENERATO da scss/features/global/mini-cart.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
+
+/* ============================================================
+   Mini carrello nell'header (widget "Menu Cart" di Elementor Pro)
+   ============================================================
+   Nell'header ci sono due istanze del widget, una per desktop e una
+   per tablet/mobile (classe custom .cart-widget-header): le regole
+   valgono per entrambe, quindi stanno sulla classe del widget e non
+   sull'id dell'elemento.
+
+   Dove Elementor espone una custom property (--cart-footer-buttons-
+   border-radius, --remove-item-button-color, …) il default si dà
+   impostando quella, sul widget (0,1,0): l'editor scrive le stesse
+   variabili sull'elemento a (0,3,0) e vince sempre. Dove la proprietà
+   non ha variabile, la regola resta a (0,2,0)-(0,3,0), sotto alle
+   regole per elemento dell'editor. Niente !important, tranne dove la
+   regola da battere lo è già.
+   ============================================================ */
+
+.elementor-widget-woocommerce-menu-cart {
+  --cart-footer-buttons-border-radius: var( --lvdt-radius-sm );
+  --remove-item-button-color: var( --e-global-color-secondary );
+  --remove-item-button-hover-color: var( --e-global-color-primary );
+  --product-variations-color: var( --e-global-color-secondary );
+  --divider-color: #e5e5e5;
+  --subtotal-divider-color: #e5e5e5;
+}
+
+/* ---- Pannello ---- */
+
+#elementor-menu-cart__toggle_button {
+  padding: .5rem .5rem;
+  background-color: transparent;
+  border: unset;
+}
+.elementor-menu-cart__container {
+  overflow: visible !important;
+  background-color: transparent !important;
+}
+
+/* Una sola larghezza al posto delle tre a vw per breakpoint (25/45/90vw):
+   a 1080px 25vw dava un pannello di 270px, troppo stretto per nome e
+   prenotazione. min() la tiene fissa sugli schermi grandi e la lascia
+   scendere sotto la larghezza del telefono. L'altezza la danno già
+   top: 0 + bottom: 0 di Elementor. */
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__main {
+  width: min( 420px, 90vw );
+}
+
+/* ---- Riga prodotto ---- */
+
+/* Elementor riserva 30px a destra su tutta la riga per il pulsante di
+   rimozione, che però è in absolute in basso, all'altezza del prezzo:
+   il margine si sposta sulla sola riga del prezzo e nome e prenotazione
+   si prendono tutta la larghezza (su telefono la data andava a capo). */
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product {
+  grid-template-columns: 80px minmax( 0, 1fr );
+  align-items: start;
+  padding-inline-end: 0;
+}
+.elementor-widget-woocommerce-menu-cart.elementor-menu-cart--show-remove-button-yes .elementor-menu-cart__product-price {
+  padding-inline-end: 30px;
+}
+
+/* Foto quadrata e ritagliata: le miniature arrivano col rapporto
+   dell'originale (1080x697) e le righe venivano alte in modo diverso. */
+.elementor-menu-cart__product-image img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var( --lvdt-radius-sm );
+}
+
+/* Il frammento del carrello arriva con l'immagine due volte (quella del
+   lazy load e la copia senza lazy load), e senza questa regola si
+   vedevano una sopra l'altra. Si tiene la prima, che è quella gestita
+   dal lazy load. */
+.elementor-menu-cart__product-image a > img ~ img {
+  display: none;
+}
+
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product-name,
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product-price {
+  padding-inline-start: 16px;
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product-name a {
+  display: block;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Dati della prenotazione: etichetta piccola SOPRA il valore invece che
+   in colonna accanto. In due colonne "Prenotazione:" si prendeva metà
+   della riga e "Saint Vincent - 26/12/2026" andava a capo. */
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product .variation {
+  display: block;
+  margin: 10px 0 0;
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product .variation dt {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product .variation dd {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product .variation dd p {
+  margin: 0;
+}
+
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__product-price {
+  font-size: 0.95rem;
+}
+
+/* ---- Subtotale ---- */
+
+/* Etichetta a sinistra, importo a destra, come nelle righe del totale
+   di carrello e checkout. */
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+
+/* ---- Pulsanti ---- */
+
+/* Il carattere è quello dei pulsanti del sito, ma a 1rem: il 1.3rem di
+   --lvdt-button-font-size in un pannello largo 420px manda "Visualizza
+   carrello" a capo sul telefono.
+
+   Il bordo prende il colore di sfondo che il pulsante ha a riposo (la
+   stessa variabile che imposta l'editor): in hover Elementor porta lo
+   sfondo a bianco e, senza bordo, il pulsante spariva nel pannello
+   bianco lasciando solo il testo. */
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__footer-buttons .elementor-button {
+  font-family: var( --lvdt-button-font );
+  font-size: 1rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__footer-buttons .elementor-button--view-cart {
+  border-color: var( --view-cart-button-background-color, var( --lvdt-button-bg ) );
+}
+.elementor-widget-woocommerce-menu-cart .elementor-menu-cart__footer-buttons .elementor-button--checkout {
+  border-color: var( --checkout-button-background-color, var( --lvdt-button-bg ) );
+}

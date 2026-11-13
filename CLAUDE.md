@@ -279,8 +279,9 @@ The PHP cron mirrors this: it generates availability data for exactly the same t
 `wp-content/themes/hello-theme-child-master/` — Child theme of Hello Elementor. **One folder = one feature**: every
 folder in `features/` holds its PHP, CSS, JS *and its own `wp_enqueue_scripts` hook* with the conditions it loads
 on, so a feature is understood by opening one folder. `inc/` holds cross-cutting code that belongs to no page. At the
-root only `style.css`, `functions.php`, `readme.txt` (map of the folders + how to add a module) and `woocommerce/`
-(reserved template overrides). Reorganized this way on 2026-10-30; before that, enqueues all lived in one 200-line
+root only `style.css`, `functions.php`, `readme.txt` (map of the folders + how to add a module), `woocommerce/`
+(reserved template overrides) and `scss/` (the stylesheets' sources, not deployed — the CSS under `features/` and
+`style.css` are compiled from it, see "The theme's CSS is compiled from SCSS" below). Reorganized this way on 2026-10-30; before that, enqueues all lived in one 200-line
 function in `functions.php` and shared CSS sat in a loose `assets/`.
 
 - `functions.php` — only the child `style.css` enqueue, the helpers `laviadelleterme_enqueue_style( $handle, $file,
@@ -366,7 +367,26 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
 
 **WooCommerce guard in each module's enqueue**: every enqueue callback that uses WooCommerce conditionals, or loads a WooCommerce-only sheet (`wc-notices.css`, `stripe-upe-appearance.css`), starts with `if ( ! class_exists( 'WooCommerce' ) ) return;` — `is_wc_endpoint_url()` and `is_checkout()` are WooCommerce functions and calling them with the plugin off is a fatal error, which matters here because plugins can be briefly inactive during manual FTP deploys. A new module must do the same. The modules themselves are always required: their WooCommerce hooks simply never fire without the plugin, and the PHP that runs on generic hooks already guards itself (`function_exists( 'is_account_page' )`, `wc_get_logger`, `as_enqueue_async_action`). For the same reason the `hello-elementor-theme-style` dependency is only declared when that handle is actually registered: turning off "Theme Style" in Hello Elementor's settings would otherwise make WordPress skip the child stylesheet entirely, in silence.
 
-**Asset versioning**: every theme asset goes through the `functions.php` helpers, which use a single version — `laviadelleterme_theme_version()`, i.e. the `Version:` header in `style.css`. Bump that header whenever a theme CSS/JS file changes, otherwise browsers keep serving the cached copy after a deploy (relevant since deploys here are sometimes manual FTP, not just `git push` — see "Manual uploads" below).
+**The theme's CSS is compiled from SCSS — edit `scss/`, never the `.css`.** Since 2026-11-13 every stylesheet has its
+source in `wp-content/themes/hello-theme-child-master/scss/`, in a tree that mirrors the theme:
+`scss/style.scss` → `style.css`, `scss/features/<x>/<x>.scss` → `features/<x>/<x>.css`. Build with `cd scss && npm
+install && npm run build` (or `npm run watch`): Dart Sass, pinned in `scss/package.json` because `package-lock.json`
+is gitignored, `--style=expanded` so comments and readability survive, `--no-source-map`, and `--no-charset` because
+the Italian comments would otherwise make Sass print `@charset "UTF-8";` above the theme header. Each generated file
+opens with a "GENERATO da scss/… — non modificare" comment (in `style.css` it sits *after* the theme header, which
+WordPress reads for `Version`). **The compiled `.css` is committed**, so the CI rsync and the manual FTP uploads work
+exactly as before, with no Node on the server; the whole `scss/` folder (sources, `package.json`, `node_modules`) is
+kept off the server by one `--exclude` in `deploy.yml` — don't FTP it either. Enqueue paths didn't change: the `.css`
+are still where the modules load them. A fix made directly to a `.css` (FTP hotfix, or out of habit) is **lost at the
+next build**, so carry it into the `.scss`. Step 0 (2026-11-13) was a pure rename: the compiled output was checked to
+be identical to the old hand-written files once minified (only `var( x )` → `var(x)` and `1 / -1` → `1/-1` differ).
+Planned next, one module at a time: partials for compile-time constants (status palette, the `rgba(66,66,66,…)` line
+grey, the Muli font stack, breakpoint mixins). Runtime values stay **custom properties** (`--lvdt-*`): they resolve
+Elementor's kit globals on `body` and are read by Stripe's `getComputedStyle`, which Sass variables can't do. Nest only
+pseudo-classes and media queries, never ancestors: the selectors here are tuned to exact specificities and nesting
+hides the final score.
+
+**Asset versioning**: every theme asset goes through the `functions.php` helpers, which use a single version — `laviadelleterme_theme_version()`, i.e. the `Version:` header in `style.css` (edited in `scss/style.scss`, then rebuilt). Bump that header whenever a theme CSS/JS file changes, otherwise browsers keep serving the cached copy after a deploy (relevant since deploys here are sometimes manual FTP, not just `git push` — see "Manual uploads" below).
 
 **SiteGround Optimizer minifies CSS in production**, and the page then loads `<handle>.min.css`, a copy written *next
 to* the source (`checkout-style.min.css` beside `checkout.css`, and so on). It regenerates the copy only when the

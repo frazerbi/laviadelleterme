@@ -95,6 +95,23 @@ non aggiungere lì cartelle di modulo, i percorsi sono riservati da WooCommerce.
 3. Aggiungere una riga require_once in functions.php (l'ordine non conta). Se un
    foglio deve venire dopo un altro, dichiararlo nei $deps del suo enqueue.
 
+== CSS: si scrive in SCSS ==
+
+I .css del tema sono GENERATI. I sorgenti stanno in scss/, con lo stesso albero del
+tema: scss/style.scss -> style.css, scss/features/<x>/<x>.scss -> features/<x>/<x>.css.
+
+  cd scss && npm install   (una volta)
+  npm run build            (oppure npm run watch mentre si lavora)
+
+Il .css compilato si committa: deploy e FTP restano come prima e sul server non serve
+Node. La cartella scss/ invece non va sul server (esclusa in deploy.yml, e non va
+caricata via FTP). Una modifica fatta direttamente a un .css si perde alla compilazione
+successiva: va riportata nel .scss.
+
+Valori che devono vivere a runtime (colori del kit Elementor, --lvdt-*) restano custom
+property; le variabili SCSS servono solo per le costanti. Annidare solo pseudo-classi e
+media query, non gli antenati: la specificità dei selettori è tarata a mano.
+
 == Versioning degli asset ==
 
 Ogni file è accodato con la versione dichiarata in style.css: va alzata a ogni

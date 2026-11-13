@@ -1,3 +1,5 @@
+/* GENERATO da scss/features/promo-pages/promozioni-speciali.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
 /* ============================================================
    Pagina "Promozioni speciali" (/promozioni-speciali/)
    ============================================================
@@ -26,11 +28,9 @@
          .ppw-pcp-pf-desc-below-form
          .ppw-error.ppw-pcp-pf-error-msg
    ============================================================ */
-
 /* ============================================================
    Contenitore
    ============================================================ */
-
 .ppw-pcp-container {
   max-width: 720px;
   margin-inline: auto;
@@ -50,7 +50,6 @@
    flex-wrap il pulsante scende sotto al campo quando non ci sta,
    invece di comprimerlo.
    ============================================================ */
-
 .ppw-pcp-password-form p.ppw-input {
   flex-wrap: wrap;
   align-items: stretch;
@@ -75,17 +74,16 @@
   color: #424242;
   background-color: #fff;
   border: 1px solid #c9c9c9;
-  border-radius: var( --lvdt-radius-sm );
+  border-radius: var(--lvdt-radius-sm);
 }
 
 .ppw-pcp-password-form input.ppw-pcp-pf-password-input:focus {
   outline: none;
-  border-color: var( --lvdt-button-bg );
+  border-color: var(--lvdt-button-bg);
 }
 
 /* Stesso aspetto dei pulsanti del resto del sito: le misure sono
    le variabili --lvdt-button-* dichiarate in style.css. */
-
 .ppw-pcp-password-form input.ppw-pcp-pf-submit-btn {
   flex: 0 0 auto;
   height: auto;
@@ -93,22 +91,22 @@
      .post-password-form [type=submit]: qui la riga la spaziano gap e
      flex-wrap, e a capo il pulsante resterebbe rientrato di 3px. */
   margin-inline-start: 0;
-  font-family: var( --lvdt-button-font );
-  font-size: var( --lvdt-button-font-size );
-  font-weight: var( --lvdt-button-font-weight );
-  line-height: var( --lvdt-button-line-height );
+  font-family: var(--lvdt-button-font);
+  font-size: var(--lvdt-button-font-size);
+  font-weight: var(--lvdt-button-font-weight);
+  line-height: var(--lvdt-button-line-height);
   text-transform: uppercase;
-  padding: var( --lvdt-button-padding );
-  color: var( --lvdt-button-color );
-  background-color: var( --lvdt-button-bg );
-  border: 1px solid var( --lvdt-button-bg );
-  border-radius: var( --lvdt-radius-sm );
+  padding: var(--lvdt-button-padding);
+  color: var(--lvdt-button-color);
+  background-color: var(--lvdt-button-bg);
+  border: 1px solid var(--lvdt-button-bg);
+  border-radius: var(--lvdt-radius-sm);
   cursor: pointer;
 }
 
 .ppw-pcp-password-form input.ppw-pcp-pf-submit-btn:hover {
-  color: var( --lvdt-button-bg );
-  background-color: var( --lvdt-button-color );
+  color: var(--lvdt-button-bg);
+  background-color: var(--lvdt-button-color);
 }
 
 /* ============================================================
@@ -118,7 +116,6 @@
    style del div, quindi qui si possono correggere solo
    impaginazione e dimensione del testo.
    ============================================================ */
-
 .ppw-pcp-password-form .ppw-error.ppw-pcp-pf-error-msg {
   width: 100%;
   margin-top: 1rem;
@@ -134,17 +131,14 @@
 /* ============================================================
    Responsive
    ============================================================ */
-
 @media only screen and (max-width: 767px) {
   .ppw-pcp-password-form .ppw-pcp-password-label {
     flex-basis: 100%;
     max-width: none;
   }
-
   .ppw-pcp-password-form input.ppw-pcp-pf-password-input {
     max-width: none;
   }
-
   .ppw-pcp-password-form input.ppw-pcp-pf-submit-btn {
     width: 100%;
   }

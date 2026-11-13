@@ -4,13 +4,16 @@ Theme URI: https://laviadelleterme.it/
 Description: Tema figlio di Hello Elementor per La Via delle Terme: personalizzazioni WooCommerce (checkout, order-pay, thank-you, account) e integrazione con il sistema di prenotazione TermeGest.
 Author: Francesco Zerbinato
 Template: hello-elementor
-Version: 2.2.2
+Version: 2.2.3
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
 */
-
+/* GENERATO da scss/style.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build).
+   L'header qui sopra resta in testa perché WordPress legge da qui
+   Version e gli altri dati del tema. */
 /* ============================================================
    Foglio principale del tema: solo regole realmente globali.
    Tutto ciò che appartiene a una pagina o a una funzionalità sta
@@ -23,8 +26,6 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
      features/checkout/     checkout e order-pay
      features/thankyou/     pagina order-received
    ============================================================ */
-
-
 /* ============================================================
    Raggi degli angoli — tre taglie
    ============================================================
@@ -48,7 +49,6 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    (badge di stato, chip dei meta prenotazione, contatore dei codici)
    e il cerchio del pallino di stato.
    ============================================================ */
-
 :root {
   --lvdt-radius-sm: 3px;
   --lvdt-radius-md: 10px;
@@ -83,7 +83,6 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    definisce davvero; il fallback copre il caso in cui l'ID globale
    cambi (gli ID del kit non sono stabili fra installazioni).
    ============================================================ */
-
 :root,
 body {
   --lvdt-button-bg: var( --e-global-color-57f91e2, #0074a0 );
@@ -114,27 +113,27 @@ body {
    su questi pulsanti (non sono widget, sono markup di template
    WooCommerce dentro a widget); se dovesse servire, la strada è alzare
    la specificità qui, non aggiungere !important dall'altra parte. */
-
 button.woocommerce-button,
 button.woocommerce-Button {
-  font-family: var( --lvdt-button-font );
-  font-size: var( --lvdt-button-font-size );
-  font-weight: var( --lvdt-button-font-weight );
-  line-height: var( --lvdt-button-line-height );
+  font-family: var(--lvdt-button-font);
+  font-size: var(--lvdt-button-font-size);
+  font-weight: var(--lvdt-button-font-weight);
+  line-height: var(--lvdt-button-line-height);
   text-transform: uppercase;
-  padding: var( --lvdt-button-padding ) !important;
-  color: var( --lvdt-button-color ) !important;
-  background-color: var( --lvdt-button-bg ) !important;
+  padding: var(--lvdt-button-padding) !important;
+  color: var(--lvdt-button-color) !important;
+  background-color: var(--lvdt-button-bg) !important;
   border-style: solid !important;
   border-width: 1px 1px 1px 1px !important;
-  border-color: var( --lvdt-button-bg ) !important;
-  border-radius: var( --lvdt-radius-sm );
+  border-color: var(--lvdt-button-bg) !important;
+  border-radius: var(--lvdt-radius-sm);
 }
+
 button.woocommerce-button:hover,
 button.woocommerce-Button:hover {
-  color: var( --lvdt-button-bg ) !important;
-  background-color: var( --lvdt-button-color ) !important;
-  border-color: var( --lvdt-button-bg ) !important;
+  color: var(--lvdt-button-bg) !important;
+  background-color: var(--lvdt-button-color) !important;
+  border-color: var(--lvdt-button-bg) !important;
 }
 
 /* Queste due regole valgono di fatto solo su "Aggiungi metodo di pagamento" nell'area
@@ -143,6 +142,7 @@ button.woocommerce-Button:hover {
 .payment_box.payment_method_stripe {
   padding: 0 !important;
 }
+
 .payment_box.payment_method_stripe fieldset {
   border: 0 !important;
   padding: 0 !important;
@@ -154,20 +154,22 @@ button.woocommerce-Button:hover {
    compaiono in nessun altro file, quindi la pagina che stampa
    questo markup va identificata prima di spostarle in un modulo.
    ============================================================ */
-
 #mupwp-form-fields {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
 }
+
 #mupwp-form-fields > .mupwp-form-field {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
 #mpwp-container .mupwp-form-term label {
   font-size: 1rem !important;
 }
+
 #mpwp-container .mupwp-form-term input {
   width: 18px;
   height: 18px;
@@ -176,7 +178,6 @@ button.woocommerce-Button:hover {
 /* ============================================================
    Responsive
    ============================================================ */
-
 @media only screen and (min-width: 1024px) {
   #menu-main .btn-promo > a.elementor-item {
     height: fit-content;
@@ -185,7 +186,7 @@ button.woocommerce-Button:hover {
     padding-inline: 1rem;
     padding-block: 0.5rem;
     line-height: 1;
-    border-radius: var( --lvdt-radius-sm );
+    border-radius: var(--lvdt-radius-sm);
     border: 1px solid var(--e-global-color-primary);
     margin-left: 1rem;
   }

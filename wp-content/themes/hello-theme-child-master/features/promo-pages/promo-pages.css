@@ -1,3 +1,5 @@
+/* GENERATO da scss/features/promo-pages/promo-pages.scss — non modificare questo file:
+   si modifica il sorgente e si ricompila (cd scss && npm run build). */
 /* ============================================================
    Pagine protette da password (plugin PPWP)
    Landing promozionali e pagina convenzione ADAVA: il form di
@@ -9,34 +11,33 @@
    qualsiasi pagina o porzione di pagina, non c'è un conditional
    tag affidabile su cui agganciare l'enqueue.
    ============================================================ */
-
 .custom-password-message {
-    display: flex;
-    justify-content: center;
-    color: red;
-    font-size: 1.6rem;
-    padding-bottom: 20vh;
-    margin-top: -20vh;
-    padding-left: 10%;
-    padding-right: 10%;
-    text-align: center;
+  display: flex;
+  justify-content: center;
+  color: red;
+  font-size: 1.6rem;
+  padding-bottom: 20vh;
+  margin-top: -20vh;
+  padding-left: 10%;
+  padding-right: 10%;
+  text-align: center;
 }
 
 /* ---- Convenzione ADAVA (Associazione Albergatori Valle d'Aosta) ---- */
-
 .form-adava-cont p.ppw-input {
   align-items: center !important;
   justify-content: center !important;
 }
+
 .form-adava-cont .ppw-description p {
   font-size: 1.5rem !important;
 }
+
 .form-adava-cont input.ppw-password-input.ppw-pcp-pf-password-input {
   height: auto !important;
 }
 
 /* ---- Form di sblocco: pagina intera ---- */
-
 /* Hello Elementor stila gia' .post-password-form nel suo theme.css
    (dev/scss/theme/_general.scss):
 
@@ -50,7 +51,6 @@
    esplicito: max-width tagliava il form a 500px (e sulla PCP annullava di
    fatto i 720px di .ppw-pcp-container, che contiene il form) e il margin
    di 50px si sommava al padding verticale impostato qui sotto. */
-
 .post-password-form {
   max-width: none;
   margin: 0;
@@ -61,58 +61,70 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
 .post-password-form > p {
   width: 100%;
   display: flex;
 }
+
 .post-password-form > p:first-child {
   font-size: 1.8rem;
   margin-bottom: 2rem;
 }
+
 .post-password-form > p:nth-child(2) {
   font-size: 1.3rem;
   display: flex;
   justify-content: center;
 }
+
 .post-password-form > p:nth-child(2) > input {
   border: white solid 1px;
   background-color: #0074A0;
   color: white;
-  border-radius: var( --lvdt-radius-sm );
+  border-radius: var(--lvdt-radius-sm);
   padding: 0.7em 2em 0.7em 2em;
 }
+
 .post-password-form > p:nth-child(2) > input:hover {
   background-color: white;
   color: #0074A0;
   border: #0074A0 solid 1px;
 }
+
 .ppwp-wrong-pw-error.ppw-ppf-error-msg {
   width: 100%;
   text-align: center;
 }
+
 .ppw-ppf-field-container {
   width: 100%;
   display: flex;
   justify-content: center;
 }
+
 .ppw-ppf-field-container > .ppw-pwd-label {
   display: flex;
   height: auto;
 }
+
 .ppw-ppf-desc {
   padding-bottom: 2%;
   text-align: center;
   color: var(--e-global-color-secondary);
   font-size: 1.8rem;
 }
+
 .ppw-ppf-desc p {
   text-align: center;
-  display:  block !important;
+  display: block !important;
 }
+
 .ppw-ppf-field-container > .ppw-pwd-submit-btn {
   border: white solid 1px;
-  border-radius: var( --lvdt-radius-sm ) !important;
+  border-radius: var(--lvdt-radius-sm) !important;
 }
+
 .ppw-ppf-headline {
   text-align: center;
   color: var(--e-global-color-secondary);
@@ -121,12 +133,12 @@
   font-weight: 700;
   text-transform: uppercase;
 }
+
 .ppw-ppf-headline p {
   display: block;
 }
 
 /* ---- Form di sblocco: contenuto parziale (PCP) ---- */
-
 .ppw-headline.ppw-pcp-pf-headline {
   color: var(--e-global-color-secondary);
   font-family: "Muli", Sans-serif;
@@ -139,6 +151,7 @@
   margin-bottom: 1rem;
   line-height: 1.2em;
 }
+
 .ppw-description.ppw-pcp-pf-desc {
   text-align: center;
   color: #424242;
@@ -148,15 +161,19 @@
   margin-top: 1rem;
   margin-bottom: 2rem;
 }
+
 .ppw-description.ppw-pcp-pf-desc p {
   display: block;
 }
+
 .ppw-pcp-password-form p.ppw-input {
   justify-content: center;
 }
+
 .post-password-form.ppw-form.ppw-pcp-password-form {
   padding-top: 2rem;
 }
+
 .ppw-pcp-pf-submit-btn {
   font-family: "Muli", Sans-serif;
   font-size: 1.2rem;
@@ -168,34 +185,32 @@
 /* ============================================================
    Responsive
    ============================================================ */
-
 @media only screen and (min-width: 768px) {
   .post-password-form {
-      padding-left: 2em;
-      padding-right: 2em;
+    padding-left: 2em;
+    padding-right: 2em;
   }
   .post-password-form > p:nth-child(2) {
-      display: flex;
-      justify-content:center;
-      flex-direction:row;
-      flex-wrap:wrap;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
   .post-password-form > p > label > input {
-      max-width:40vw;
-      height:3rem;
+    max-width: 40vw;
+    height: 3rem;
   }
 }
-
 @media only screen and (max-width: 767px) {
   .post-password-form > p > label > input {
-      max-width:50vw;
-      height: 3rem;
+    max-width: 50vw;
+    height: 3rem;
   }
   .post-password-form {
-      padding-left: 0;
-      padding-right: 0;
-      padding-top: 5em;
-      padding-bottom: 5em;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 5em;
+    padding-bottom: 5em;
   }
   .post-password-form p {
     font-size: 1.3rem;
