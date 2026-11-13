@@ -2,10 +2,10 @@
 /**
  * Asset presenti su tutto il sito
  *
- * Menu mobile e off-canvas, script.js, carosello immagini di Elementor e notice
- * WooCommerce. Stanno qui e non in un modulo di pagina perché il markup che stilano
- * lo stampano Elementor o WooCommerce su qualsiasi pagina: non c'è un conditional
- * tag su cui restringere l'enqueue.
+ * Menu mobile e off-canvas, script.js, carosello immagini di Elementor, notice
+ * WooCommerce e mini carrello dell'header. Stanno qui e non in un modulo di pagina
+ * perché il markup che stilano lo stampano Elementor o WooCommerce su qualsiasi
+ * pagina: non c'è un conditional tag su cui restringere l'enqueue.
  *
  * @package HelloElementorChild
  */
@@ -32,4 +32,8 @@ add_action( 'wp_enqueue_scripts', function () {
 	// Dipende da shop-style per essere stampato dopo: `.cont-prodotti a.button` e
 	// `.woocommerce-message a.button` pesano entrambi (0,2,1) e deve vincere il notice.
 	laviadelleterme_enqueue_style( 'wc-notices-style', 'features/global/wc-notices.css', [ 'shop-style' ] );
+
+	// Mini carrello del widget Menu Cart di Elementor Pro: sta nell'header, quindi
+	// è su tutte le pagine.
+	laviadelleterme_enqueue_style( 'mini-cart-style', 'features/global/mini-cart.css', [ 'hello-elementor-child-style' ] );
 }, 20 );

@@ -4,7 +4,7 @@ Theme URI: https://laviadelleterme.it/
 Description: Tema figlio di Hello Elementor per La Via delle Terme: personalizzazioni WooCommerce (checkout, order-pay, thank-you, account) e integrazione con il sistema di prenotazione TermeGest.
 Author: Francesco Zerbinato
 Template: hello-elementor
-Version: 2.2.1
+Version: 2.2.2
 Text Domain: hello-elementor-child
 License: GNU General Public License v3 or later.
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -15,7 +15,8 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
    Foglio principale del tema: solo regole realmente globali.
    Tutto ciò che appartiene a una pagina o a una funzionalità sta
    nel modulo di quella funzionalità, in features/ (vedi readme.txt):
-     features/global/       menu mobile, notice, carosello Elementor
+     features/global/       menu mobile, notice, carosello Elementor,
+                            mini carrello dell'header
      features/shop/         catalogo, prodotto, carrello
      features/promo-pages/  pagine protette da password
      features/my-account/   account, login, password persa
@@ -23,33 +24,6 @@ Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, fe
      features/thankyou/     pagina order-received
    ============================================================ */
 
-
-/* ============================================================
-   Mini carrello nell'header (widget Elementor)
-   ============================================================ */
-
-#elementor-menu-cart__toggle_button {
-  padding: .5rem .5rem;
-  background-color: transparent;
-  border: unset;
-}
-.elementor-menu-cart__container {
-  overflow:visible !important; 
-  background-color: transparent !important;
-}
-.elementor-menu-cart__main {
-  height: 100vh;
-  width: 25vw;
-}
-.elementor-menu-cart__product-remove {
-  border-color: var(--e-global-color-secondary) !important;
-}
-.elementor-menu-cart__product-remove::before {
-  background: var(--e-global-color-secondary) !important;
-}
-.elementor-menu-cart__product-remove::after {
-  background: var(--e-global-color-secondary) !important;
-}
 
 /* ============================================================
    Raggi degli angoli — tre taglie
@@ -203,16 +177,6 @@ button.woocommerce-Button:hover {
    Responsive
    ============================================================ */
 
-@media only screen and (min-width: 1080px) {
-  .cart-widget-header .elementor-menu-cart__main {
-    width: 25vw;
-    height: 100vh;
-  }
-  .cart-widget-header .elementor-menu-cart__main .widget_shopping_cart_content {
-    max-height: 80vh;
-  }
-}
-
 @media only screen and (min-width: 1024px) {
   #menu-main .btn-promo > a.elementor-item {
     height: fit-content;
@@ -235,19 +199,5 @@ button.woocommerce-Button:hover {
   }
   .elementor-nav-menu {
     align-items: center;
-  }
-}
-
-@media only screen and (max-width: 1080px) {
-  .cart-widget-header .elementor-menu-cart__main {
-    width: 45vw;
-    height: 100vh;
-  }
-}
-
-@media only screen and (max-width: 767px) {
-  .cart-widget-header .elementor-menu-cart__main {
-    width: 90vw;
-    height: 100vh;
   }
 }

@@ -17,7 +17,7 @@ carica solo style.css e l'elenco dei moduli.
 * features/global/          asset di tutto il sito: menu mobile e off-canvas,
                             script.js, notice WooCommerce, caroselli immagini di
                             Elementor (slide di altezza uniforme e frecce a disco
-                            sotto la foto)
+                            sotto la foto), mini carrello dell'header
 * features/shop/            catalogo, scheda prodotto, carrello
 * features/promo-pages/     pagine protette da password (plugin PPWP): base
                             condivisa caricata ovunque, perché PPWP può proteggere
@@ -56,8 +56,8 @@ inc/ contiene il codice trasversale, che non appartiene a nessuna pagina:
 
 Alla radice, oltre a functions.php:
 
-* style.css                  solo regole realmente globali (header, mini carrello,
-                             pulsanti WooCommerce). Non è una discarica: se una regola
+* style.css                  solo regole realmente globali (header, pulsanti
+                             WooCommerce). Non è una discarica: se una regola
                              appartiene a una pagina, va nel modulo di quella pagina.
                              Qui stanno anche le variabili --lvdt-button-* con
                              l'aspetto standard dei pulsanti (colori del kit

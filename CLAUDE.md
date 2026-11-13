@@ -292,7 +292,7 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
   because `.cont-prodotti a.button` and `.woocommerce-message a.button` are both (0,2,1) and the notice must win. Until
   2026-10-30 this was enforced only by `global.php` being required after `shop.php`, which nothing in the code
   protected. Enqueue handles are unchanged from before the reorganization, so `$deps` between sheets still resolve.
-- `style.css` — **only genuinely global rules** (header/scroll classes, Elementor mini-cart, the site-wide
+- `style.css` — **only genuinely global rules** (header/scroll classes, the site-wide
   `button.woocommerce-Button`, the Stripe `payment_box` reset for the account's add-payment-method page). Must stay at
   theme root (WP requirement) but is *not* the theme's catch-all: it used to be, and grew to 517 lines mixing five
   unrelated pages, with the `.woocommerce-lost-password` rules split across two blocks 280 lines apart. If a rule
@@ -301,7 +301,8 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
 - **Site-wide modules.** Some markup is printed on many pages, or by Elementor content / third-party plugins, so there
   is no reliable conditional tag to narrow the enqueue. Those sheets are still modules, just enqueued everywhere:
   `features/global/` (`mobile-menu.css` — mobile + off-canvas menu, `script.js`, `wc-notices.css` — all WooCommerce
-  notices, `elementor-carousel.css` — Elementor's Image Carousel widget), `features/shop/` (`shop.css`: catalog, product
+  notices, `elementor-carousel.css` — Elementor's Image Carousel widget, `mini-cart.css` — the header's Menu Cart
+  widget, see below), `features/shop/` (`shop.css`: catalog, product
   page, cart), `features/promo-pages/` (PPWP password forms) and `stripe-upe-appearance.css` (the hidden sampler input
   Stripe reads), which lives in `features/checkout/` with the rest of the payment fields but is enqueued site-wide.
   `features/global/script.js` (password-protected promo pages, hamburger icon state, second header on scroll) is **vanilla JS with no
@@ -333,6 +334,16 @@ function in `functions.php` and shared CSS sat in a loose `assets/`.
   guaranteed. (0,3,0) still sits below the editor's per-element rules (0,4,0), so hand-set Elementor values keep
   winning — see the general rule above.
 
+- `features/global/mini-cart.css` — the header's **Menu Cart** side panel (Elementor Pro), two instances (desktop, and
+  tablet/mobile with the custom class `.cart-widget-header`), styled on the widget class. Moved out of `style.css` on
+  2026-11-13. Defaults go through **Elementor's own custom properties** set on the widget at (0,1,0)
+  (`--cart-footer-buttons-border-radius`, `--remove-item-button-color`, `--divider-color`, …), so whatever the editor
+  sets on the element (0,3,0) wins; properties with no variable sit at (0,2,0)–(0,3,0). Non-obvious bits: the cart
+  fragment carries the product image **twice** (lazy-load copy + plain copy) and `img ~ img` hides the second; the
+  reserved 30px on the right for the remove button is moved from the whole row to the price row only, since the button
+  is absolute at the bottom; the buttons get a border in their own rest background (`--view-cart-button-background-color`
+  / `--checkout-button-…`) because the editor's hover turns them white on the white panel. Width is
+  `min(420px, 90vw)`, replacing 25/45/90vw per breakpoint (25vw was 270px at 1080px).
 - `features/checkout/`, `order-pay/`, `thankyou/`, `booking-status/`, `satispay/`, `my-account/`, `newsletter/`, `controllo-codici/` — page/feature modules. `features/checkout/checkout.css` holds only what the normal checkout and order-pay share (notices, payment methods, Stripe wallet + UPE card fields, terms, place-order button); everything scoped to `form#order_review` lives in `features/order-pay/order-pay.css`, enqueued by `order-pay.php` on the same `is_checkout()` condition with `checkout-style` as dependency. `features/my-account/my-account.css` is enqueued on `is_account_page() || is_page('login-e-registrazione')` — registration is a standalone page here, not a WC endpoint (see the `login_url`/`register_url` filters), so `is_account_page()` alone would miss it. The lost-password page has its own `features/my-account/lost-password.css`, enqueued nested inside that branch on `is_wc_endpoint_url('lost-password')`; its selectors keep the `body.woocommerce-lost-password` prefix even though the sheet is already page-scoped, because dropping it would lower their specificity against Elementor's and WooCommerce's own rules. Its H1 ("Il mio account", hardcoded in the account area's shared Elementor template) is rewritten to "Password dimenticata" server-side by an `elementor/widget/render_content` filter in `my-account.php` — the same pattern as `thankyou.php`. It used to be faked in CSS by hiding the real H1 and printing the string in an `::after` at a fixed `5rem !important`: that skipped the widget's responsive typography and, with no width of its own, wrapped below the form.
 - `woocommerce/pdf/Templates/` — removed on 2026-11-11: they overrode the WP Overnight "PDF Invoices & Packing Slips" plugin, which is no longer installed on either environment (only its `wpo_wcpdf_*` options remain). If the plugin comes back, the forks are in git history before that date.
 - `woocommerce/emails/` — Custom WooCommerce email templates. Only `customer-completed-order.php` is live (it adds the "you'll get the coupon PDF in a separate email" line and filters the item meta down to the booking fields). **Check it is on production after any full theme upload**: on 2026-11-11 the whole `woocommerce/` folder turned out to be missing there, so customers were getting WooCommerce's stock email; four `__`-prefixed disabled copies were deleted in the 2026-08-25 cleanup (WooCommerce resolves overrides by exact filename, so they were never loaded).
