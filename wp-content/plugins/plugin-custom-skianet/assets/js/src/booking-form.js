@@ -163,7 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileName = mapLocationToFileName(location);
             const jsonPath = `/wp-content/plugins/plugin-custom-skianet/assets/data/availability-${fileName}.json`;
 
-            const response = await fetch(jsonPath);
+            // no-cache: il browser chiede sempre al server se il file e' cambiato (304 se no).
+            // SiteGround serve i .json con max-age di 180 giorni e l'URL non cambia mai:
+            // senza, chi aveva gia' aperto il calendario continuava a vedere le date della
+            // sua prima visita, e al cambio mese il mese nuovo gli risultava tutto chiuso.
+            const response = await fetch(jsonPath, { cache: 'no-cache' });
 
             if (!response.ok) {
                 console.error(`File non trovato: ${jsonPath}`);

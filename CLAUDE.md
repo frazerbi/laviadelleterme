@@ -279,6 +279,16 @@ The PHP cron mirrors this in `Availability_Checker::get_calendar_dates()` (same 
 `Booking_Handler::get_christmas_dates()`, which comes from the same constants). Change one and you must change the
 other.
 
+**The JSON is fetched with `{ cache: 'no-cache' }` — keep it.** SiteGround serves `.json` with
+`cache-control: max-age=15552000` (180 days), and the file's URL never changes. Until 2026-11-24 a plain `fetch()`
+let the browser reuse its copy: a returning visitor saw the dates of their first visit, and after a month turn the new
+month was all closed for them (whitelist below). Found when 1–6 January were open in the JSON on the server but not on
+the calendar of whoever had already opened it. `no-cache` revalidates every time; the server answers 304 with an
+empty body when the file hasn't changed. A `?v=` query string would not do: the cron rewrites the file at a time no
+page knows. The bundle itself is safe from this: SiteGround names its combined JS after the md5 of its content
+(`Abstract_Combinator::create_temp_file_and_get_url()`), and without combination the URL carries
+`PLUGIN_SKIANET_VERSION`.
+
 **Disabled dates — whitelist logic**: `buildDisabledDatesArray` iterates the full calendar range (dateMin→dateMax) and disables any date where `availability[dateStr]` is falsy (missing OR false). Do not use blacklist logic (filtering only explicit `false` entries) — dates absent from the JSON would appear enabled even if never checked by the cron.
 
 **Local date formatting**: Never use `new Date(...).toISOString().split('T')[0]` to produce `dateMin`/`dateMax` strings. `toISOString()` converts to UTC, shifting the date by one day for Europe/Rome (UTC+2) at midnight. Use `formatLocalDate(d)` which reads `getFullYear/getMonth/getDate` directly.
