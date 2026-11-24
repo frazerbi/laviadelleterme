@@ -116,24 +116,16 @@ class Availability_Checker {
         }
 
 
-        // Step 1: Crea array con tutti i giorni dei 2 mesi
-        $all_dates = $this->get_all_dates_for_two_months();
-        
-        
-        // Step 2: Inizializza risultati con tutti i giorni a false
-        $results = array();
-        foreach ($all_dates as $date) {
-            $results[$date] = false;
-        }
-        
-        // Step 3: Per ogni mese, chiama l'API
-        $months_to_check = $this->get_months_to_check();
-        
-        foreach ($months_to_check as $period) {
+        // Step 1: tutti i giorni del calendario, inizializzati a false
+        $all_dates = $this->get_calendar_dates();
+        $results = array_fill_keys($all_dates, false);
+
+        // Step 2: per ogni mese toccato dal calendario, una chiamata per categoria
+        foreach ($this->get_months_to_check($all_dates) as $period) {
             $month = $period['month'];
             $year = $period['year'];
 
-            foreach ($this->get_categories_for_month($month) as $cat) {
+            foreach ($period['categories'] as $cat) {
                 // Chiama API TermeGest per il mese
                 $dispArr = skianet_termegest_get_disponibilita($month, $year, $cat, $encrypted_location);
 
@@ -146,21 +138,8 @@ class Availability_Checker {
             }
         }
 
-        // Step 5: Salva nel file JSON
+        // Step 3: Salva nel file JSON
         $this->save_json_file($location, $results);
-    }
-
-    /**
-     * Categorie da chiedere a TermeGest per un mese.
-     *
-     * Ogni giorno va giudicato sulla categoria che il form accettera' quel giorno
-     * (Booking_Handler::validate_category()): p2 fuori dal periodo natalizio, pm dentro.
-     * Dicembre e gennaio contengono entrambi, quindi si chiedono tutte e due; prima si
-     * chiedeva pm per tutto il mese, e i giorni fuori dal periodo (1-23 dicembre,
-     * 7-31 gennaio) risultavano aperti o chiusi secondo una categoria che il form scarta.
-     */
-    private function get_categories_for_month($month) {
-        return ($month == 12 || $month == 1) ? array('p2', 'pm') : array('p2');
     }
 
     /**
@@ -184,13 +163,18 @@ class Availability_Checker {
 
             $date_key = $date_obj->format('Y-m-d'); // Es: "2025-12-09"
 
+            // Fuori dal calendario: a novembre gennaio si chiede intero ma si mostra fino al 6
+            if (!array_key_exists($date_key, $results)) {
+                continue;
+            }
+
             // Giorno di competenza dell'altra categoria
             if (Booking_Redirect::is_christmas_period($date_key) !== $want_christmas) {
                 continue;
             }
 
             // Se questo giorno è già disponibile, skip
-            if (isset($results[$date_key]) && $results[$date_key] === true) {
+            if ($results[$date_key] === true) {
                 continue;
             }
 
@@ -202,48 +186,68 @@ class Availability_Checker {
     }
 
     /**
-     * Ottieni tutti i giorni dei prossimi 2 mesi
+     * Giorni del calendario: dal primo del mese corrente all'ultimo del successivo, come il
+     * form (initCalendar() in booking-form.js). Se quell'ultimo giorno cade nel periodo
+     * natalizio, cioe' a novembre, si arriva fino alla fine del periodo (6 gennaio): il
+     * periodo si vende intero, e senza la proroga 1-6 gennaio diventavano prenotabili solo
+     * dal 1° dicembre (chiesto dal cliente il 2026-11-24).
      */
-    private function get_all_dates_for_two_months() {
-        $dates = array();
+    private function get_calendar_dates() {
         $wp_timezone = wp_timezone();
 
-        // Primo giorno del mese corrente
-        $start = new DateTime('first day of this month', $wp_timezone);
-        
-        // Ultimo giorno del mese successivo
-        $end = new DateTime('last day of next month', $wp_timezone);
-        
-        $current = clone $start;
-        
+        $current = new DateTime('first day of this month midnight', $wp_timezone);
+        $end = new DateTime('last day of next month midnight', $wp_timezone);
+
+        if (Booking_Redirect::is_christmas_period($end->format('Y-m-d'))) {
+            while (Booking_Redirect::is_christmas_period((clone $end)->modify('+1 day')->format('Y-m-d'))) {
+                $end->modify('+1 day');
+            }
+        }
+
+        $dates = array();
         while ($current <= $end) {
             $dates[] = $current->format('Y-m-d');
             $current->modify('+1 day');
         }
-        
+
         return $dates;
     }
 
     /**
-     * Ottieni i mesi da controllare
+     * Mesi da chiedere a TermeGest (l'API lavora per mese) e, per ognuno, le categorie che
+     * servono ai suoi giorni del calendario.
+     *
+     * Ogni giorno va giudicato sulla categoria che il form accettera' quel giorno
+     * (Booking_Handler::validate_category()): pm nel periodo natalizio, p2 fuori. Un mese a
+     * cavallo (dicembre; gennaio quando e' il mese corrente) si chiede quindi con tutte e
+     * due; il gennaio della proroga di novembre ha nel calendario solo 1-6, e basta pm.
+     * Fino al 2026-11-12 si chiedeva pm per tutto dicembre e gennaio, e i giorni fuori dal
+     * periodo risultavano aperti o chiusi secondo una categoria che il form scarta.
      */
-    private function get_months_to_check() {
-        $wp_timezone = wp_timezone();
+    private function get_months_to_check(array $dates) {
+        $months = array();
 
-        $current_date = new DateTime('first day of this month', $wp_timezone);
-        $current_month = (int) $current_date->format('n');
-        $current_year = (int) $current_date->format('Y');
+        foreach ($dates as $date) {
+            $key = substr($date, 0, 7); // "2026-12"
 
+            if (!isset($months[$key])) {
+                $months[$key] = array(
+                    'month' => (int) substr($date, 5, 2),
+                    'year' => (int) substr($date, 0, 4),
+                    'categories' => array(),
+                );
+            }
 
-        $next_date = new DateTime('first day of next month', $wp_timezone);
-        $next_month = (int) $next_date->format('n');
-        $next_year = (int) $next_date->format('Y');
+            $cat = Booking_Redirect::is_christmas_period($date) ? 'pm' : 'p2';
+            $months[$key]['categories'][$cat] = $cat;
+        }
 
+        foreach ($months as &$period) {
+            $period['categories'] = array_values($period['categories']);
+        }
+        unset($period);
 
-        return array(
-            array('month' => $current_month, 'year' => $current_year),
-            array('month' => $next_month, 'year' => $next_year)
-        );
+        return array_values($months);
     }
 
     /**

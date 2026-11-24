@@ -247,10 +247,11 @@ $next_date    = new DateTime('first day of next month', $wp_timezone);
 - Inside the Christmas period (24/12–6/1, `Booking_Redirect::is_christmas_period()`) → `pm`
 - Every other day → `p2`
 
-So December and January are queried twice (`get_categories_for_month()` returns `p2` and `pm`) and
-`merge_availability()` counts each response only on its own days. Until 2026-11-12 the whole of December and January
-was checked with `pm` alone, so 1–23 December and 7–31 January were opened or closed by a category the form rejects
-on those days.
+`get_months_to_check()` derives months *and* categories from the calendar's days, so a month straddling the period
+(December; January when it is the current month) is queried with both `p2` and `pm`, and `merge_availability()`
+counts each response only on its own days — and only on days inside the calendar (a January queried whole in November
+lands in the JSON only up to the 6th). Until 2026-11-12 the whole of December and January was checked with `pm`
+alone, so 1–23 December and 7–31 January were opened or closed by a category the form rejects on those days.
 
 **Triggering manually** (for debug/test):
 ```bash
@@ -266,9 +267,17 @@ wp cron event run termegest_check_availability --path=/home/customer/www/laviade
 **Calendar range requirement**: The calendar must always show the full current month + full next month (first day of current month → last day of next month). Do not use a fixed-days window (e.g. "today + 60 days") — it would cut off the end of next month or expose a partial third month. This range is computed as:
 ```javascript
 const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-const lastDayNextMonth     = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+let calendarEnd            = new Date(today.getFullYear(), today.getMonth() + 2, 0);
 ```
-The PHP cron mirrors this: it generates availability data for exactly the same two months.
+**One exception, the Christmas period**: when that last day falls inside it — i.e. in November, whose next month is
+December — the range is stretched day by day to the period's end, **6 January**, so it covers the whole period. Added
+on 2026-11-24 at the client's request: TermeGest already had 1–6 January loaded, but the calendar would have offered
+them only from 1 December. It is the only partial third month allowed, and it has availability data: the cron applies
+the same rule. Everywhere else the window stays exactly two months.
+The PHP cron mirrors this in `Availability_Checker::get_calendar_dates()` (same rule, built on
+`Booking_Redirect::is_christmas_period()`; the JS uses `christmas_dates` localized from
+`Booking_Handler::get_christmas_dates()`, which comes from the same constants). Change one and you must change the
+other.
 
 **Disabled dates — whitelist logic**: `buildDisabledDatesArray` iterates the full calendar range (dateMin→dateMax) and disables any date where `availability[dateStr]` is falsy (missing OR false). Do not use blacklist logic (filtering only explicit `false` entries) — dates absent from the JSON would appear enabled even if never checked by the cron.
 

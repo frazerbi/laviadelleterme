@@ -248,12 +248,21 @@ document.addEventListener('DOMContentLoaded', function() {
     async function initCalendar(location) {
         if (calendar) return true;
 
-        // Range: primo giorno del mese corrente → ultimo giorno del mese successivo
+        // Range: primo giorno del mese corrente → ultimo giorno del mese successivo. Se
+        // quel giorno cade nel periodo natalizio (a novembre) si arriva alla fine del
+        // periodo, il 6 gennaio: il periodo si vende intero. Stessa regola nel cron,
+        // Availability_Checker::get_calendar_dates().
         const today = new Date();
+        const dayAfter = d => new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
         const firstDayCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        let calendarEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        if (isChristmasPeriod(formatLocalDate(calendarEnd))) {
+            while (isChristmasPeriod(formatLocalDate(dayAfter(calendarEnd)))) {
+                calendarEnd = dayAfter(calendarEnd);
+            }
+        }
         const dateMinStr = formatLocalDate(firstDayCurrentMonth);
-        const dateMaxStr = formatLocalDate(lastDayNextMonth);
+        const dateMaxStr = formatLocalDate(calendarEnd);
 
         // Recupera i dati di disponibilità dal JSON
         const data = await fetchAvailabilityJSON(location);
